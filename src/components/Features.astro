@@ -1,0 +1,107 @@
+---
+import SectionHeading from './ui/SectionHeading.astro'
+import styles from './Features.module.css'
+
+const items = [
+  {
+    title: 'Sites without custom CSS',
+    body: 'Build pages, menus and themes from a fixed set of sections and design tokens, then publish them like any article.',
+  },
+  {
+    title: "Media that can't break a page",
+    body: 'Every upload is checked before anyone can use it, so a release never goes out pointing at a broken image.',
+  },
+  {
+    title: 'Rollbacks that get reviewed',
+    body: 'Returning to an older version opens a normal change for review instead of skipping the process.',
+  },
+  {
+    title: "APIs that can't drift",
+    body: 'API docs and the TypeScript SDK are generated from the server itself, and the CLI and MCP tools match the API.',
+  },
+]
+const altFor = (title: string) => `${title} in the Colophon Studio`
+---
+
+<section class="section" id="features">
+  <div class={`container ${styles.inner}`}>
+    <div class={styles.head}>
+      <SectionHeading badge="What's built" class={styles.heading}>
+        The core is done.
+        <br />
+        <span class="soft">The rest is in arcs.</span>
+      </SectionHeading>
+      <p class={`t-body-lg ${styles.intro}`}>
+        Writing, editing, publishing and delivery checks are finished. Newer work arrives in arcs, and each one is
+        tested against failure before it counts.
+      </p>
+    </div>
+
+    <div class={styles.body} data-features>
+      <div class={styles.menu} role="tablist" aria-label="Capabilities">
+        {
+          items.map((it, i) => (
+            <>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={String(i === 0)}
+                class={styles.item}
+                data-active={String(i === 0)}
+              >
+                <img src="/icons/double-arrow.svg" alt="" width="24" height="24" class={styles.arrow} />
+                <span class={styles.content}>
+                  <span class={`t-h4 ${styles.title}`}>{it.title}</span>
+                  <span class={styles.desc}>
+                    <span class="t-small">{it.body}</span>
+                  </span>
+                </span>
+              </button>
+              {i === 0 && (
+                <div class={styles.inlineImage}>
+                  <img src="/images/feature-mobile.png" alt="" loading="lazy" />
+                </div>
+              )}
+            </>
+          ))
+        }
+      </div>
+
+      <div class={styles.image} role="tabpanel">
+        {
+          items.map((it, i) => (
+            <img
+              src={`/images/feature-${i + 1}.png`}
+              alt={i === 0 ? altFor(it.title) : ''}
+              data-alt={altFor(it.title)}
+              data-active={String(i === 0)}
+              loading={i === 0 ? 'eager' : 'lazy'}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // One active capability; on tablets and phones its screenshot sits right under its button.
+  const root = document.querySelector<HTMLElement>('[data-features]')!
+  const buttons = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')]
+  const images = [...root.querySelectorAll<HTMLImageElement>('[role="tabpanel"] img')]
+  const inline = buttons[0].nextElementSibling as HTMLElement
+
+  buttons.forEach((button, i) =>
+    button.addEventListener('click', () => {
+      buttons.forEach((b, j) => {
+        b.setAttribute('aria-selected', String(i === j))
+        b.dataset.active = String(i === j)
+      })
+      images.forEach((img, j) => {
+        img.alt = i === j ? img.dataset.alt! : ''
+        img.dataset.active = String(i === j)
+      })
+      button.after(inline)
+    }),
+  )
+</script>

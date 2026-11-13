@@ -1,0 +1,74 @@
+---
+import '../styles/global.css'
+import Nav from '../components/Nav.astro'
+import Hero from '../components/Hero.astro'
+import Benefits from '../components/Benefits.astro'
+import Features from '../components/Features.astro'
+import Testimonials from '../components/Testimonials.astro'
+import Pricing from '../components/Pricing.astro'
+import HowItWorks from '../components/HowItWorks.astro'
+import FAQ from '../components/FAQ.astro'
+import Integrations from '../components/Integrations.astro'
+import CTA from '../components/CTA.astro'
+import Footer from '../components/Footer.astro'
+import 'lenis/dist/lenis.css'
+
+const title = 'Colophon | A CMS where every publish leaves a receipt'
+const description =
+  'Colophon is a content management system where every publish becomes a numbered release, with a record of exactly what went live and where it was seen.'
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" href="/fonts/dm-sans-600.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/geist-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/images/hero.jpg" as="image" />
+  </head>
+  <body>
+    <div id="root">
+      <div style="display: flex; flex-direction: column; align-items: center; overflow: clip;">
+        <Nav />
+        <main style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 1px;">
+          <Hero />
+          <Benefits />
+          <Features />
+          <Testimonials />
+          <Pricing />
+          <HowItWorks />
+          <FAQ />
+          <Integrations />
+          <CTA />
+        </main>
+        <Footer />
+      </div>
+    </div>
+
+    <script>
+      // Inertia scrolling (Lenis, 1.5 s, default exponential easing); in-page anchor links glide the same way.
+      import Lenis from 'lenis'
+
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const lenis = new Lenis({
+          duration: 1.5,
+          easing: (t) => Math.min(1, 1.001 - 2 ** (-10 * t)),
+          smoothWheel: true,
+          anchors: true,
+        })
+        requestAnimationFrame(function raf(time) {
+          lenis.raf(time)
+          requestAnimationFrame(raf)
+        })
+      }
+    </script>
+  </body>
+</html>

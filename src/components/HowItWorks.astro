@@ -1,0 +1,76 @@
+---
+import SectionHeading from './ui/SectionHeading.astro'
+import styles from './HowItWorks.module.css'
+
+const tabs = ['Write and review', 'Publish a release', 'Prove it was seen']
+---
+
+<!--
+  Three product screens, one per step. The active screen fades in and
+  drifts slowly so the panel still feels alive without a video.
+-->
+<section class="section">
+  <div class={`container ${styles.inner}`}>
+    <SectionHeading badge="How it works" align="center" width={700}>
+      From draft to live, <span class="soft">and proof that it got there.</span>
+    </SectionHeading>
+
+    <div class={styles.stage} data-how>
+      <div class={styles.tabs} role="tablist" aria-label="How it works">
+        {
+          tabs.map((t, i) => (
+            <button type="button" role="tab" aria-selected={String(i === 0)} class={styles.tab} data-active={String(i === 0)}>
+              {t}
+            </button>
+          ))
+        }
+      </div>
+      <div class={styles.screen} role="tabpanel" aria-label={tabs[0]}>
+        {
+          tabs.map((_, i) => (
+            <img
+              src={`/images/how/how-${i + 1}.jpg`}
+              alt=""
+              data-active={String(i === 0)}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              aria-hidden={String(i !== 0)}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-how]')!
+  const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')]
+  const panel = root.querySelector<HTMLElement>('[role="tabpanel"]')!
+  const images = [...panel.querySelectorAll('img')]
+
+  tabs.forEach((tab, i) =>
+    tab.addEventListener('click', () => {
+      tabs.forEach((t, j) => {
+        t.setAttribute('aria-selected', String(i === j))
+        t.dataset.active = String(i === j)
+      })
+      images.forEach((img, j) => {
+        img.dataset.active = String(i === j)
+        img.setAttribute('aria-hidden', String(i !== j))
+      })
+      panel.setAttribute('aria-label', tab.textContent!.trim())
+    }),
+  )
+
+  // Phones get a tighter crop of each screen.
+  const phone = window.matchMedia('(max-width: 809px)')
+  const crop = () => {
+    const dir = phone.matches ? '/images/how/mobile' : '/images/how'
+    images.forEach((img, i) => {
+      const src = `${dir}/how-${i + 1}.jpg`
+      if (img.getAttribute('src') !== src) img.setAttribute('src', src)
+    })
+  }
+  crop()
+  phone.addEventListener('change', crop)
+</script>

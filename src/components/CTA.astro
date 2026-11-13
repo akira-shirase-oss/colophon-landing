@@ -1,0 +1,24 @@
+---
+import ArrowButton from './ui/ArrowButton.astro'
+import styles from './CTA.module.css'
+---
+
+<section class={styles.section}>
+  <div class={styles.card}>
+    <div class={styles.image} aria-hidden="true">
+      <div class={styles.overlay}></div>
+    </div>
+    <div class={styles.title}>
+      <h2 class={`t-h2 ${styles.heading}`}>
+        Follow the build.
+        <br />
+        <em>Mistakes included</em>
+      </h2>
+      <p class={`t-body ${styles.sub}`}>
+        Colophon is being built in public, one write-up at a time. Read along as it comes together, or poke around the
+        demo sites.
+      </p>
+      <ArrowButton href="#">Read the build log</ArrowButton>
+    </div>
+  </div>
+</section>

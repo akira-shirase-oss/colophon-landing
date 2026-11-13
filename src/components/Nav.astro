@@ -1,0 +1,75 @@
+---
+import ArrowButton from './ui/ArrowButton.astro'
+import BrandLogo from './ui/BrandLogo.astro'
+import styles from './Nav.module.css'
+
+const links = [
+  { label: 'Features', href: '#features' },
+  { label: 'Status', href: '#pricing' },
+  { label: 'Contact', href: '#' },
+  { label: 'Build log', href: '#' },
+]
+---
+
+<header class={styles.wrap}>
+  <nav class={styles.nav} aria-label="Primary" data-nav>
+    <div class={styles.container}>
+      <a href="#" class={styles.logo} aria-label="Colophon home">
+        <BrandLogo />
+      </a>
+      <div class={styles.menu}>
+        <div class={styles.links}>
+          {
+            links.map((l, i) => (
+              <>
+                {i > 0 && <span class={styles.dot} aria-hidden="true" />}
+                <a href={l.href} class={`t-label ${styles.link}`}>
+                  {l.label}
+                </a>
+              </>
+            ))
+          }
+        </div>
+        <ArrowButton href="#">See a demo</ArrowButton>
+      </div>
+      <button type="button" class={styles.burger} aria-label="Open menu" aria-expanded="false" data-nav-toggle>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <!-- The phone menu exists in the DOM only while open, as in the original. -->
+    <template data-nav-menu>
+      <div class={styles.mobileMenu}>
+        {
+          links.map((l) => (
+            <a href={l.href} class="t-h5" data-nav-close>
+              {l.label}
+            </a>
+          ))
+        }
+        <ArrowButton href="#">See a demo</ArrowButton>
+      </div>
+    </template>
+  </nav>
+</header>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('[data-nav]')!
+  const toggle = nav.querySelector<HTMLButtonElement>('[data-nav-toggle]')!
+  const template = nav.querySelector<HTMLTemplateElement>('[data-nav-menu]')!
+  let menu: HTMLElement | null = null
+
+  const setOpen = (open: boolean) => {
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu')
+    toggle.setAttribute('aria-expanded', String(open))
+    if (open && !menu) {
+      menu = template.content.firstElementChild!.cloneNode(true) as HTMLElement
+      menu.querySelectorAll('[data-nav-close]').forEach((a) => a.addEventListener('click', () => setOpen(false)))
+      template.before(menu)
+    } else if (!open && menu) {
+      menu.remove()
+      menu = null
+    }
+  }
+  toggle.addEventListener('click', () => setOpen(!menu))
+</script>

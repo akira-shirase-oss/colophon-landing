@@ -1,0 +1,24 @@
+---
+/** Oversized, soft-gradient wordmark that sits behind the footer's legal line. */
+type Props = { class?: string }
+const { class: className } = Astro.props
+---
+
+<svg class={className} viewBox="0 0 1240 347" preserveAspectRatio="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="wordmark-fill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ebebeb"></stop>
+      <stop offset="1" stop-color="#e2e2e2"></stop>
+    </linearGradient>
+  </defs>
+  <text
+    x="0"
+    y="262"
+    textLength="1240"
+    lengthAdjust="spacingAndGlyphs"
+    fill="url(#wordmark-fill)"
+    font-family="DM Sans, sans-serif"
+    font-weight="700"
+    font-size="360">Colophon</text
+  >
+</svg>
