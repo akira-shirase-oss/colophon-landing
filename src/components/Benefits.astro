@@ -1,89 +1,116 @@
 ---
-import SectionHeading from './ui/SectionHeading.astro'
 import styles from './Benefits.module.css'
 
-const cards = [
+// strong dots carry a ring, soft ones are lighter and smaller (both appear in the reference)
+type Tone = 'blue' | 'green' | 'pink' | 'blueSoft' | 'pinkSoft'
+
+// Every claim here is built and tested in Colophon today (README "The four promises", roles and automation).
+const cards: { title: string; lines: [string, string]; tag: string; tone: Tone; icon: string }[] = [
   {
     title: 'Lose nothing',
-    // the open image sits on a painting instead of flat gray (UI lifted onto review-bg.jpg)
-    openImage: '/images/benefit-1-open.jpg',
-    body: 'Pull the plug in the middle of a save and your work is still there. A publish lands once and completely, or it does not land at all.',
+    lines: ['Pull the plug mid-save and your work is still there.', 'A publish lands once and completely, or not at all.'],
+    tag: 'Crash-safe',
+    tone: 'blue',
+    icon: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/>',
   },
   {
     title: 'Replayable bugs',
-    body: 'When a test run finds a problem, it hands back a seed number. Run that seed and you get the exact same failure again, every time, until it is fixed.',
+    lines: ['Every failing test run hands back a seed number.', 'Replay that seed and get the exact same failure.'],
+    tag: 'Deterministic tests',
+    tone: 'green',
+    icon: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.25"/><circle cx="12" cy="12" r="1.25"/><circle cx="15.5" cy="15.5" r="1.25"/>',
   },
   {
     title: 'Time travel',
-    body: 'Scrub back to any release and see the site exactly as readers saw it that day. Going back is simply a new release.',
+    lines: ['Scrub back to any release, exactly as readers saw it.', 'Going back is simply a new release.'],
+    tag: 'Release history',
+    tone: 'green',
+    icon: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',
   },
   {
     title: 'Honest status',
-    body: 'A page only counts as published once readers can see it. Until then, Colophon shows it as pending.',
+    lines: ['A page counts as published only once readers see it.', 'Until then it shows as pending, with the evidence.'],
+    tag: 'Delivery receipts',
+    tone: 'pink',
+    icon: '<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-8"/><path d="M16 12h-8"/><path d="M12 16H8"/>',
+  },
+  {
+    title: 'Roles down to a field',
+    lines: ['Decide who can read, edit or publish, down to a field.', 'Every token action lands in an append-only audit log.'],
+    tag: 'Permissions',
+    tone: 'blueSoft',
+    icon: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+  },
+  {
+    title: 'Agents draft, people approve',
+    lines: ['Scripts and AI agents work through scoped tokens.', 'They can draft and propose changes, never approve.'],
+    tag: 'Safe automation',
+    tone: 'pinkSoft',
+    icon: '<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>',
   },
 ]
-const initiallyOpen = 1
 ---
 
 <section class="section" id="benefits">
   <div class={`container ${styles.inner}`}>
     <div class={styles.head}>
-      <SectionHeading badge="Why Colophon">
-        The four promises
-        <br />
-        Colophon keeps on every change
-      </SectionHeading>
-      <p class={`t-body ${styles.intro}`}>
-        Most tools trust their own progress bars. Colophon checks itself against these four promises with simulated
-        crashes and network faults on every change.
+      <p class={styles.eyebrow}>
+        <span>01</span>
+        <span class={styles.rule} aria-hidden="true"></span>
+        <span>Why Colophon</span>
       </p>
+      <h2 class={styles.heading}>Promises kept on every change.</h2>
     </div>
 
-    <div class={styles.row} data-benefits>
+    <ul class={styles.grid} data-why>
       {
-        cards.map((c, i) => {
-          const isOpen = i === initiallyOpen
-          return (
-            <article class={styles.card} data-open={String(isOpen)} tabindex="0">
-              <div class={styles.closed} aria-hidden={String(isOpen)}>
-                <p class={styles.num}>0{i + 1}.</p>
-                <div class={styles.closedImg}>
-                  <img src={`/images/benefit-${i + 1}-closed.png`} alt="" loading="lazy" />
-                </div>
-                <h3 class="t-h5">{c.title}</h3>
-              </div>
-              <div class={styles.opened} aria-hidden={String(!isOpen)}>
-                <div class={styles.openImg}>
-                  <img src={c.openImage ?? `/images/benefit-${i + 1}-open.png`} alt="" loading="lazy" />
-                </div>
-                <div class={styles.openContent}>
-                  <h3 class="t-h3">{c.title}</h3>
-                  <p class="t-small" style="white-space: pre-line;">
-                    {c.body}
-                  </p>
-                </div>
-              </div>
-            </article>
-          )
-        })
+        cards.map((c, i) => (
+          <li class={styles.card} style={`--i: ${i}`}>
+            <div class={styles.titleRow}>
+              <span class={styles.icon} aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="30"
+                  height="30"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  set:html={c.icon}
+                />
+              </span>
+              <h3 class={styles.title}>{c.title}</h3>
+            </div>
+            <p class={styles.body}>
+              <span>{c.lines[0]}</span> <span>{c.lines[1]}</span>
+            </p>
+            <span class={`${styles.tag} ${styles[c.tone]}`}>
+              <span class={styles.dot} aria-hidden="true" />
+              {c.tag}
+            </span>
+          </li>
+        ))
       }
-    </div>
+    </ul>
   </div>
 </section>
 
 <script>
-  // Hovering (or focusing) a card opens it, and it stays open.
-  const cards = [...document.querySelectorAll<HTMLElement>('[data-benefits] > article')]
-  const open = (target: HTMLElement) => {
-    for (const card of cards) {
-      const isOpen = card === target
-      card.dataset.open = String(isOpen)
-      card.children[0].setAttribute('aria-hidden', String(isOpen))
-      card.children[1].setAttribute('aria-hidden', String(!isOpen))
-    }
-  }
-  for (const card of cards) {
-    card.addEventListener('mouseenter', () => open(card))
-    card.addEventListener('focus', () => open(card))
+  // Micro-interaction: cards rise in, staggered, the first time the grid scrolls into view.
+  // Without JavaScript (or with reduced motion) they are simply visible.
+  const grid = document.querySelector<HTMLElement>('[data-why]')!
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+    grid.dataset.reveal = 'pending'
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          grid.dataset.reveal = 'shown'
+          io.disconnect()
+        }
+      },
+      { threshold: 0.15 },
+    )
+    io.observe(grid)
   }
 </script>
