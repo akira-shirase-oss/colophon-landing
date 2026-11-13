@@ -5,6 +5,8 @@ import styles from './Benefits.module.css'
 const cards = [
   {
     title: 'Lose nothing',
+    // the open image sits on a painting instead of flat gray (UI lifted onto review-bg.jpg)
+    openImage: '/images/benefit-1-open.jpg',
     body: 'Pull the plug in the middle of a save and your work is still there. A publish lands once and completely, or it does not land at all.',
   },
   {
@@ -52,7 +54,7 @@ const initiallyOpen = 1
               </div>
               <div class={styles.opened} aria-hidden={String(!isOpen)}>
                 <div class={styles.openImg}>
-                  <img src={`/images/benefit-${i + 1}-open.png`} alt="" loading="lazy" />
+                  <img src={c.openImage ?? `/images/benefit-${i + 1}-open.png`} alt="" loading="lazy" />
                 </div>
                 <div class={styles.openContent}>
                   <h3 class="t-h3">{c.title}</h3>
