@@ -224,4 +224,10 @@
   .prose :global(h2) {
     font-size: 26px;
   }
+  /* Comparison tables are wider than a phone: they scroll inside the column, never the page. */
+  .prose :global(table) {
+    display: block;
+    overflow-x: auto;
+    font-size: 15px;
+  }
 }
