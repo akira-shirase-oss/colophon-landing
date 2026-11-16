@@ -82,8 +82,9 @@ export async function entries(
     else if (generation !== undefined) url.searchParams.set('generation', String(generation));
     const response = await fetch(url, { headers: { accept: 'application/json' } });
     if (!response.ok) throw new Error(`GET ${url.pathname}: HTTP ${response.status}`);
-    const named = Number(response.headers.get('colophon-generation'));
-    if (Number.isFinite(named)) release = named;
+    const header = response.headers.get('colophon-generation');
+    const named = header === null ? NaN : Number(header);
+    if (Number.isSafeInteger(named) && named > 0) release = named;
     const body = (await response.json()) as { data: Entry[]; next_cursor: string | null };
     items.push(...body.data);
     cursor = body.next_cursor;
@@ -111,10 +112,11 @@ Each call without `generation` reads the latest release at that moment. If your 
 
 ```ts
 const posts = await entries('posts');
-const authors = await entries('authors', posts.generation);
+// Release 0 means nothing is published yet; there's nothing to pin to.
+const authors = await entries('authors', posts.generation > 0 ? posts.generation : undefined);
 ```
 
-Asking for a release that doesn't exist is refused with `422 invalid_generation`, never quietly answered from the latest one.
+Asking for a release that doesn't exist, including release 0, is refused with a `422` whose `error.details.reason` is `invalid_generation`, never quietly answered from the latest one.
 
 ## Step 3: pages from entries
 
@@ -166,7 +168,7 @@ const { title, generation } = Astro.props as { title: string; generation?: numbe
 </html>
 ```
 
-Release 0 means nothing has been published yet, so the marker is left out.
+Release 0 means nothing has been published yet, so the marker is left out. The site check reads the marker in exactly this form: `name` before `content`, both double-quoted, within the first megabyte of the page. Astro writes it that way; a hand-written variant with the attributes swapped or single quotes counts as no marker.
 
 ## Step 5: rebuild when you publish
 
