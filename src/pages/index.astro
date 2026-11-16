@@ -11,7 +11,6 @@ import FAQ from '../components/FAQ.astro'
 import Integrations from '../components/Integrations.astro'
 import CTA from '../components/CTA.astro'
 import Footer from '../components/Footer.astro'
-import 'lenis/dist/lenis.css'
 
 const title = 'Colophon | A CMS where every publish leaves a receipt'
 const description =
@@ -53,22 +52,5 @@ const description =
       </div>
     </div>
 
-    <script>
-      // Inertia scrolling (Lenis, 1.5 s, default exponential easing); in-page anchor links glide the same way.
-      import Lenis from 'lenis'
-
-      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        const lenis = new Lenis({
-          duration: 1.5,
-          easing: (t) => Math.min(1, 1.001 - 2 ** (-10 * t)),
-          smoothWheel: true,
-          anchors: true,
-        })
-        requestAnimationFrame(function raf(time) {
-          lenis.raf(time)
-          requestAnimationFrame(raf)
-        })
-      }
-    </script>
   </body>
 </html>

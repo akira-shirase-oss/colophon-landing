@@ -98,6 +98,12 @@
 html {
   -webkit-text-size-adjust: 100%;
 }
+/* Native scrolling only: the wheel and trackpad are never taken over. In-page links glide unless motion is reduced. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
 body {
   background: var(--c-bg);
   color: var(--c-ink);
