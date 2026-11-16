@@ -1,0 +1,72 @@
+---
+import { render } from 'astro:content'
+import Base from '../../layouts/Base.astro'
+import Nav from '../../components/Nav.astro'
+import Footer from '../../components/Footer.astro'
+import styles from '../../components/Blog.module.css'
+import { posts, formatDate, type Post } from '../../lib/posts'
+
+export async function getStaticPaths() {
+  return (await posts()).map((post) => ({ params: { slug: post.id }, props: { post } }))
+}
+
+const { post } = Astro.props as { post: Post }
+const { Content } = await render(post)
+const { title, description, pubDate, updatedDate, draft } = post.data
+const url = new URL(`/blog/${post.id}/`, Astro.site).href
+---
+
+<Base
+  title={`${title} | Colophon`}
+  description={description}
+  type="article"
+  published={pubDate}
+  modified={updatedDate}
+  jsonLd={{
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: title,
+    description,
+    datePublished: pubDate.toISOString(),
+    dateModified: (updatedDate ?? pubDate).toISOString(),
+    mainEntityOfPage: url,
+    url,
+    image: new URL('/og.jpg', Astro.site).href,
+    author: { '@type': 'Organization', name: 'Colophon', url: Astro.site?.href },
+    publisher: { '@type': 'Organization', name: 'Colophon', url: Astro.site?.href },
+  }}
+>
+  {draft && <meta slot="head" name="robots" content="noindex" />}
+  <div style="display: flex; flex-direction: column; align-items: center; overflow: clip;">
+    <Nav />
+    <main class={styles.page}>
+      <article class={styles.column}>
+        <a class={styles.back} href="/blog/">← All posts</a>
+        <header class={styles.postHead}>
+          <span class={styles.stamp}>
+            <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+            {
+              updatedDate && (
+                <span>
+                  · Updated <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time>
+                </span>
+              )
+            }
+            {draft && <span class={styles.draft}>Draft</span>}
+          </span>
+          <h1 class={styles.postTitle}>{title}</h1>
+          <p class="t-body-lg" style="line-height: 1.5;">{description}</p>
+        </header>
+        <div class={styles.prose}>
+          <Content />
+        </div>
+        <footer class={styles.foot}>
+          <a href="/blog/">More posts</a>
+          <a href="https://404human.dev/colophon/">The build log</a>
+          <a href="https://github.com/akira-shirase-oss/colophon-cms">Source on GitHub</a>
+        </footer>
+      </article>
+    </main>
+    <Footer />
+  </div>
+</Base>

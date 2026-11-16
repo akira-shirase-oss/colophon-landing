@@ -1,0 +1,227 @@
+/* The blog: one reading column in the site's type, quiet chrome, the date stamp as the signature. */
+.page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 148px var(--pad-x) 96px;
+}
+.column {
+  width: 100%;
+  max-width: 720px;
+}
+
+/* ---------- Index ---------- */
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--c-line);
+}
+.lede {
+  max-width: 560px;
+  line-height: 1.5;
+}
+.lede a {
+  color: var(--c-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--c-line);
+  text-underline-offset: 3px;
+}
+.list {
+  list-style: none;
+}
+.item {
+  border-bottom: 1px solid var(--c-line);
+}
+.item a {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 28px 0;
+  color: var(--c-ink);
+}
+.item a:hover .itemTitle {
+  text-decoration: underline;
+  text-decoration-color: var(--c-line);
+  text-underline-offset: 4px;
+}
+.itemTitle {
+  text-wrap: balance;
+}
+.itemDesc {
+  line-height: 1.5;
+}
+.empty {
+  padding: 40px 0;
+}
+
+/* the signature: a dated stamp, as on the build-log cards */
+.stamp {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--c-text);
+  font-variant-numeric: tabular-nums;
+}
+.draft {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #fff4d6;
+  color: #6b4e00;
+}
+
+/* ---------- Post ---------- */
+.back {
+  display: inline-block;
+  margin-bottom: 32px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--c-text);
+}
+.back:hover {
+  color: var(--c-ink);
+}
+.postHead {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 32px;
+  margin-bottom: 40px;
+  border-bottom: 1px solid var(--c-line);
+}
+.postTitle {
+  font-family: var(--font-display);
+  font-size: 48px;
+  line-height: 1.08;
+  font-weight: 500;
+  color: var(--c-ink);
+}
+
+/* Markdown body */
+.prose {
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.65;
+  color: #2b2b2b;
+}
+.prose :global(:where(p, ul, ol, blockquote, pre, table, figure)) {
+  margin-bottom: 24px;
+  text-wrap: pretty;
+}
+.prose :global(h2) {
+  margin: 48px 0 16px;
+  font-family: var(--font-display);
+  font-size: 30px;
+  line-height: 1.15;
+  font-weight: 500;
+  color: var(--c-ink);
+}
+.prose :global(h3) {
+  margin: 32px 0 12px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 500;
+  color: var(--c-ink);
+}
+.prose :global(a) {
+  color: var(--c-ink);
+  text-decoration: underline;
+  text-decoration-color: #bdbdbd;
+  text-underline-offset: 3px;
+}
+.prose :global(a:hover) {
+  text-decoration-color: currentColor;
+}
+.prose :global(:where(ul, ol)) {
+  padding-left: 24px;
+}
+.prose :global(ul) {
+  list-style: disc;
+}
+.prose :global(li) {
+  margin-bottom: 8px;
+}
+.prose :global(strong) {
+  font-weight: 600;
+  color: var(--c-ink);
+}
+.prose :global(blockquote) {
+  padding-left: 20px;
+  border-left: 2px solid var(--c-line);
+  color: var(--c-text);
+}
+.prose :global(code) {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.875em;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--c-surface);
+}
+.prose :global(pre) {
+  overflow-x: auto;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: var(--c-surface) !important;
+  font-size: 15px;
+  line-height: 1.55;
+}
+.prose :global(pre code) {
+  padding: 0;
+  background: none;
+  font-size: inherit;
+}
+.prose :global(table) {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+.prose :global(:where(th, td)) {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--c-line);
+  text-align: left;
+  vertical-align: top;
+}
+.prose :global(hr) {
+  margin: 40px 0;
+  border: 0;
+  border-top: 1px solid var(--c-line);
+}
+
+.foot {
+  margin-top: 56px;
+  padding-top: 28px;
+  border-top: 1px solid var(--c-line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+.foot a {
+  color: var(--c-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--c-line);
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 809px) {
+  .page {
+    padding-top: 120px;
+  }
+  .postTitle {
+    font-size: 34px;
+  }
+  .prose {
+    font-size: 17px;
+  }
+  .prose :global(h2) {
+    font-size: 26px;
+  }
+}

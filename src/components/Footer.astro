@@ -4,23 +4,45 @@ import BrandLogo from './ui/BrandLogo.astro'
 import BrandWordmark from './ui/BrandWordmark.astro'
 import styles from './Footer.module.css'
 
+// TODO(links): '#' marks a destination that does not exist yet (demo sites, contact, privacy, terms).
+const REPO = 'https://github.com/akira-shirase-oss/colophon-cms'
 const columns = [
-  { title: 'Product', links: ['Features', 'Status', 'Demo sites'] },
-  { title: 'Build', links: ['Build log', 'Contact'] },
-  { title: 'Legal', links: ['Privacy', 'Terms'] },
+  {
+    title: 'Product',
+    links: [
+      { label: 'Features', href: '/#features' },
+      { label: 'Status', href: '/#pricing' },
+      { label: 'Demo sites', href: '#' },
+    ],
+  },
+  {
+    title: 'Build',
+    links: [
+      { label: 'Blog', href: '/blog/' },
+      { label: 'Build log', href: 'https://404human.dev/colophon/' },
+      { label: 'Source code', href: REPO },
+      { label: 'Contact', href: '#' },
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { label: 'Privacy', href: '#' },
+      { label: 'Terms', href: '#' },
+    ],
+  },
 ]
 
 const socials = [
-  { icon: '/icons/x.svg', label: 'X', href: 'https://x.com/' },
-  { icon: '/icons/threads.svg', label: 'Threads', href: 'https://www.threads.com/' },
-  { icon: '/icons/linkedin.svg', label: 'LinkedIn', href: 'https://www.linkedin.com/' },
+  { icon: '/icons/x.svg', label: 'Colophon on X', href: 'https://x.com/akirashiraseoss' },
+  { icon: '/icons/github.svg', label: 'Colophon on GitHub', href: REPO },
 ]
 ---
 
 <footer class={styles.footer}>
   <div class={styles.inner}>
     <div class={styles.top}>
-      <a href="#" aria-label="Colophon home">
+      <a href="/" aria-label="Colophon home">
         <BrandLogo />
       </a>
       <div class={styles.social}>
@@ -50,8 +72,8 @@ const socials = [
                 {c.title}
               </p>
               {c.links.map((l) => (
-                <a href="#" class={`t-tiny ${styles.link}`}>
-                  {l}
+                <a href={l.href} class={`t-tiny ${styles.link}`}>
+                  {l.label}
                 </a>
               ))}
             </div>
@@ -62,9 +84,8 @@ const socials = [
 
     <div class={styles.wordmark}>
       <BrandWordmark class={styles.wordmarkImg} />
-      <img class={styles.mosaic} src="/images/mosaic-footer.png" alt="" aria-hidden="true" />
       <div class={styles.legal}>
-        <p class="t-small">© 2026 Colophon · Made with <a href="#">Rust and Svelte</a></p>
+        <p class="t-small">© 2026 Colophon · Made with <a href={REPO}>Rust and Svelte</a></p>
         <a href="#" class="t-small" style="color: var(--c-ink);">Terms &amp; Conditions</a>
       </div>
     </div>

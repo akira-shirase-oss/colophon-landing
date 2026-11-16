@@ -36,7 +36,7 @@
 .social {
   display: flex;
   align-items: center;
-  gap: 19px;
+  gap: 20px;
 }
 .socialButtons {
   display: flex;
@@ -107,16 +107,6 @@
   height: 347px;
   object-fit: cover;
 }
-.mosaic {
-  position: absolute;
-  top: 69px;
-  left: 50%;
-  width: 624px;
-  height: 98px;
-  transform: translateX(-50%);
-  object-fit: cover;
-  z-index: 1;
-}
 .legal {
   position: absolute;
   left: 0;
@@ -169,9 +159,6 @@
   .wordmarkImg {
     top: 168px;
     height: 100px;
-  }
-  .mosaic {
-    z-index: 0;
   }
   .legal {
     top: 141.6px;

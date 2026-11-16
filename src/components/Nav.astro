@@ -4,17 +4,17 @@ import BrandLogo from './ui/BrandLogo.astro'
 import styles from './Nav.module.css'
 
 const links = [
-  { label: 'Features', href: '#features' },
-  { label: 'Status', href: '#pricing' },
-  { label: 'Contact', href: '#' },
-  { label: 'Build log', href: '#' },
+  { label: 'Features', href: '/#features' },
+  { label: 'Status', href: '/#pricing' },
+  { label: 'Blog', href: '/blog/' },
+  { label: 'Contact', href: '#' }, // TODO(links): no contact address yet
 ]
 ---
 
 <header class={styles.wrap}>
   <nav class={styles.nav} aria-label="Primary" data-nav>
     <div class={styles.container}>
-      <a href="#" class={styles.logo} aria-label="Colophon home">
+      <a href="/" class={styles.logo} aria-label="Colophon home">
         <BrandLogo />
       </a>
       <div class={styles.menu}>

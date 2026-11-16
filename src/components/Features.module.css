@@ -28,7 +28,7 @@
   flex: 0 0 518px;
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 24px;
 }
 .item {
   display: flex;

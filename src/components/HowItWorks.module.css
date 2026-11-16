@@ -13,7 +13,7 @@
   gap: 40px;
   padding: 40px 20px;
   border-radius: 24px;
-  background: url('/images/how-bg.jpg') center / cover no-repeat;
+  background: url('/images/how-bg.webp') center / cover no-repeat;
 }
 .tabs {
   display: flex;
@@ -60,20 +60,6 @@
 }
 .screen img[data-active='true'] {
   opacity: 1;
-  animation: drift 9s var(--ease) infinite alternate;
-}
-@keyframes drift {
-  from {
-    transform: scale(1);
-  }
-  to {
-    transform: scale(1.045);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .screen img[data-active='true'] {
-    animation: none;
-  }
 }
 
 @media (max-width: 809px) {

@@ -16,8 +16,7 @@
   border-radius: 24px;
   overflow: clip;
 }
-/* The painting is stretched to a fixed box and zooms from 1.5x to 3.9x
-   as the page scrolls (--zoom is set by useScrollZoom). */
+/* The painting is stretched to a fixed box and shown at 1.5x. It stays still while the page scrolls. */
 .bg {
   position: absolute;
   left: 50%;
@@ -25,9 +24,9 @@
   /* sized from the card like the source: desktop card − 409px */
   width: max(calc(100% - 409px), calc(100% / 1.49));
   height: 526px;
-  transform: translate(-50%, -50%) scale(var(--zoom, 1.5));
+  transform: translate(-50%, -50%) scale(1.5);
   /* cover keeps the painting's proportions in every box shape */
-  background: url('/images/hero.jpg') 55% center / cover no-repeat;
+  background: url('/images/hero.webp') 55% center / cover no-repeat;
   will-change: transform;
 }
 .overlay {

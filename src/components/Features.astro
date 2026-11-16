@@ -59,7 +59,7 @@ const altFor = (title: string) => `${title} in the Colophon Studio`
               </button>
               {i === 0 && (
                 <div class={styles.inlineImage}>
-                  <img src="/images/feature-mobile.png" alt="" loading="lazy" />
+                  <img src="/images/feature-mobile.webp" alt="" loading="lazy" />
                 </div>
               )}
             </>
@@ -71,7 +71,7 @@ const altFor = (title: string) => `${title} in the Colophon Studio`
         {
           items.map((it, i) => (
             <img
-              src={`/images/feature-${i + 1}.png`}
+              src={`/images/feature-${i + 1}.webp`}
               alt={i === 0 ? altFor(it.title) : ''}
               data-alt={altFor(it.title)}
               data-active={String(i === 0)}

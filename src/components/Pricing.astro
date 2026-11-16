@@ -10,7 +10,7 @@ type Stage = {
   unit: Record<View, string>
   description: string
   features: { label: string; done: boolean }[]
-  cta: { label: string; variant: 'primary' | 'secondary' }
+  cta: { label: string; variant: 'primary' | 'secondary'; href: string }
   featured?: boolean
 }
 
@@ -31,7 +31,7 @@ const stages: Stage[] = [
       { label: 'Import and export', done: true },
       { label: 'Type builder', done: true },
     ],
-    cta: { label: 'Read the build log', variant: 'secondary' },
+    cta: { label: 'Read the build log', variant: 'secondary', href: 'https://404human.dev/colophon/' },
   },
   {
     name: 'Automation',
@@ -48,7 +48,7 @@ const stages: Stage[] = [
       { label: 'Adversarial eval gate', done: true },
       { label: 'JSONL content export and import', done: true },
     ],
-    cta: { label: 'See a demo site', variant: 'primary' },
+    cta: { label: 'See a demo site', variant: 'primary', href: '#' },
     featured: true,
   },
   {
@@ -66,7 +66,7 @@ const stages: Stage[] = [
       { label: 'Hourly retention sweep', done: true },
       { label: '24-hour soak test', done: false },
     ],
-    cta: { label: 'Get in touch', variant: 'secondary' },
+    cta: { label: 'Get in touch', variant: 'secondary', href: '#' },
   },
 ]
 
@@ -113,7 +113,7 @@ const views: { id: View; label: string }[] = [
         {
           stages.map((p) => (
             <article class={`${styles.card} ${p.featured ? styles.featured : ''}`}>
-              {p.featured && <img class={styles.cardBg} src="/images/pricing-pro.jpg" alt="" loading="lazy" />}
+              {p.featured && <img class={styles.cardBg} src="/images/pricing-pro.webp" alt="" loading="lazy" />}
               <h3 class={`t-h4 ${styles.planName}`}>{p.name}</h3>
               <div class={styles.price}>
                 <p class={`t-h3 ${styles.amount}`} data-phase={p.value.phase} data-proof={p.value.proof}>{p.value.phase}</p>
@@ -128,7 +128,7 @@ const views: { id: View; label: string }[] = [
                   </li>
                 ))}
               </ul>
-              <ArrowButton href="#" variant={p.cta.variant} block>{p.cta.label}</ArrowButton>
+              <ArrowButton href={p.cta.href} variant={p.cta.variant} block>{p.cta.label}</ArrowButton>
             </article>
           ))
         }

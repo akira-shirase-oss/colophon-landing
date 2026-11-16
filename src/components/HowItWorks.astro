@@ -29,7 +29,7 @@ const tabs = ['Write and review', 'Publish a release', 'Prove it was seen']
         {
           tabs.map((_, i) => (
             <img
-              src={`/images/how/how-${i + 1}.jpg`}
+              src={`/images/how/how-${i + 1}.webp`}
               alt=""
               data-active={String(i === 0)}
               loading={i === 0 ? 'eager' : 'lazy'}
@@ -67,7 +67,7 @@ const tabs = ['Write and review', 'Publish a release', 'Prove it was seen']
   const crop = () => {
     const dir = phone.matches ? '/images/how/mobile' : '/images/how'
     images.forEach((img, i) => {
-      const src = `${dir}/how-${i + 1}.jpg`
+      const src = `${dir}/how-${i + 1}.webp`
       if (img.getAttribute('src') !== src) img.setAttribute('src', src)
     })
   }
