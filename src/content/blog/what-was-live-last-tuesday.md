@@ -3,7 +3,7 @@ title: "What was live on your site last Tuesday?"
 description: "Most CMSs keep history per entry. Colophon numbers every publish as a release, so you can read the whole site exactly as it was at any past release."
 pubDate: 2026-11-16
 tags: ["releases", "history"]
-draft: true
+draft: false
 ---
 
 Someone asks what your site said on a particular day. It might be a complaint about a price, an editor checking a correction, a lawyer, or a bug that only showed up for a few hours. You open the CMS and find version history for each entry, one at a time. That tells you how one page changed. It does not easily tell you what the whole site looked like at one moment.
@@ -49,7 +49,7 @@ The TypeScript SDK has the same idea: `delivery(project).atGeneration(41)` retur
 
 There is no `?at=2026-11-10T15:00` parameter. The API takes a release number. To answer "last Tuesday", you look at the releases list, which records when each release was published, and take the last release published before the moment you care about. That release was live until the next one went out. Then you read the site at that number.
 
-One more thing happens between "published in Colophon" and "readers saw it": your website has to rebuild or clear its cache. That is a separate problem, and each release records its own receipt of what reached your site. It deserves its own post.
+One more thing happens between "published in Colophon" and "readers saw it": your website has to rebuild or clear its cache. That is a separate problem, and each release records its own receipt of what reached your site: ["Published" should mean readers can see it](/blog/published-means-readers-can-see-it/).
 
 ## Rolling back is just another release
 
@@ -57,7 +57,7 @@ If release 41 was right and release 42 was a mistake, Colophon does not move the
 
 Either way, the rollback builds an ordinary changeset. It pins the version that was live at that release for every entry that has changed since, plus an unpublish for every entry that is live now but wasn't then. That changeset then goes through the same review and the same publish as any other change, and it becomes a new release, say 43. Releases 41 and 42 stay in the history exactly as they were.
 
-I chose this on purpose. A rollback that skipped review would be the one way to change the live site without anyone approving it. Making it a normal changeset means the review rules cover it without any special case. A test in the repository walks through it: publish release 1, publish release 2, roll back to 1 as release 3, then check that reads pinned at 1, 2 and 3 and the latest each return what they should.
+I chose this on purpose, and wrote up the reasoning in [rollback is a change too](/blog/rollback-is-a-change-too/). A rollback that skipped review would be the one way to change the live site without anyone approving it. Making it a normal changeset means the review rules cover it without any special case. A test in the repository walks through it: publish release 1, publish release 2, roll back to 1 as release 3, then check that reads pinned at 1, 2 and 3 and the latest each return what they should.
 
 ## What history will not show you
 
@@ -67,10 +67,10 @@ Gated content works the same way. A pin to an old release doesn't let a visitor 
 
 ## How other CMSs handle this
 
-Some systems are moving in this direction at the record level. In June 2026 DatoCMS [added publication ranges to record versions](https://www.datocms.com/product-updates/see-exactly-when-each-version-of-a-record-was-live), with `published_from` and `published_until` metadata. Their announcement documents two limits: a version republished without edits "reflects its latest interval rather than a full multi-interval log", and intervals are not reconstructed for versions that were already live when the feature shipped. It is still per-record history, which is the model I wanted to step away from.
+Some systems are moving in this direction at the record level. In June 2026 DatoCMS [added publication ranges to record versions](https://www.datocms.com/product-updates/see-exactly-when-each-version-of-a-record-was-live), with `published_from` and `published_until` metadata. Their announcement documents two limits: a version republished without edits "reflects its latest interval rather than a full multi-interval log", and intervals are not reconstructed for versions that were already live when the feature shipped. It is still per-record history, which is the model I wanted to step away from. The same is true of the open-source CMSs I compared: Strapi, Payload and Directus all keep history per entry or per item, not per release of the whole site (see [Colophon vs Strapi](/blog/colophon-vs-strapi/), [vs Payload](/blog/colophon-vs-payload/) and [vs Directus](/blog/colophon-vs-directus/)).
 
 ## Where it stands
 
-Colophon is not launched and has no users. I'm building it in public, alone. The pieces above are built and tested: numbered releases, publication intervals, pinned reads through `?generation=`, the SDK's pinned client, and rollback as a reviewed changeset. In the Studio, a release's page has a slider that steps through releases ("Release 3 of 7") and shows each one's receipt. What it does not do yet is show you a rendered page of your site at that release; for now, reading content at a past release goes through the API. My own site isn't running on Colophon in production yet either. That is the next real test.
+Colophon is pre-release (0.1.0-alpha) and has no users. I'm building it in public, alone. The pieces above are built and tested: numbered releases, publication intervals, pinned reads through `?generation=`, the SDK's pinned client, and rollback as a reviewed changeset. In the Studio, a release's page has a slider that steps through releases ("Release 3 of 7") and shows each one's receipt. What it does not do yet is show you a rendered page of your site at that release; for now, reading content at a past release goes through the API. My own site isn't running on Colophon in production yet either. That is the next real test.
 
 I write up each step in the build log at [404human.dev/colophon](https://404human.dev/colophon/).

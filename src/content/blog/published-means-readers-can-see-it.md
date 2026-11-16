@@ -3,7 +3,7 @@ title: "\"Published\" should mean readers can see it"
 description: "Why a CMS says published while your site still shows old content, and how Colophon keeps a release pending until a check on the live site has seen it."
 pubDate: 2026-11-16
 tags: ["publishing", "delivery", "cdn", "caching"]
-draft: true
+draft: false
 ---
 
 You press publish. The CMS says published. You open the site, and it still shows the old headline. You refresh. Still old. Somebody asks in chat whether it went out, and the honest answer is "I think so".
@@ -28,8 +28,8 @@ A common check is to call the content API and see the new text. That proves the 
 
 Every publish in Colophon is a numbered release. A publish either commits as one release or doesn't commit at all, and each release has a receipt. The receipt carries one label, and the label says only what has been proven:
 
-- **Published in CMS.** The release is committed. Anything that reads Colophon directly has it. Nothing has checked your website.
-- **Website update pending.** A rebuild, CDN clear or site check is still on its way. The label settles by itself.
+- **Published in Colophon.** The release is committed. Anything that reads Colophon directly has it. Nothing has checked your website.
+- **Website update pending.** A rebuild, cache clear or site check is still on its way. The label settles by itself.
 - **Verified at 1 location** (or 2, or more). A site check read this release, or a later one, on the live site, from that many places.
 - **Needs attention.** Something gave up, and the receipt says what failed and what to do next.
 
@@ -42,7 +42,7 @@ The rules behind the label are short. A failure anywhere outranks everything els
 Colophon has three kinds of website connection:
 
 - A **site rebuild** tells your site a release is out. It is a webhook, sent once, with a key your site can use to drop repeats.
-- A **CDN clear** asks your CDN to drop the copies the release changed.
+- A **cache clear** asks the cache in front of your site, usually a CDN, to drop the copies the release changed.
 - A **site check** reads your live site after each release to confirm readers see it.
 
 For the check to work, the page has to say which release it was built from. The content API already sends a `Colophon-Generation` header with every answer. A static page can't set its own headers, so it carries a marker instead:
@@ -71,9 +71,9 @@ When a connection gives up, the release shows Needs attention, and the receipt e
 
 It also says what is still true: "It is published in Colophon, and anything that reads Colophon directly has it, but your website may not show it yet." It suggests two next steps: check the connection's address and that your website is up, or publish again, because the next release carries this one's changes.
 
-CDN clears report their own state on the Releases page. Pending reads "copies the CDN holds may still be served". Failed reads "copies the CDN holds may be served until they expire (up to 5 minutes)". A clear names the tags of the entries and collections that changed, and it covers every release since that CDN's last successful clear, so one failure doesn't leave a gap.
+Cache clears report their own state on the Releases page. Pending reads "copies the CDN holds may still be served". Failed reads "copies the CDN holds may be served until they expire (up to 5 minutes)". A clear names the tags of the entries and collections that changed, and it covers every release since that CDN's last successful clear, so one failure doesn't leave a gap.
 
-Taking content down follows the same rules. After an unpublish, the Studio shows removal pending at the CDN until the CDN accepts the purge.
+Taking content down follows the same rules. An unpublish is a release too, and its purge shows as pending, with the same warning that copies the CDN holds may still be served, until the CDN accepts it. The content API itself stops serving the entry at once, at every release number, old ones included.
 
 ## What a delivery check can't prove
 
@@ -84,8 +84,8 @@ I want the limits to be as clear as the labels.
 - **Some copies can't be recalled.** Browser caches and copies people already downloaded are out of reach, and the docs say so.
 - **The cache timings are policies, not promises.** Live public answers have a 30-second shared cache lifetime and release-pinned content 300 seconds. The docs call these "policies to test, not a global 30-second consistency guarantee".
 
-If you have no website connections at all, Colophon doesn't guess. The release says Published in CMS, and the Studio tells you that nothing checks your website yet and where to add a site check.
+If you have no website connections at all, Colophon doesn't guess. The release says Published in Colophon, and the Studio tells you that nothing checks your website yet and where to add a site check.
 
 ## Where it stands
 
-Colophon is not released and has no users. I'm building it in public, on my own. Receipts, site checks and webhook rebuilds are built and tested in the repository. CDN purges are tested against a fake CDN that caches by tag, and the adapter for a real CDN isn't built yet. The reference site runs locally, not on the internet, and my own site doesn't run on Colophon yet. Some of the cache fault tests are still owed, and the publish-to-visible timing target hasn't been measured. A retry button for a single failed delivery is planned but not there yet. Progress, including what broke, goes in the build log: [404human.dev/colophon](https://404human.dev/colophon/).
+Colophon is pre-release (0.1.0-alpha) and has no users. I'm building it in public, on my own. Receipts, site checks and webhook rebuilds are built and tested in the repository, and five Astro demo sites rebuild themselves when a release is published; how to wire up your own is in [using Colophon as a headless CMS for Astro](/blog/colophon-with-astro/). Webhook payloads aren't signed yet. CDN purges are tested against a fake CDN that caches by tag, and the adapter for a real CDN isn't built yet. The reference site and the demo sites run locally, not on the internet, and my own site doesn't run on Colophon yet. Some of the cache fault tests are still owed, and the publish-to-visible timing target hasn't been measured. A retry button for a single failed delivery is planned but not there yet. The other questions a CMS should be able to answer about a publish are mapped in [what a headless CMS should be able to prove](/blog/headless-cms-should-prove/). Progress, including what broke, goes in the build log: [404human.dev/colophon](https://404human.dev/colophon/).

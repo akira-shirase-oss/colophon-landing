@@ -41,7 +41,7 @@ The public content API reads the latest release by default, or any past one with
 
 This is the question most systems can't answer, because the CMS only knows its own database. Your readers see a CDN copy, or a static page built from an older release.
 
-Colophon gives every release a receipt with one label: Published in CMS, Website update pending, Verified at N locations, or Needs attention. Only a site check that read the live site can make it verified, and it always says how many places it looked from. Details: ["Published" should mean readers can see it](/blog/published-means-readers-can-see-it/).
+Colophon gives every release a receipt with one label: Published in Colophon, Website update pending, Verified at N locations, or Needs attention. Only a site check that read the live site can make it verified, and it always says how many places it looked from. Details: ["Published" should mean readers can see it](/blog/published-means-readers-can-see-it/).
 
 ## 5. Can I undo it, and will someone check the undo?
 

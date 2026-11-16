@@ -68,7 +68,7 @@ Colophon's review is part of the free core. Editors ask for review; publishers a
 
 Strapi tells you the entry is published in Strapi. Whether your CDN or static site picked it up is yours to work out, and Strapi's [webhooks](https://docs.strapi.io/cms/backend-customization/webhooks) don't sign payloads themselves; the docs recommend you add HMAC signing yourself.
 
-Colophon gives each release a receipt: published in the CMS, website update pending, verified at N locations, or needs attention with the reason. Verification comes only from a site check that read the release's marker on the live site. Colophon's webhooks aren't signed yet either, and its CDN purge is tested against a fake CDN; a real CDN adapter isn't built. Details: ["Published" should mean readers can see it](/blog/published-means-readers-can-see-it/).
+Colophon gives each release a receipt: published in Colophon, website update pending, verified at N locations, or needs attention with the reason. Verification comes only from a site check that read the release's marker on the live site. Colophon's webhooks aren't signed yet either, and its CDN purge is tested against a fake CDN; a real CDN adapter isn't built. Details: ["Published" should mean readers can see it](/blog/published-means-readers-can-see-it/).
 
 ## Permissions and audit
 

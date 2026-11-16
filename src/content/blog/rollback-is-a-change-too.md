@@ -1,9 +1,9 @@
 ---
-title: "Rollback is a change too: reverting published content in Colophon"
+title: "Rollback is a change too: reverting a release"
 description: "In Colophon, rolling back published content opens a normal publish request. It gets reviewed, lands as a new numbered release, and history only moves forward."
 pubDate: 2026-11-16
 tags: ["rollback", "review", "releases"]
-draft: true
+draft: false
 ---
 
 Something wrong went live. A price, a legal line, a page that should have waited. The first instinct is to find a button that makes it un-happen.
@@ -72,8 +72,8 @@ Images have one known gap. Every uploaded version of an image is kept and can be
 
 ## How other CMSs handle rollback
 
-Other CMSs document their own approaches. Contentstack, for example, can [roll back a deployed release](https://www.contentstack.com/docs/headless-cms/roll-back-a-release). Its docs describe restoring each item to its previous published state, or unpublishing it if no prior version existed, and note that a rollback changes publish state rather than deleting or restoring content versions. A rollback release there must be deployed manually and can't be scheduled. Different design goals lead to different answers. Colophon's is to treat the rollback as one more reviewed change.
+Other CMSs document their own approaches. Contentstack, for example, can [roll back a deployed release](https://www.contentstack.com/docs/headless-cms/roll-back-a-release). Its docs describe restoring each item to its previous published state, or unpublishing it if no prior version existed, and note that a rollback changes publish state rather than deleting or restoring content versions. A rollback release there must be deployed manually and can't be scheduled. Strapi's Releases, on its paid plans, take a different line again: its docs say a published release "cannot be edited or published again", and restoring an older version goes through per-entry [Content History](https://docs.strapi.io/cms/features/content-history), which replaces the current draft ([Strapi Releases docs](https://docs.strapi.io/cms/features/releases), checked 16 November 2026; more in [Colophon vs Strapi](/blog/colophon-vs-strapi/)). Different design goals lead to different answers. Colophon's is to treat the rollback as one more reviewed change.
 
 ## Where it stands
 
-Colophon isn't launched and has no users yet. I build it in public, alone. Rollback through a reviewed publish request is built and covered by tests against a real database, and the Studio has the rollback button and the release slider. Version 0.1 still has gates I owe, including a long soak run and checks that need other people. Exact image versions on rollback come later. I post progress in the build log at [404human.dev/colophon](https://404human.dev/colophon/).
+Colophon is pre-release (0.1.0-alpha) and has no users yet. I build it in public, alone. Rollback through a reviewed publish request is built and covered by tests against a real database, and the Studio has the rollback button and the release slider. Version 0.1 still has gates I owe, including a long soak run and checks that need other people. Exact image versions on rollback come later. Agents can propose a rollback but never approve one; why is in [give AI agents CMS access, not the publish button](/blog/ai-agents-without-the-publish-button/). I post progress in the build log at [404human.dev/colophon](https://404human.dev/colophon/).
