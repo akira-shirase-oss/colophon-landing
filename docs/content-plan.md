@@ -19,7 +19,7 @@ recheck the whole matrix each quarter.
 ## Competitor matrix
 
 `yes` documented and available; `paid` on paid or enterprise plans only; `partial` exists with
-a notable limit; `diy` you build it yourself (hooks, flows, custom code); `no` not found in a
+a notable limit; `enterprise` enterprise plans only; `diy` you build it yourself (hooks, flows, custom code); `no` not found in a
 targeted search of their site; `soon` on a public roadmap; `?` not checked.
 
 | | Strapi | Payload | Directus | Sanity | Contentful | Ghost | Storyblok | Hygraph | Keystone | Tina | Decap | Keystatic |
@@ -28,15 +28,16 @@ targeted search of their site; `soon` on a public roadmap; `?` not checked.
 | "Best CMS" listicles | yes | ? | partial | yes | yes | no | yes | yes, many | no | no | no | no |
 | Astro guide | yes | ? | yes | yes | yes | no | yes | yes | no | yes | no | yes |
 | Self-hosting | yes | yes | yes | Studio only | no | yes | no | no | yes | yes | yes | yes |
-| Grouped releases | paid | ? | no | paid | yes | no | yes | paid | no | ? | ? | no |
+| Grouped releases | paid | ? | no | enterprise | paid | no | paid | paid | no | ? | ? | no |
 | Whole-site history at a past moment | no | no | no | no | no | no | no | no | no | via Git | via Git | via Git |
-| Release-level rollback | no | ? | no | paid add-on | ? | no | no | no | no | via Git | via Git | via Git |
-| Scheduled publishing | paid | yes | diy | yes | yes | yes | yes | yes | no | no | no | no |
-| Review / approvals | paid | paid | diy | ? | yes | partial | yes | yes | diy | paid | yes | no |
-| Signed webhooks | diy | no webhooks | diy | yes | yes | partial | ? | ? | ? | ? | ? | ? |
-| Confirms readers see a publish | no | no | no | no | no | no | no | no | no | no | partial | no |
+| Release-level rollback | no | ? | no | paid add-on | no | no | no | no | no | via Git | via Git | via Git |
+| Scheduled publishing | paid | yes | diy | paid | paid | yes | paid | paid | no | no | no | no |
+| Review / approvals | paid | paid | diy | ? | paid | partial | yes | paid | diy | paid | yes | no |
+| Signed webhooks | diy | no webhooks | diy | yes | yes | partial | paid | yes | ? | ? | ? | ? |
+| Reports deploy status (not the live site) | no | no | partial | no | partial | no | partial | partial | no | no | partial | no |
+| Checks what the live site serves | no | no | no | no | no | no | no | no | no | no | no | no |
 | Performance numbers with a method | partial | no | no | no | no | no | no | no | no | no | partial | no |
-| Official MCP server | yes | plugin | yes | yes | yes | no | yes | yes | no | soon | soon | no |
+| Official MCP server | yes | plugin | yes | yes | yes | beta, CLI | yes | yes | no | soon | soon | no |
 | Licence | MIT + EE | MIT | MSCL | Studio MIT, SaaS | proprietary | MIT | proprietary | proprietary | MIT | Apache-2.0 | MIT | MIT |
 
 Notes on the cells that matter most for Colophon's angle:
@@ -69,26 +70,30 @@ Notes on the cells that matter most for Colophon's angle:
   $5M revenue and 50 employees.
 - **Sanity.** The most comparison pages ([hub](https://www.sanity.io/compare-sanity));
   [Content Releases](https://www.sanity.io/docs/user-guides/content-releases); signed
-  [webhooks](https://www.sanity.io/docs/content-lake/webhook-best-practices) whose docs advise a
-  "propagation delay" because webhooks can fire before the CDN updates; hosted
+  [webhooks](https://www.sanity.io/docs/content-lake/webhook-best-practices); its Next.js
+  [webhook helper](https://www.sanity.io/docs/nextjs/validating-sanity-webhooks-nextjs) waits 3
+  seconds by default "so the Content Lake has time to reach eventual consistency"; hosted
   [MCP](https://www.sanity.io/mcp); content lives only in Sanity's hosted Content Lake.
 - **Contentful.** SaaS only; signed webhooks
   ([request verification](https://www.contentful.com/developers/docs/webhooks/request-verification/));
   releases fail whole if one entry is invalid; remote [MCP](https://www.contentful.com/developers/docs/tools/mcp-server/);
   large agentic-AI guide hub.
 - **Ghost.** A publishing platform rather than a headless CMS; its [vs pages](https://ghost.org/vs/wordpress/)
-  target blogging and newsletter tools. No official MCP server.
+  target blogging and newsletter tools. Its official [`ghst` CLI](https://github.com/TryGhost/ghst)
+  is in beta and has a built-in MCP server mode.
 - **Storyblok.** Enterprise buyer's guide and enterprise vs pages; strong Astro tutorials
   ([guide](https://www.storyblok.com/docs/guides/astro)); hosted [MCP](https://www.storyblok.com/docs/tooling/mcp-server).
 - **Hygraph.** Owns "best X CMS 2026" listicles and alternative pages
   ([best headless CMS](https://hygraph.com/blog/best-headless-cms),
   [Strapi alternative](https://hygraph.com/blog/strapi-alternative)); [MCP](https://hygraph.com/docs/hygraph-ai/mcp-server)
   can publish entries; SaaS only.
-- **Keystone, Tina, Decap, Keystatic.** Developer-focused, little marketing content. Decap Turbo's
-  [deploy status](https://decapcms.org/docs/turbo-deploy-status/) tells editors when a deploy
-  containing their change succeeded: the closest any competitor comes to publish confirmation,
-  and it confirms the deploy, not what the CDN serves. Decap Turbo also publishes measured
-  timings. Tina lists MCP and auditing as coming soon on its [roadmap](https://tina.io/roadmap).
+- **Deploy status.** Decap Turbo's [deploy status](https://decapcms.org/docs/turbo-deploy-status/),
+  Directus's [Deployment module](https://directus.com/docs/guides/deployments), Contentful's
+  [Netlify app](https://www.contentful.com/help/apps/netlify-app/), and Storyblok's and Hygraph's
+  Netlify or Vercel integrations report whether a deploy succeeded. None of them checks what the
+  live site or CDN serves.
+- **Keystone, Tina, Decap, Keystatic.** Developer-focused, little marketing content. Decap Turbo
+  also publishes measured timings. Tina lists MCP and auditing as coming soon on its [roadmap](https://tina.io/roadmap).
 - **Others.** Wagtail ([headless](https://wagtail.org/headless/), experimental MCP) and
   Contentstack compete for "open-source CMS" and "headless CMS" respectively; not covered yet.
 
@@ -98,13 +103,13 @@ Notes on the cells that matter most for Colophon's angle:
   generic content modeling explainers, "best headless CMS 2026" listicles. Every funded
   competitor covers them, and a pre-release project ranking itself in a listicle would be
   dishonest.
-- **Table stakes now:** an MCP server. Nearly every competitor ships one, so "has MCP" is not a
+- **Table stakes now:** an MCP server. Nearly every competitor ships one or has one in beta, so "has MCP" is not a
   differentiator. The difference worth writing about is what an agent's token is prevented from
   doing, and where that rule is enforced.
 - **Open, and Colophon can prove it:** whether a publish reached readers (receipts, site checks),
   what the whole site looked like at a past release, rollback as a reviewed release,
   crash and downtime behaviour, and performance numbers with the machine, commit and failures
-  attached. Nobody in the matrix covers these with evidence.
+  attached. Several report deploy status, but nobody in the matrix checks the live site.
 - **Comparison searches exist in both directions.** Strapi, Payload, Directus, Sanity and Hygraph
   all run "X vs Y" pages. Colophon's comparisons have to be the fair ones: dated, sourced,
   and saying where the other product is ahead.
