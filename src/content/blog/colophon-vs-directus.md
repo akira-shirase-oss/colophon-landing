@@ -18,7 +18,7 @@ If you need an admin and API over an existing database, or a back office as much
 
 | | Directus 12 | Colophon |
 |---|---|---|
-| Status | Stable; v12.6.1 released 4 November 2026 | Pre-release, 0.1.0-alpha, no users |
+| Status | Stable; v12.6.1 released 4 November 2026 | Pre-release, 0.1.0-alpha.1, no users |
 | Licence | Monospace Sustainable Core License (MSCL) | MIT; the licence file isn't in the repository yet |
 | Stack | Node.js API; Vue data studio | Rust server; Svelte Studio |
 | Databases | PostgreSQL, MySQL, MariaDB, SQLite, SQL Server, Oracle, CockroachDB | PostgreSQL only |

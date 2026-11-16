@@ -18,7 +18,7 @@ If you're building on Next.js and want your CMS in the same codebase and the sam
 
 | | Payload 3 | Colophon |
 |---|---|---|
-| Status | Stable; v3.93.0 released 4 November 2026; v4 in beta | Pre-release, 0.1.0-alpha, no users |
+| Status | Stable; v3.93.0 released 4 November 2026; v4 in beta | Pre-release, 0.1.0-alpha.1, no users |
 | Licence | MIT | MIT; the licence file isn't in the repository yet |
 | Stack | TypeScript; React admin on the Next.js App Router | Rust server; Svelte Studio |
 | Databases | MongoDB, PostgreSQL, SQLite | PostgreSQL only |
@@ -33,7 +33,7 @@ If you're building on Next.js and want your CMS in the same codebase and the sam
 ## Where Payload is ahead
 
 - **Maturity and community.** Payload is widely used in production, with around 45,900 [GitHub stars](https://github.com/payloadcms/payload), active releases and a large community. Colophon has none of that yet.
-- **Type safety end to end.** Because the schema is TypeScript in the same codebase, Payload [generates matching types](https://payloadcms.com/docs/typescript/generating-types) (`payload-types.ts`, automatically by default) that your front end and CMS share, and the [Local API](https://payloadcms.com/docs/local-api/overview) lets server code query content in-process without HTTP. Colophon's TypeScript SDK generates types from its OpenAPI document, which is a step further away, and the SDK isn't on npm yet.
+- **Type safety end to end.** Because the schema is TypeScript in the same codebase, Payload [generates matching types](https://payloadcms.com/docs/typescript/generating-types) (`payload-types.ts`, [automatically by default](https://payloadcms.com/docs/configuration/overview)) that your front end and CMS share, and the [Local API](https://payloadcms.com/docs/local-api/overview) lets server code query content in-process without HTTP. Colophon's TypeScript SDK generates types from its OpenAPI document, which is a step further away, and the SDK isn't on npm yet.
 - **Customisation.** Payload's admin can be extended with your own React components, and its [access control](https://payloadcms.com/docs/access-control/overview) is arbitrary code. Colophon deliberately runs no user code in the server, so extension is narrower.
 - **Editor features Colophon lacks.** Payload has [live preview](https://payloadcms.com/docs/live-preview/overview) and per-field [localization](https://payloadcms.com/docs/configuration/localization) with fallbacks. Colophon has no draft preview yet, and its public API can't select a locale yet.
 - **Database choice.** Payload supports MongoDB, PostgreSQL and SQLite. Colophon is PostgreSQL only.

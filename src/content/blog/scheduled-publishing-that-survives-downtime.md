@@ -45,7 +45,7 @@ It isn't presented as on time, though. A publish that starts more than 60 second
 
 There's one limit worth knowing. Because a schedule must fall before its approval expires, downtime long enough to outlast the approval ends with the schedule blocked as expired, not published days late on a stale review.
 
-For comparison, Strapi documents a different choice for its scheduled releases: "If the server restarts less than 5 minutes after the scheduled time, the release is published automatically," and after that "the release ends as `Failed` and all its entries are skipped" ([Strapi Releases docs](https://docs.strapi.io/cms/features/releases), checked 16 November 2026), and a "Create release from skipped" action recovers the skipped entries. That's a clear, documented rule. Colophon's rule is: run late, say so, and recheck everything first.
+For comparison, Strapi documents a different choice for its scheduled releases: "If the server restarts less than 5 minutes after the scheduled time, the release is published automatically," and after that "the release ends as `Failed` and all its entries are skipped" ([Strapi Releases docs](https://docs.strapi.io/cms/features/releases), checked 16 November 2026), and, from Strapi 5.62.0, a "Create release from skipped" action recovers the skipped entries. That's a clear, documented rule. Colophon's rule is: run late, say so, and recheck everything first.
 
 ## When two workers race
 

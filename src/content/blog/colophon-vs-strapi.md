@@ -18,7 +18,7 @@ Colophon is worth watching if your questions are about proof: what exactly went 
 
 | | Strapi 5 | Colophon |
 |---|---|---|
-| Status | Stable; v5.62.0 released 12 November 2026 | Pre-release, 0.1.0-alpha, no users |
+| Status | Stable; v5.62.0 released 12 November 2026 | Pre-release, 0.1.0-alpha.1, no users |
 | Licence | MIT, with enterprise code under a separate licence | MIT; the licence file isn't in the repository yet |
 | Stack | Node.js, TypeScript; React admin | Rust server; Svelte Studio |
 | Databases | PostgreSQL, MySQL, MariaDB, SQLite | PostgreSQL only |
