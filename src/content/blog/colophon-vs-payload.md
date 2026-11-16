@@ -27,18 +27,18 @@ If you're building on Next.js and want your CMS in the same codebase and the sam
 | Version history | Per document, in the open-source core | Every save, plus whole-site history by release |
 | Scheduling | Built in; needs a job runner | Built in; runs in the worker |
 | Outbound webhooks | Write your own in hooks | Built in; payloads not signed yet |
-| Publish confirmation | Not offered | Delivery receipts with site checks |
+| Publish confirmation | Not built in | Delivery receipts with site checks |
 | MCP | Official plugin | Built in; agents can't approve or publish |
 
 ## Where Payload is ahead
 
 - **Maturity and community.** Payload is widely used in production, with around 45,900 [GitHub stars](https://github.com/payloadcms/payload), active releases and a large community. Colophon has none of that yet.
-- **Type safety end to end.** Because the schema is TypeScript, your front end and your CMS share types without a generation step, and the [Local API](https://payloadcms.com/docs/local-api/overview) lets server code query content in-process without HTTP. Colophon's TypeScript SDK generates types from its OpenAPI document, which is a step further away, and the SDK isn't on npm yet.
+- **Type safety end to end.** Because the schema is TypeScript in the same codebase, Payload [generates matching types](https://payloadcms.com/docs/typescript/generating-types) (`payload-types.ts`, automatically by default) that your front end and CMS share, and the [Local API](https://payloadcms.com/docs/local-api/overview) lets server code query content in-process without HTTP. Colophon's TypeScript SDK generates types from its OpenAPI document, which is a step further away, and the SDK isn't on npm yet.
 - **Customisation.** Payload's admin can be extended with your own React components, and its [access control](https://payloadcms.com/docs/access-control/overview) is arbitrary code. Colophon deliberately runs no user code in the server, so extension is narrower.
 - **Editor features Colophon lacks.** Payload has [live preview](https://payloadcms.com/docs/live-preview/overview) and per-field [localization](https://payloadcms.com/docs/configuration/localization) with fallbacks. Colophon has no draft preview yet, and its public API can't select a locale yet.
 - **Database choice.** Payload supports MongoDB, PostgreSQL and SQLite. Colophon is PostgreSQL only.
 
-One thing to know about hosting: Payload's site says Payload "has joined Figma", that the open-source core continues, and that on Payload Cloud "deployment of new projects is currently paused" ([source](https://payloadcms.com/payload-has-joined-figma)). Self-hosting Payload is unaffected. Colophon has no hosted offering at all.
+One thing to know about hosting: Payload's site says Payload "has joined Figma", that the open-source core continues, and that on Payload Cloud "deployment of new projects is currently paused" ([source](https://payloadcms.com/payload-has-joined-figma)). Existing Cloud projects keep running, and self-hosting Payload is unaffected. Colophon has no hosted offering at all.
 
 ## Schema as code versus schema as data
 
@@ -50,13 +50,13 @@ In Colophon, content types are versioned definitions in PostgreSQL. Owners and d
 
 ## Access control
 
-Payload's access control is functions: "There are three main types of Access Control in Payload", for collections, globals and fields, and a function can return a query to filter rows. It's as flexible as code. Two things to know: roles are whatever your functions check, with no built-in roles screen, and in the Local API "all Access Control is skipped by default" unless you pass `overrideAccess: false`.
+Payload's access control is functions: "There are three main types of Access Control in Payload", for collections, globals and fields, and a function can return a query to filter rows. It's as flexible as code. Two things to know: roles are whatever your functions check, with no built-in roles screen, and in Payload 3's Local API "all Access Control is skipped by default" unless you pass `overrideAccess: false`; the [v4 beta](https://github.com/payloadcms/payload/blob/main/docs/migration-guide/v4.mdx) reverses this default.
 
 Colophon's permissions are data: default roles, custom roles edited as a grid in the Studio, field lists and own-entry conditions. Every path, including the Studio, the CLI, scripts and agents, goes through the same policy check; there's no in-process path that skips it. Some rules are enforced by PostgreSQL itself, such as project isolation by row-level security and a delivery role that can't read drafts. It's less flexible than arbitrary code, and that's the trade. Details: [field-level permissions](/blog/field-level-permissions/).
 
 ## Versions, publishing and rollback
 
-Payload's [versions](https://payloadcms.com/docs/versions/overview) are in the open-source core: each save keeps "a _full_ copy of the document", up to 100 per document by default, and the admin can restore an older one. Drafts and autosave are built in. [Scheduled publishing](https://payloadcms.com/docs/versions/drafts) creates a background job; without a job runner, the docs warn, "your scheduled publish / unpublish jobs will never be executed." Payload lists Publishing Workflows, its approval feature, under Enterprise features on its [enterprise page](https://payloadcms.com/enterprise).
+Payload's [versions](https://payloadcms.com/docs/versions/overview) are in the open-source core and opt-in per collection in Payload 3: once enabled, each save keeps "a _full_ copy of the document", up to 100 per document by default, and the admin can restore an older one. Drafts and autosave are built in. [Scheduled publishing](https://payloadcms.com/docs/versions/drafts) creates a background job; without a job runner, the docs warn, "your scheduled publish / unpublish jobs will never be executed." Payload lists Publishing Workflows, its approval feature, under Enterprise features on its [enterprise page](https://payloadcms.com/enterprise).
 
 Colophon keeps every save as an insert-only revision too, and retention never deletes them. The difference is above the document. Every publish in Colophon is a numbered release of exact revisions, approved against a hash of them, committed in one transaction. Each entry's publication history means you can read the whole site as it was at any past release (content taken down since stays down). Rollback builds a reviewed request that lands as a new release. Review is in the core. Scheduling runs in Colophon's worker, rechecks the approval and content when it falls due, and labels a late run as delayed. Details: [scheduled publishing that survives downtime](/blog/scheduled-publishing-that-survives-downtime/) and [rollback is a change too](/blog/rollback-is-a-change-too/).
 
