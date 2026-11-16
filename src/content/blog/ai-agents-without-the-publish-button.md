@@ -6,7 +6,7 @@ tags: ["ai agents", "mcp", "permissions", "automation"]
 draft: false
 ---
 
-Connecting an AI agent to a CMS is now an afternoon's work. [Strapi](https://docs.strapi.io/cms/features/strapi-mcp-server), [Directus](https://directus.com/docs/guides/ai/mcp), [Sanity](https://www.sanity.io/mcp), [Contentful](https://www.contentful.com/developers/docs/tools/mcp-server/), [Storyblok](https://www.storyblok.com/docs/libraries/mcp-server) and [Hygraph](https://hygraph.com/docs/hygraph-ai/mcp-server) all document official MCP servers, and Payload has an [official MCP plugin](https://payloadcms.com/docs/plugins/mcp) (checked 16 November 2026). The question has moved from "can an agent use my CMS?" to "what can it do once it's in?"
+Connecting an AI agent to a CMS is now an afternoon's work. [Strapi](https://docs.strapi.io/cms/features/strapi-mcp-server), [Directus](https://directus.com/docs/guides/ai/mcp), [Sanity](https://www.sanity.io/mcp), [Contentful](https://www.contentful.com/developers/docs/tools/mcp-server/), [Storyblok](https://www.storyblok.com/docs/tooling/mcp-server) and [Hygraph](https://hygraph.com/docs/hygraph-ai/mcp-server) all document official MCP servers, and Payload has an [official MCP plugin](https://payloadcms.com/docs/plugins/mcp) (checked 16 November 2026). The question has moved from "can an agent use my CMS?" to "what can it do once it's in?"
 
 The risky part isn't the agent's intelligence. It's authority. An agent that can publish, delete or run up costs without bounds is a liability however good the model is, and a prompt hidden in an article it reads can steer it. I'm building Colophon, an open-source CMS, and I wanted the answer to "can the agent publish?" to be no, enforced by the server rather than by asking the model to behave.
 
