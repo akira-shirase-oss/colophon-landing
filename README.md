@@ -21,3 +21,7 @@ npm run build    # static production build into dist/
   benefit cards, feature tabs, Phase/Proof switch, How-it-works tabs, FAQ, hero scroll zoom) are small vanilla
   `<script>`s in the component; everything else is plain HTML with no JavaScript.
 - The FAQ also emits `FAQPage` structured data (JSON-LD).
+
+## License
+
+MIT — see [LICENSE](LICENSE).
