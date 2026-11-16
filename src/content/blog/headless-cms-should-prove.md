@@ -65,4 +65,4 @@ The list above is what's built. A few things are not, and I'd rather say so here
 
 ## Where it stands
 
-Colophon is pre-release (0.1.0-alpha) and has no users. I'm building it in public, alone, and the [status section](/#pricing) on the home page says what's done and what isn't. Each step, including what broke, is in the build log at [404human.dev/colophon](https://404human.dev/colophon/).
+Colophon is pre-release (0.1.0-alpha.1) and has no users. It will be open source under the MIT licence; the licence file is being added to the repository before the first release. I'm building it in public, alone, and the [status section](/#pricing) on the home page says what's done and what isn't. Each step, including what broke, is in the build log at [404human.dev/colophon](https://404human.dev/colophon/).

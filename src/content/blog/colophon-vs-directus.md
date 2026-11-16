@@ -19,7 +19,7 @@ If you need an admin and API over an existing database, or a back office as much
 | | Directus 12 | Colophon |
 |---|---|---|
 | Status | Stable; v12.6.1 released 4 November 2026 | Pre-release, 0.1.0-alpha, no users |
-| Licence | Monospace Sustainable Core License (MSCL) | Apache-2.0 proposed; the licence file isn't added yet |
+| Licence | Monospace Sustainable Core License (MSCL) | MIT; the licence file isn't in the repository yet |
 | Stack | Node.js API; Vue data studio | Rust server; Svelte Studio |
 | Databases | PostgreSQL, MySQL, MariaDB, SQLite, SQL Server, Oracle, CockroachDB | PostgreSQL only |
 | Existing database | Introspects existing tables | Owns its own schema |
@@ -41,7 +41,7 @@ If you need an admin and API over an existing database, or a back office as much
 
 Directus 12 uses its own licence, the [Monospace Sustainable Core License](https://github.com/directus/directus/blob/main/license). It permits any use except a "Competing Use", meaning offering the software in competition with Directus's own paid offerings, and each version becomes available under GPL-3.0 "on the fourth anniversary" of its release. Directus's [licensing overview](https://directus.com/docs/licensing/overview) describes free use through its Open Innovation Grant for organisations with "less than $5M in annual revenue and fewer than 50 employees". Read the terms for your own situation; I'm not giving legal advice.
 
-Colophon's licence isn't settled either: Apache-2.0 is proposed for the core, CLI and SDK, and the licence file will be added before any release. Until then, it's fair to treat Colophon's licence as an open question.
+Colophon will be MIT-licensed, a decision made on 16 November 2026. The licence file isn't committed yet and will be before any release; until it lands, the code carries no licence grant.
 
 ## Permissions
 

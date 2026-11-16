@@ -19,7 +19,7 @@ Colophon is worth watching if your questions are about proof: what exactly went 
 | | Strapi 5 | Colophon |
 |---|---|---|
 | Status | Stable; v5.62.0 released 12 November 2026 | Pre-release, 0.1.0-alpha, no users |
-| Licence | MIT, with enterprise code under a separate licence | Apache-2.0 proposed; the licence file isn't added yet |
+| Licence | MIT, with enterprise code under a separate licence | MIT; the licence file isn't in the repository yet |
 | Stack | Node.js, TypeScript; React admin | Rust server; Svelte Studio |
 | Databases | PostgreSQL, MySQL, MariaDB, SQLite | PostgreSQL only |
 | Hosting | Self-hosted, or Strapi Cloud | Self-hosted only, built from source |
@@ -38,7 +38,7 @@ Being plain about this matters more than the table.
 - **Installation.** `npx create-strapi@latest` and you're running. In a hands-on test I did on 28 October 2026 with Strapi 5.60.0, install took about 75 seconds with only Node. Colophon needs Docker for PostgreSQL, Valkey and an S3-compatible store, plus a Rust toolchain to build the server.
 - **Hosting choices.** Strapi runs on several databases and has [Strapi Cloud](https://strapi.io/pricing-cloud). Colophon is PostgreSQL only, and there's no hosted version.
 - **Editor features Colophon doesn't have yet.** Strapi has [preview](https://docs.strapi.io/cms/features/preview), with Live Preview on paid plans; Colophon has no draft preview for editors yet. Strapi's [internationalization](https://docs.strapi.io/cms/features/internationalization) is built in and free, through to the API; Colophon stores locales and localized entries, but its public delivery API can't select a locale yet. Strapi's [media library](https://docs.strapi.io/cms/features/media-library) is mature; Colophon's media fields work, but images inside rich text are still placeholders.
-- **A settled licence.** Strapi's licence is clear. Colophon's is proposed, not final.
+- **A licence you can rely on today.** Strapi's licence is in its repository. Colophon will be MIT-licensed, but the licence file isn't committed yet, so until it lands the code carries no licence grant.
 
 ## Content modeling
 

@@ -19,7 +19,7 @@ If you're building on Next.js and want your CMS in the same codebase and the sam
 | | Payload 3 | Colophon |
 |---|---|---|
 | Status | Stable; v3.93.0 released 4 November 2026; v4 in beta | Pre-release, 0.1.0-alpha, no users |
-| Licence | MIT | Apache-2.0 proposed; the licence file isn't added yet |
+| Licence | MIT | MIT; the licence file isn't in the repository yet |
 | Stack | TypeScript; React admin on the Next.js App Router | Rust server; Svelte Studio |
 | Databases | MongoDB, PostgreSQL, SQLite | PostgreSQL only |
 | Schema | Code, in your Payload config | Versioned data in PostgreSQL, changed at runtime |
@@ -36,7 +36,7 @@ If you're building on Next.js and want your CMS in the same codebase and the sam
 - **Type safety end to end.** Because the schema is TypeScript, your front end and your CMS share types without a generation step, and the [Local API](https://payloadcms.com/docs/local-api/overview) lets server code query content in-process without HTTP. Colophon's TypeScript SDK generates types from its OpenAPI document, which is a step further away, and the SDK isn't on npm yet.
 - **Customisation.** Payload's admin can be extended with your own React components, and its [access control](https://payloadcms.com/docs/access-control/overview) is arbitrary code. Colophon deliberately runs no user code in the server, so extension is narrower.
 - **Editor features Colophon lacks.** Payload has [live preview](https://payloadcms.com/docs/live-preview/overview) and per-field [localization](https://payloadcms.com/docs/configuration/localization) with fallbacks. Colophon has no draft preview yet, and its public API can't select a locale yet.
-- **Database choice and a settled licence.** Payload supports MongoDB, PostgreSQL and SQLite under MIT. Colophon is PostgreSQL only and its licence is still a proposal.
+- **Database choice.** Payload supports MongoDB, PostgreSQL and SQLite. Colophon is PostgreSQL only.
 
 One thing to know about hosting: Payload's site says Payload "has joined Figma", that the open-source core continues, and that on Payload Cloud "deployment of new projects is currently paused" ([source](https://payloadcms.com/payload-has-joined-figma)). Self-hosting Payload is unaffected. Colophon has no hosted offering at all.
 
