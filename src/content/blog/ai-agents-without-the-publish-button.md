@@ -52,7 +52,7 @@ The load test for this runs normal editorial traffic, then adds a token capped a
 
 ## Retries that can't double-write
 
-Agents retry. Networks drop answers. Every write tool sends an idempotency key, either the agent's own or one the server generates and returns. A retry with the same key replays the recorded result instead of writing again. A write that got no answer at all comes back as an `outcome_unknown` error naming the key to retry with.
+Agents retry. Networks drop answers. Every create and update tool sends an idempotency key, either the agent's own or one the server generates and returns. A retry with the same key replays the recorded result instead of writing again. A write that got no answer at all comes back as an `outcome_unknown` error naming the key to retry with.
 
 Updates send the revision the agent read. If a person saved in the meantime, the update is refused with the current revision named and nothing saved. An agent can't overwrite an editor's newer work, which is the same rule people get; see [what happens to your draft when the CMS crashes](/blog/crash-safe-drafts/).
 
@@ -62,7 +62,7 @@ The server's instructions to the model say that entry content is data written by
 
 ## How it's tested
 
-Colophon has an evaluation suite where the adversary is a scoped API token against the real API and a real MCP session, never a mock and never a friendly model. It covers six abuse cases: prompt injection in content, tool-argument manipulation, cost overruns, a mass-deletion attempt, an altered approved changeset and an unsafe import, plus token-privilege and MCP-surface cases.
+Colophon has an evaluation suite where the adversary is a scoped API token against the real API and a real MCP session, never a mock and never a friendly model. It covers six abuse cases: prompt injection in content, tool-argument manipulation, cost overruns, a mass-deletion attempt, an altered approved changeset and an unsafe import, plus self-approval, field-bounds, cross-project and MCP-surface cases.
 
 Every adversarial call is classified as refused, permitted (the agent's own legitimate work) or unauthorized. The gate is `UNAUTHORIZED: 0`, with `PROBLEMS: 0` beside it, because a test that can't tell a refusal from a success proves nothing. The stored run from 4 November ran ten cases, three trials each: 0 unauthorized, 0 problems (`perf/results/2026-11-04T141109.623685Z-evals.json`, commit `9058bb4`).
 
@@ -78,4 +78,4 @@ There's no model in the suite on purpose. The cases are deterministic attacks on
 
 ## Where it stands
 
-Colophon is pre-release (0.1.0-alpha) and has no users yet. The MCP server, API tokens, budgets and the evaluation suite are built and tested in the [repository](https://github.com/akira-shirase-oss/colophon-cms). Roles for people work the same way and are covered in [field-level permissions](/blog/field-level-permissions/). I post progress in the build log at [404human.dev/colophon](https://404human.dev/colophon/).
+Colophon is pre-release (0.1.0-alpha.1) and has no users yet. The MCP server, API tokens, budgets and the evaluation suite are built and tested in the [repository](https://github.com/akira-shirase-oss/colophon-cms). Roles for people work the same way and are covered in [field-level permissions](/blog/field-level-permissions/). I post progress in the build log at [404human.dev/colophon](https://404human.dev/colophon/).

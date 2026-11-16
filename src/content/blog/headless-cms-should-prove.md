@@ -19,7 +19,7 @@ I'm building Colophon, an open-source CMS in Rust and Svelte, around the idea th
 
 ## 1. Did my save land?
 
-A save is either acknowledged and durable, or clearly not saved. Colophon writes every save as a new, insert-only revision, and accepts it only if it started from the current draft. A stale save is refused with a `409` that names the current revision, so two editors can't overwrite each other silently. Every write carries an idempotency key, so a retry after a lost answer replays the first result instead of saving twice.
+A save is either acknowledged and durable, or clearly not saved. Colophon writes every save as a new, insert-only revision, and accepts it only if it started from the current draft. A stale save is refused with a `409` that names the current revision, so two editors can't overwrite each other silently. Every save carries an idempotency key, so a retry after a lost answer replays the first result instead of saving twice.
 
 Two crash tests kill the server just before and just after a commit and check both outcomes. A deterministic simulator runs thousands of seeded schedules of colliding editors and lost answers on every push. Details: [what happens to your draft when the CMS crashes](/blog/crash-safe-drafts/).
 
@@ -33,7 +33,7 @@ Telling your website happens after the commit, never inside it. The same transac
 
 ## 3. What exactly went live?
 
-Every committed release has a number that only goes up, one per release, per environment. Each entry keeps a publication history: which revision was live from which release to which. Because revisions never change, "release 41" names exact bytes.
+Every committed release has a number that only goes up, one per release, per environment. Each entry keeps a publication history: which revision was live from which release to which. Because revisions never change, "release 41" names exact revisions.
 
 The public content API reads the latest release by default, or any past one with `?generation=41`, and every answer says which release it came from in a `Colophon-Generation` header. Details: [what was live on your site last Tuesday?](/blog/what-was-live-last-tuesday/)
 
@@ -49,7 +49,7 @@ Rolling back in Colophon builds an ordinary changeset that restores what was liv
 
 ## 6. Who, or what, was able to change it?
 
-Roles are data: owners, developers, editors and publishers by default, plus roles you define, narrowed down to single fields or to entries a person created. Project API tokens are identities of their own, so what a script wrote names the token. Changes to roles, members, invitations and tokens go in an append-only audit log the database won't let anyone edit.
+Roles are data: owners, developers, editors and publishers by default, plus roles you define, narrowed down to single fields or to entries a person created. Project API tokens are identities of their own, so what a script wrote names the token. Changes to roles, members, invitations and tokens go in an append-only audit log: the server's database login can only add to it and read it, and triggers refuse edits and deletes apart from the retention sweep and whole-project deletion.
 
 AI agents work through those same tokens. Colophon's MCP adapter lets them read, draft and propose, but no tool approves or publishes, and the API refuses a token's approval of anything a token submitted. Details: [field-level permissions](/blog/field-level-permissions/) and [giving AI agents CMS access without the publish button](/blog/ai-agents-without-the-publish-button/).
 
@@ -65,4 +65,4 @@ The list above is what's built. A few things are not, and I'd rather say so here
 
 ## Where it stands
 
-Colophon is pre-release (0.1.0-alpha.1) and has no users. It will be open source under the MIT licence; the licence file is being added to the repository before the first release. I'm building it in public, alone, and the [status section](/#pricing) on the home page says what's done and what isn't. Each step, including what broke, is in the build log at [404human.dev/colophon](https://404human.dev/colophon/).
+Colophon is pre-release (0.1.0-alpha.1) and has no users. It will be open source under the MIT licence; the licence file is being added to the repository before the first release. I'm building it in public, alone, and the [status section](/#pricing) on the home page says what's done; the list above says what isn't. Each step, including what broke, is in the build log at [404human.dev/colophon](https://404human.dev/colophon/).

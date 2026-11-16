@@ -12,7 +12,7 @@ I'm building Colophon, so read this knowing that. Payload facts come from Payloa
 
 Payload and Colophon start from different places. Payload is a code-first TypeScript CMS: you describe collections, fields and access rules in code, and it installs into a Next.js app. Colophon is a separate server with a Rust core: content types are data you change at runtime, and the design is organised around proving what was published.
 
-If you're building on Next.js and want your CMS in the same codebase and the same types, Payload is the obvious pick, and it's production-ready. Colophon is pre-release (0.1.0-alpha), has no users, and isn't published to any package registry yet.
+If you're building on Next.js and want your CMS in the same codebase and the same types, Payload is the obvious pick, and it's production-ready. Colophon is pre-release (0.1.0-alpha.1), has no users, and isn't published to any package registry yet.
 
 ## At a glance
 
@@ -58,7 +58,7 @@ Colophon's permissions are data: default roles, custom roles edited as a grid in
 
 Payload's [versions](https://payloadcms.com/docs/versions/overview) are in the open-source core: each save keeps "a _full_ copy of the document", up to 100 per document by default, and the admin can restore an older one. Drafts and autosave are built in. [Scheduled publishing](https://payloadcms.com/docs/versions/drafts) creates a background job; without a job runner, the docs warn, "your scheduled publish / unpublish jobs will never be executed." Payload lists Publishing Workflows, its approval feature, under Enterprise features on its [enterprise page](https://payloadcms.com/enterprise).
 
-Colophon keeps every save as an insert-only revision too, and retention never deletes them. The difference is above the document. Every publish in Colophon is a numbered release of exact revisions, approved against a hash of them, committed in one transaction. Each entry's publication history means you can read the whole site as it was at any past release. Rollback builds a reviewed request that lands as a new release. Review is in the core. Scheduling runs in Colophon's worker, rechecks the approval and content when it falls due, and labels a late run as delayed. Details: [scheduled publishing that survives downtime](/blog/scheduled-publishing-that-survives-downtime/) and [rollback is a change too](/blog/rollback-is-a-change-too/).
+Colophon keeps every save as an insert-only revision too, and retention never deletes them. The difference is above the document. Every publish in Colophon is a numbered release of exact revisions, approved against a hash of them, committed in one transaction. Each entry's publication history means you can read the whole site as it was at any past release (content taken down since stays down). Rollback builds a reviewed request that lands as a new release. Review is in the core. Scheduling runs in Colophon's worker, rechecks the approval and content when it falls due, and labels a late run as delayed. Details: [scheduled publishing that survives downtime](/blog/scheduled-publishing-that-survives-downtime/) and [rollback is a change too](/blog/rollback-is-a-change-too/).
 
 ## Telling your site, and knowing it worked
 

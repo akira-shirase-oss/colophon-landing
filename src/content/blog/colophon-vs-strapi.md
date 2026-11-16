@@ -10,7 +10,7 @@ I'm building Colophon, so I'm not a neutral judge of it. I'll try to be useful a
 
 ## The short answer
 
-If you need a headless CMS for a real site today, choose Strapi over Colophon. Strapi 5 is mature, has a large community and plugin marketplace, installs in about a minute with only Node, and has a managed cloud. Colophon is pre-release (0.1.0-alpha), has no users yet, and isn't published to npm or any package registry.
+If you need a headless CMS for a real site today, choose Strapi over Colophon. Strapi 5 is mature, has a large community and plugin marketplace, installs in about a minute with only Node, and has a managed cloud. Colophon is pre-release (0.1.0-alpha.1), has no users yet, and isn't published to npm or any package registry.
 
 Colophon is worth watching if your questions are about proof: what exactly went live, whether readers can see it yet, whether a rollback was reviewed, and what an AI agent is allowed to do. It's built around those questions, and that's where it differs most from Strapi.
 
@@ -56,7 +56,7 @@ Strapi's [Content History](https://docs.strapi.io/cms/features/content-history) 
 
 Strapi's [Releases](https://docs.strapi.io/cms/features/releases), also Growth and Enterprise, group entries to publish together, optionally on a schedule. A release publishes "the latest saved version of the draft", and the docs say "A release cannot be pinned to a specific version of an entry." Once published, it "cannot be edited or published again."
 
-In Colophon every publish is a release. A publish request pins exact revisions, an approval counts only for a hash of them, and publishing commits one numbered release in one transaction. Every save from the Studio, the CLI or the API is an insert-only revision, and retention never deletes revisions. Each entry's publication history means you can read the site as it was at any past release with `?generation=N`. Rollback builds a reviewed publish request that becomes a new release. More in [what was live on your site last Tuesday?](/blog/what-was-live-last-tuesday/) and [rollback is a change too](/blog/rollback-is-a-change-too/).
+In Colophon every publish is a release. A publish request pins exact revisions, an approval counts only for a hash of them, and publishing commits one numbered release in one transaction. Every save from the Studio, the CLI or the API is an insert-only revision, and retention never deletes revisions. Each entry's publication history means you can read the site as it was at any past release with `?generation=N` (content taken down since stays down). Rollback builds a reviewed publish request that becomes a new release. More in [what was live on your site last Tuesday?](/blog/what-was-live-last-tuesday/) and [rollback is a change too](/blog/rollback-is-a-change-too/).
 
 ## Review and approvals
 
@@ -88,4 +88,4 @@ Colophon's import reads Strapi v4 and v5 exports, with a dry run that reports an
 
 ## Where it stands
 
-Colophon is pre-release and built by one person in public. If you try it, read the [status section](/#pricing) first. Progress, including what broke, is in the build log at [404human.dev/colophon](https://404human.dev/colophon/). If anything about Strapi here is wrong or out of date, tell me and I'll correct it.
+Colophon is pre-release and built by one person in public. If you try it, read the [status section](/#pricing) first for what's done; the sections above say what isn't. Progress, including what broke, is in the build log at [404human.dev/colophon](https://404human.dev/colophon/). If anything about Strapi here is wrong or out of date, tell me and I'll correct it.

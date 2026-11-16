@@ -65,4 +65,4 @@ Cancelling a schedule waits for a run already in progress and never undoes a rel
 
 ## Where it stands
 
-Colophon is pre-release (0.1.0-alpha) and has no users. Scheduling is built and tested against a real database, and its endpoint has a million-request load run on record. The Studio has a Schedule panel on a publish request and a Scheduled list on the Releases page. The build log is at [404human.dev/colophon](https://404human.dev/colophon/).
+Colophon is pre-release (0.1.0-alpha.1) and has no users. Scheduling is built and tested against a real database, and its endpoint has a million-request load run on record. The Studio has a Schedule panel on a publish request and a Scheduled list on the Releases page. The build log is at [404human.dev/colophon](https://404human.dev/colophon/).

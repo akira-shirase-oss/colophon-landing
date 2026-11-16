@@ -8,7 +8,7 @@ draft: false
 
 Astro and a headless CMS fit well: the CMS holds content, Astro reads it at build time and ships plain HTML. This guide shows how to do that with Colophon, an open-source CMS I'm building, using only its public delivery API. It's the same approach the five Astro demo sites in Colophon's repository use.
 
-First, an honest prerequisite. Colophon is pre-release (0.1.0-alpha) and isn't published to npm or any package registry yet, so to follow along you run Colophon from its [repository](https://github.com/akira-shirase-oss/colophon-cms) on your own machine, as its README describes. Nothing below needs Colophon's SDK; it's plain `fetch`.
+First, an honest prerequisite. Colophon is pre-release (0.1.0-alpha.1) and isn't published to npm or any package registry yet, so to follow along you run Colophon from its [repository](https://github.com/akira-shirase-oss/colophon-cms) on your own machine, as its README describes. Nothing below needs Colophon's SDK; it's plain `fetch`.
 
 ## The delivery API in one paragraph
 
@@ -185,4 +185,4 @@ I haven't tested specific hosts' deploy hooks, so check that yours accepts a `PO
 
 ## Where it stands
 
-Colophon is pre-release (0.1.0-alpha) and has no users. The delivery API, the generation marker, site rebuilds and site checks are built and tested, and the five demo sites in `apps/sites` show this end to end on a local machine. To see what a release pins and how to read an old one, read [what was live on your site last Tuesday?](/blog/what-was-live-last-tuesday/) The build log is at [404human.dev/colophon](https://404human.dev/colophon/).
+Colophon is pre-release (0.1.0-alpha.1) and has no users. The delivery API, the generation marker, site rebuilds and site checks are built and tested, and the five demo sites in `apps/sites` show this end to end on a local machine. To see what a release pins and how to read an old one, read [what was live on your site last Tuesday?](/blog/what-was-live-last-tuesday/) The build log is at [404human.dev/colophon](https://404human.dev/colophon/).

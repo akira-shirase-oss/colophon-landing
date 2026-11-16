@@ -23,7 +23,7 @@ There are two moments where a crash hurts, and Colophon has a crash test for eac
 - **Killed just before the commit.** The client must not be told the save worked, because it didn't. The test checks that no success was acknowledged, nothing was stored, and a retry with the same key then works.
 - **Killed just after the commit, before the answer.** The save did happen, but the client never heard. The safe move is to retry, and the retry must not save the text a second time. The test checks that the retry returns the same result as the original.
 
-What makes the second case work is an idempotency key. Every write carries one. If the same key arrives again with the same request, the server replays the answer it already recorded instead of doing the work twice. The Studio reuses the key for as long as the base revision and the content haven't changed, so a retried autosave is the same request, not a new one.
+What makes the second case work is an idempotency key. Every save carries one, and so do creates and publishes. If the same key arrives again with the same request, the server replays the answer it already recorded instead of doing the work twice. The Studio reuses the key for as long as the base revision and the content haven't changed, so a retried autosave is the same request, not a new one.
 
 These two tests, and a third that kills the worker after it announces a release, run in CI on every push.
 
@@ -58,7 +58,7 @@ It runs the editing and publishing rules in one thread, with a virtual clock and
 cargo run -p colophon-sim -- --seed 1234 --trace
 ```
 
-The simulator is checked two ways. A deliberately broken rule has to be caught, so it can't pass by testing nothing. And the same scenarios run against real PostgreSQL, so the simulator's model of the database can't drift from the database. The double-save case above is one the simulator found.
+The simulator is checked two ways. A deliberately broken rule has to be caught, so it can't pass by testing nothing. And runs of the editing scenario are replayed save by save against real PostgreSQL, which must give the same answers, so the model is checked against the database it stands in for. The publishing scenario has no such replay yet. The double-save case above is one the simulator found.
 
 ## What this does not cover
 
@@ -68,4 +68,4 @@ The simulator is checked two ways. A deliberately broken rule has to be caught, 
 
 ## Where it stands
 
-Colophon is pre-release (0.1.0-alpha) and has no users yet. I'm building it in public, alone. Insert-only revisions, expected-revision saves, idempotent retries, the conflict screen, the crash tests and the simulator are built and run in CI. Publishing has the same kind of protection, which is the subject of [what a headless CMS should be able to prove](/blog/headless-cms-should-prove/). The engineering behind each step goes in the build log at [404human.dev/colophon](https://404human.dev/colophon/).
+Colophon is pre-release (0.1.0-alpha.1) and has no users yet. I'm building it in public, alone. Insert-only revisions, expected-revision saves, idempotent retries, the conflict screen, the crash tests and the simulator are built and run in CI. Publishing has the same kind of protection, which is the subject of [what a headless CMS should be able to prove](/blog/headless-cms-should-prove/). The engineering behind each step goes in the build log at [404human.dev/colophon](https://404human.dev/colophon/).

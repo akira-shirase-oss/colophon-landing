@@ -12,7 +12,7 @@ I'm building Colophon, so I'm not neutral. Directus facts here come from Directu
 
 Directus and Colophon solve different problems. Directus is a data platform: point it at a SQL database, new or existing, and you get REST and GraphQL APIs, a no-code data studio, permissions and automation over your own tables. Colophon is a CMS for publishing a website, organised around numbered releases and evidence of what readers saw.
 
-If you need an admin and API over an existing database, or a back office as much as a CMS, Directus does things Colophon never will. If your main question is "what exactly did we publish, and did it reach the site?", Colophon is built for that, but it's pre-release (0.1.0-alpha), has no users, and isn't published to any package registry yet.
+If you need an admin and API over an existing database, or a back office as much as a CMS, Directus does things Colophon never will. If your main question is "what exactly did we publish, and did it reach the site?", Colophon is built for that, but it's pre-release (0.1.0-alpha.1), has no users, and isn't published to any package registry yet.
 
 ## At a glance
 
@@ -53,7 +53,7 @@ Colophon's roles are data too, narrowed per field and to entries a person create
 
 Directus's [content versioning](https://directus.com/docs/guides/content/content-versioning) works per item: a draft version you edit while the published item stays live, then a field-by-field comparison to promote it. Revisions record each change and can be restored. Approvals are something you build: Directus's own [tutorial](https://directus.com/docs/tutorials/workflows/build-content-approval-workflows-with-custom-permissions) uses a status field and per-role permissions. Scheduled publishing is a Flow with a "Schedule (CRON)" [trigger](https://directus.com/docs/guides/flows/triggers). That's flexible, and it's also logic you maintain.
 
-In Colophon these are built in and connected. A publish request pins exact revisions; an approval counts only for a hash of them and expires after seven days. Publishing commits one numbered release in one transaction, so you can read the whole site as it was at any past release. Scheduling stores a local time and time zone, asks for an explicit choice at daylight-saving edges, rechecks the approval and content when it falls due, and labels a late run as delayed. Rollback is a reviewed request that lands as a new release. Details: [what was live on your site last Tuesday?](/blog/what-was-live-last-tuesday/) and [scheduled publishing that survives downtime](/blog/scheduled-publishing-that-survives-downtime/).
+In Colophon these are built in and connected. A publish request pins exact revisions; an approval counts only for a hash of them and expires after seven days. Publishing commits one numbered release in one transaction, so you can read the whole site as it was at any past release (content taken down since stays down). Scheduling stores a local time and time zone, asks for an explicit choice at daylight-saving edges, rechecks the approval and content when it falls due, and labels a late run as delayed. Rollback is a reviewed request that lands as a new release. Details: [what was live on your site last Tuesday?](/blog/what-was-live-last-tuesday/) and [scheduled publishing that survives downtime](/blog/scheduled-publishing-that-survives-downtime/).
 
 ## Telling your site, and knowing it worked
 
@@ -67,4 +67,4 @@ Directus has a built-in [MCP server](https://directus.com/docs/guides/ai/mcp), t
 
 ## Where it stands
 
-Colophon is pre-release and built by one person in public. The [status section](/#pricing) on the home page lists what's done and what isn't, and the [Strapi](/blog/colophon-vs-strapi/) and [Payload](/blog/colophon-vs-payload/) comparisons cover the other two common open-source choices. If anything about Directus here is wrong or out of date, tell me and I'll correct it. The build log is at [404human.dev/colophon](https://404human.dev/colophon/).
+Colophon is pre-release and built by one person in public. The [status section](/#pricing) on the home page lists what's done, and the [Strapi](/blog/colophon-vs-strapi/) and [Payload](/blog/colophon-vs-payload/) comparisons cover the other two common open-source choices. If anything about Directus here is wrong or out of date, tell me and I'll correct it. The build log is at [404human.dev/colophon](https://404human.dev/colophon/).

@@ -41,7 +41,7 @@ The rules behind the label are short. A failure anywhere outranks everything els
 
 Colophon has three kinds of website connection:
 
-- A **site rebuild** tells your site a release is out. It is a webhook, sent once, with a key your site can use to drop repeats.
+- A **site rebuild** tells your site a release is out. It is a webhook, sent once per release, and retried if needed with the same key, which your site can use to drop repeats.
 - A **cache clear** asks the cache in front of your site, usually a CDN, to drop the copies the release changed.
 - A **site check** reads your live site after each release to confirm readers see it.
 
@@ -88,4 +88,4 @@ If you have no website connections at all, Colophon doesn't guess. The release s
 
 ## Where it stands
 
-Colophon is pre-release (0.1.0-alpha) and has no users. I'm building it in public, on my own. Receipts, site checks and webhook rebuilds are built and tested in the repository, and five Astro demo sites rebuild themselves when a release is published; how to wire up your own is in [using Colophon as a headless CMS for Astro](/blog/colophon-with-astro/). Webhook payloads aren't signed yet. CDN purges are tested against a fake CDN that caches by tag, and the adapter for a real CDN isn't built yet. The reference site and the demo sites run locally, not on the internet, and my own site doesn't run on Colophon yet. Some of the cache fault tests are still owed, and the publish-to-visible timing target hasn't been measured. A retry button for a single failed delivery is planned but not there yet. The other questions a CMS should be able to answer about a publish are mapped in [what a headless CMS should be able to prove](/blog/headless-cms-should-prove/). Progress, including what broke, goes in the build log: [404human.dev/colophon](https://404human.dev/colophon/).
+Colophon is pre-release (0.1.0-alpha.1) and has no users. I'm building it in public, on my own. Receipts, site checks and webhook rebuilds are built and tested in the repository, and five Astro demo sites rebuild themselves when a release is published; how to wire up your own is in [using Colophon as a headless CMS for Astro](/blog/colophon-with-astro/). Webhook payloads aren't signed yet. CDN purges are tested against a fake CDN that caches by tag, and the adapter for a real CDN isn't built yet. The reference site and the demo sites run locally, not on the internet, and my own site doesn't run on Colophon yet. Some of the cache fault tests are still owed, and the publish-to-visible timing target hasn't been measured. A retry button for a single failed delivery is planned but not there yet. The other questions a CMS should be able to answer about a publish are mapped in [what a headless CMS should be able to prove](/blog/headless-cms-should-prove/). Progress, including what broke, goes in the build log: [404human.dev/colophon](https://404human.dev/colophon/).

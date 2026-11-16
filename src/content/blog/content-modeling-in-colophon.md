@@ -87,4 +87,4 @@ Entries can have locale variants, grouped as one logical entry. Each variant has
 
 ## Where it stands
 
-Colophon is pre-release (0.1.0-alpha) and has no users. Everything above is built and tested in the [repository](https://github.com/akira-shirase-oss/colophon-cms), including load runs of the modeling and locale endpoints. To see how this compares with a schema-as-code CMS, read [Colophon vs Strapi](/blog/colophon-vs-strapi/) or [Colophon vs Payload](/blog/colophon-vs-payload/). The build log is at [404human.dev/colophon](https://404human.dev/colophon/).
+Colophon is pre-release (0.1.0-alpha.1) and has no users. Everything above is built and tested in the [repository](https://github.com/akira-shirase-oss/colophon-cms), including load runs of the modeling and locale endpoints. To see how this compares with a schema-as-code CMS, read [Colophon vs Strapi](/blog/colophon-vs-strapi/) or [Colophon vs Payload](/blog/colophon-vs-payload/). The build log is at [404human.dev/colophon](https://404human.dev/colophon/).

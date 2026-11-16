@@ -1,6 +1,6 @@
 ---
 title: "What was live on your site last Tuesday?"
-description: "Most CMSs keep history per entry. Colophon numbers every publish as a release, so you can read the whole site exactly as it was at any past release."
+description: "Most CMSs keep history per entry. Colophon numbers every publish as a release, so you can read the whole site at any past release, minus what was taken down since."
 pubDate: 2026-11-16
 tags: ["releases", "history"]
 draft: false
@@ -71,6 +71,6 @@ Some systems are moving in this direction at the record level. In June 2026 Dato
 
 ## Where it stands
 
-Colophon is pre-release (0.1.0-alpha) and has no users. I'm building it in public, alone. The pieces above are built and tested: numbered releases, publication intervals, pinned reads through `?generation=`, the SDK's pinned client, and rollback as a reviewed changeset. In the Studio, a release's page has a slider that steps through releases ("Release 3 of 7") and shows each one's receipt. What it does not do yet is show you a rendered page of your site at that release; for now, reading content at a past release goes through the API. My own site isn't running on Colophon in production yet either. That is the next real test.
+Colophon is pre-release (0.1.0-alpha.1) and has no users. I'm building it in public, alone. The pieces above are built and tested: numbered releases, publication intervals, pinned reads through `?generation=`, the SDK's pinned client, and rollback as a reviewed changeset. In the Studio, a release's page has a slider that steps through releases ("Release 3 of 7") and shows each one's receipt. What it does not do yet is show you a rendered page of your site at that release; for now, reading content at a past release goes through the API. My own site isn't running on Colophon in production yet either. That is the next real test.
 
 I write up each step in the build log at [404human.dev/colophon](https://404human.dev/colophon/).

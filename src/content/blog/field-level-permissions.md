@@ -61,7 +61,7 @@ The field-level checks above live in one policy function in Colophon's Rust code
 - **The owner role can't be changed.** Database triggers refuse any update or delete of the owner role or its permissions, even as the application's own login.
 - **A project can't lose its last owner.** A deferred trigger refuses any commit that would leave none.
 - **Some powers are never a token's.** API tokens for scripts and agents can never hold member, role or token management, or read the audit log. The API refuses those grants, and so does a database check.
-- **The audit log is append-only.** Changes to roles, members, invitations and tokens, and a few operational events such as schema migration approvals, are recorded in the same transaction that makes them. A trigger refuses updates, deletes and truncation from anyone, the table owner included. The one exception is the retention sweep, which removes events after 90 days by default through a dedicated function.
+- **The audit log is append-only.** Changes to roles, members, invitations and tokens, and a few operational events such as schema migration approvals, are recorded in the same transaction that makes them. The server's database login can only add to it and read it, and a trigger refuses updates, deletes and truncation, including from the table's owner. There are two sanctioned deletes, each through its own database function: the retention sweep, which removes events after 90 days by default, and deleting a whole project, which removes that project's events with it. Whoever administers the database itself could still disable a trigger, so this protects the record from the application, not from the database's operator.
 
 ## Tokens for scripts and agents
 
@@ -75,4 +75,4 @@ Project API tokens use the same permission model as roles: read-only, full acces
 
 ## Where it stands
 
-Colophon is pre-release (0.1.0-alpha) and has no users. The roles, field lists, own-entry conditions, tokens, audit log and the database rules above are built and covered by tests against a real database. How this compares with other CMSs is in [Colophon vs Strapi](/blog/colophon-vs-strapi/) and [Colophon vs Directus](/blog/colophon-vs-directus/). The build log is at [404human.dev/colophon](https://404human.dev/colophon/).
+Colophon is pre-release (0.1.0-alpha.1) and has no users. The roles, field lists, own-entry conditions, tokens, audit log and the database rules above are built and covered by tests against a real database. How this compares with other CMSs is in [Colophon vs Strapi](/blog/colophon-vs-strapi/) and [Colophon vs Directus](/blog/colophon-vs-directus/). The build log is at [404human.dev/colophon](https://404human.dev/colophon/).
