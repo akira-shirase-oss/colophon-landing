@@ -1,10 +1,25 @@
 ---
 import styles from './Integrations.module.css'
 
-// icon order per row, as on the source page
-const rows = [
-  { icons: [1, 2, 3, 4, 5, 6, 7, 8], dir: 'right' as const },
-  { icons: [4, 5, 3, 2, 8, 6, 1, 7], dir: 'left' as const },
+// The five ways in, all behind the same permissions (lucide-style glyphs, one stroke and size)
+const surfaces = [
+  {
+    label: 'REST',
+    icon: '<path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/>',
+  },
+  {
+    label: 'GraphQL',
+    icon: '<rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/>',
+  },
+  {
+    label: 'TypeScript SDK',
+    icon: '<path d="M10 12.5 8 15l2 2.5"/><path d="m14 12.5 2 2.5-2 2.5"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/>',
+  },
+  { label: 'CLI', icon: '<path d="m4 17 6-6-6-6"/><path d="M12 19h8"/>' },
+  {
+    label: 'MCP server',
+    icon: '<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>',
+  },
 ]
 ---
 
@@ -13,7 +28,7 @@ const rows = [
     <div class={styles.head}>
       <div class={styles.titleBadge}>
         <p class="t-badge">For developers</p>
-        <h2 class="t-h2">One API, every surface. <span class="soft">Same rules on each.</span></h2>
+        <h2 class="t-h2">One API, every surface. <span class="soft">Same rules on each</span></h2>
       </div>
       <p class={`t-body ${styles.intro}`}>
         REST, GraphQL, the TypeScript SDK, the CLI and an MCP server all follow the same permissions. Test a Strapi or
@@ -21,24 +36,27 @@ const rows = [
       </p>
     </div>
 
-    <div class={styles.animation} aria-hidden="true">
+    <ul class={styles.surfaces}>
       {
-        rows.map((row) => (
-          <div class={styles.row}>
-            <div class={`${styles.track} ${row.dir === 'right' ? styles.toRight : styles.toLeft}`}>
-              {[0, 1].map(() => (
-                <ul class={styles.list}>
-                  {row.icons.map((n) => (
-                    <li class={styles.icon}>
-                      <img src={`/integrations/icon-${n}.svg`} alt="" width="96" height="96" />
-                    </li>
-                  ))}
-                </ul>
-              ))}
-            </div>
-          </div>
+        surfaces.map((x) => (
+          <li class={styles.surface}>
+            <span class={styles.icon} aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                width="28"
+                height="28"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                set:html={x.icon}
+              />
+            </span>
+            <span class={styles.label}>{x.label}</span>
+          </li>
         ))
       }
-    </div>
+    </ul>
   </div>
 </section>

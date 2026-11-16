@@ -2,13 +2,8 @@
 import ArrowButton from './ui/ArrowButton.astro'
 import styles from './Hero.module.css'
 
-const logos = [
-  { src: '/logos/logo-1.svg', w: 156, h: 58, name: 'Cloudplex' },
-  { src: '/logos/logo-2.svg', w: 135, h: 22, name: 'Tytotone' },
-  { src: '/logos/logo-3.svg', w: 139, h: 28, name: 'Bloopglow' },
-  { src: '/logos/logo-4.svg', w: 133, h: 27, name: 'Zingzap' },
-  { src: '/logos/logo-5.svg', w: 113, h: 25, name: 'Junotwig' },
-]
+// What Colophon is actually built on, set as plain words (no customer logos: it has no users yet)
+const stack = ['Rust', 'Svelte', 'PostgreSQL', 'Valkey', 'TypeScript']
 ---
 
 <section class={styles.hero}>
@@ -17,7 +12,7 @@ const logos = [
     <div class={styles.overlay} aria-hidden="true"></div>
     <div class={styles.title}>
       <h1 class="t-hero">
-        A CMS where every publish leaves a&nbsp;<em class={styles.em}>receipt</em>
+        A CMS where every publish leaves a&nbsp;receipt
       </h1>
       <p class={`t-body ${styles.sub}`}>
         Write, review and ship your site's articles, then see exactly what went live, when it went live, and where
@@ -29,16 +24,10 @@ const logos = [
 </section>
 
 <section class={styles.trusted}>
-  <p class="t-small" style="color: var(--c-ink);">Built in the open.</p>
-  <div class={styles.logos}>
-    {
-      logos.map((l) => (
-        <div class={styles.logoBox}>
-          <img src={l.src} alt={l.name} width={l.w} height={l.h} />
-        </div>
-      ))
-    }
-  </div>
+  <p class="t-small" style="color: var(--c-ink);">Built in the open with</p>
+  <ul class={styles.logos}>
+    {stack.map((name) => <li class={styles.logoBox}>{name}</li>)}
+  </ul>
 </section>
 
 <script>

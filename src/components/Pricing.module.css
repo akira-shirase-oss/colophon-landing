@@ -110,7 +110,11 @@
   position: relative;
 }
 .planName {
-  font-style: italic;
+  font-style: normal;
+}
+/* on the painting, the grey body text loses contrast: set it in near-black instead */
+.featured :is(.desc, .price :global(.t-body)) {
+  color: #1f1f1f;
 }
 .price {
   display: flex;

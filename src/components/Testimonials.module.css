@@ -1,9 +1,9 @@
+/* Three build-log excerpts in a static row. Quote on top, the post it came from at the bottom. */
 .inner {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 40px;
-  overflow: clip;
 }
 .head {
   display: flex;
@@ -16,44 +16,37 @@
   max-width: 500px;
 }
 
-.viewport {
+.grid {
+  list-style: none;
   width: 100%;
-  height: 346px;
-  border-radius: 10px;
-  overflow: clip;
-  -webkit-mask-image: radial-gradient(52% 177%, #000 0%, rgba(0, 0, 0, 0.8) 90.0901%, rgba(0, 0, 0, 0) 100%);
-  mask-image: radial-gradient(52% 177%, #000 0%, rgba(0, 0, 0, 0.8) 90.0901%, rgba(0, 0, 0, 0) 100%);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
 }
-.track {
+.grid > li {
   display: flex;
-  gap: 10px;
-  width: max-content;
-  /* 5 cards × (372 + 10) = 1910px per loop at 50px/s */
-  animation: marquee 38.2s linear infinite;
-}
-.list {
-  display: flex;
-  gap: 10px;
-}
-@keyframes marquee {
-  to {
-    transform: translateX(-1910px);
-  }
 }
 
 .card {
   position: relative;
   overflow: hidden;
-  cursor: pointer;
-  width: 372px;
-  height: 346px;
+  flex: 1;
+  min-height: 320px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 20px;
+  gap: 32px;
+  padding: 24px;
   border-radius: 12px;
-  background: #fff;
+  background: var(--c-surface);
+  color: var(--c-ink);
+  transition: background-color 0.2s var(--ease);
 }
+.card:focus-visible {
+  outline: 2px solid var(--c-ink);
+  outline-offset: 2px;
+}
+/* hover: the painting fades in behind the words */
 .hoverBg {
   position: absolute;
   inset: 0;
@@ -72,116 +65,65 @@
   position: relative;
 }
 .quote {
-  transition: opacity 0.4s var(--ease);
-  text-wrap: wrap;
   font-family: var(--font-quote);
-  font-size: 16px;
-  line-height: 1.2;
-  color: #000;
-  opacity: 0.8;
+  font-size: 18px;
+  line-height: 1.45;
+  color: #1f1f1f;
+  text-wrap: pretty;
 }
-.card:hover .quote {
-  opacity: 1;
-}
+
 .bottom {
-  width: 100%;
   display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 8px;
 }
-.person {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.avatar {
-  position: relative;
-  width: 52px;
-  height: 52px;
-  border-radius: 8px;
-  overflow: hidden;
-}
-.avatar::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border: 1px solid #fff;
-  border-radius: inherit;
-}
-.avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.name {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.role {
-  transition: opacity 0.4s var(--ease);
-  text-wrap: wrap;
-  font-family: var(--font-quote);
-  font-size: 16px;
-  line-height: 1.2;
-  color: #000;
-  opacity: 0.5;
-}
-.card:hover .role {
-  opacity: 0.7;
-}
-/* "Read on X" pill that appears on hover */
-.readOn {
-  z-index: 1;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  background: var(--c-ink);
+/* the signature: a dated stamp, like a release number on a receipt */
+.stamp {
   font-family: var(--font-body);
   font-size: 14px;
-  line-height: 19.6px;
-  color: #ebebeb;
-  white-space: nowrap;
-  opacity: 0;
-  transform: translateY(6px);
-  pointer-events: none;
-  transition:
-    opacity 0.3s var(--ease),
-    transform 0.4s var(--spring);
+  line-height: 1.4;
+  color: var(--c-text);
+  font-variant-numeric: tabular-nums;
 }
-.card:hover .readOn,
-.readOn:focus-visible {
-  opacity: 1;
-  transform: none;
-  pointer-events: auto;
+.readOn {
+  margin-top: 4px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--c-text);
+  text-decoration: underline;
+  text-decoration-color: var(--c-line);
+  text-underline-offset: 3px;
+  transition:
+    color 0.2s var(--ease),
+    text-decoration-color 0.2s var(--ease);
+}
+.card:hover .readOn {
+  color: var(--c-ink);
+  text-decoration-color: currentColor;
 }
 
 @media (max-width: 1199px) {
-  .name :global(.t-h5) {
+  .card {
+    padding: 20px;
+  }
+  .quote {
+    font-size: 16px;
+  }
+  .bottom :global(.t-h5) {
     font-size: 18px;
   }
 }
 @media (max-width: 809px) {
   .inner {
-    gap: 20px;
+    gap: 24px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
   .card {
-    width: 343px;
-  }
-  .track {
-    /* 5 × (343 + 10) = 1765px */
-    animation-name: marqueePhone;
-    animation-duration: 35.3s;
-  }
-}
-@keyframes marqueePhone {
-  to {
-    transform: translateX(-1765px);
+    min-height: 0;
   }
 }

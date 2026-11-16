@@ -46,8 +46,8 @@
   width: 660px;
   color: #fff;
 }
-.heading em {
-  font-weight: 400;
+.soft {
+  color: rgba(255, 255, 255, 0.72);
 }
 .sub {
   max-width: 500px;

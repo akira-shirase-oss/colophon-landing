@@ -9,16 +9,6 @@
   justify-content: center;
   gap: 40px;
 }
-.mosaic {
-  position: absolute;
-  left: 0;
-  top: 304px;
-  width: 531px;
-  height: 125px;
-  object-fit: cover;
-  z-index: 0;
-  pointer-events: none;
-}
 .left {
   position: relative;
   flex: 0 0 600px;
@@ -112,10 +102,6 @@
     height: 217px;
     justify-content: flex-start;
   }
-  .mosaic {
-    top: 315.8px;
-    width: 405px;
-  }
   .question :global(.t-h5) {
     font-size: 18px;
   }
@@ -133,11 +119,6 @@
     flex: none;
     width: 100%;
     height: auto;
-  }
-  .mosaic {
-    top: auto;
-    bottom: -135px;
-    width: calc(100% - 2px);
   }
   .question :global(.t-h5) {
     font-size: 18px;

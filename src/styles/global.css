@@ -164,11 +164,11 @@ figcaption {
   font-weight: 500;
   color: var(--c-ink);
 }
-/* the soft italic second phrase in many headings */
+/* the soft second phrase in many headings: the same face, set back in muted grey */
 .t-h2 .soft,
 .soft {
-  font-style: italic;
-  font-weight: 400;
+  font-style: normal;
+  font-weight: inherit;
   color: var(--c-muted);
 }
 .t-h3 {
