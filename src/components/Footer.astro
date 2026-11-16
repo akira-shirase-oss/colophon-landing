@@ -4,7 +4,7 @@ import BrandLogo from './ui/BrandLogo.astro'
 import BrandWordmark from './ui/BrandWordmark.astro'
 import styles from './Footer.module.css'
 
-// TODO(links): '#' marks a destination that does not exist yet (demo sites, contact, privacy, terms).
+// No public demo, contact address, privacy or terms page exists yet, so the footer links only to what does.
 const REPO = 'https://github.com/akira-shirase-oss/colophon-cms'
 const columns = [
   {
@@ -12,7 +12,6 @@ const columns = [
     links: [
       { label: 'Features', href: '/#features' },
       { label: 'Status', href: '/#pricing' },
-      { label: 'Demo sites', href: '#' },
     ],
   },
   {
@@ -21,14 +20,7 @@ const columns = [
       { label: 'Blog', href: '/blog/' },
       { label: 'Build log', href: 'https://404human.dev/colophon/' },
       { label: 'Source code', href: REPO },
-      { label: 'Contact', href: '#' },
-    ],
-  },
-  {
-    title: 'Legal',
-    links: [
-      { label: 'Privacy', href: '#' },
-      { label: 'Terms', href: '#' },
+      { label: 'Open an issue', href: `${REPO}/issues` },
     ],
   },
 ]
@@ -86,7 +78,6 @@ const socials = [
       <BrandWordmark class={styles.wordmarkImg} />
       <div class={styles.legal}>
         <p class="t-small">© 2026 Colophon · Made with <a href={REPO}>Rust and Svelte</a></p>
-        <a href="#" class="t-small" style="color: var(--c-ink);">Terms &amp; Conditions</a>
       </div>
     </div>
   </div>
