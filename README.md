@@ -21,6 +21,12 @@ npm run build    # static production build into dist/
   benefit cards, Phase/Proof switch, FAQ, hero scroll zoom) are small vanilla
   `<script>`s in the component; everything else is plain HTML with no JavaScript.
 - The FAQ also emits `FAQPage` structured data (JSON-LD).
+- `src/studio-ui/` — the Studio windows in "What's built". They are Colophon's own UI, copied from the
+  [Colophon repository](https://github.com/akira-shirase-oss/colophon-cms) (MIT; each file names its source):
+  the Studio's shell, buttons and badges as Svelte components, four screens with sample data, its site renderer
+  and its design tokens (`studio.css`, Tailwind CSS v4 limited to these files). Astro renders them at build
+  time and never hydrates them, so they add no JavaScript; the windows are `inert` and hidden from screen
+  readers, with a figure caption saying what each shows.
 
 ## Security headers and checks
 
@@ -29,7 +35,8 @@ HSTS, nosniff, `X-Frame-Options`, Referrer-Policy, Permissions-Policy and COOP. 
 site's own files plus a SHA-256 hash for each inline script.
 
 ```bash
-npm test                 # unit tests: JSON-LD output can't leave its <script> element
+npm test                 # unit tests: JSON-LD output can't leave its <script> element; the site builder
+                         # illustration has no live links or outline headings, and its theme passes AA
 npm run build
 npm run check            # dist/: headers and CSP fit every page; no leaks, drafts or unsafe new-tab links;
                          # every same-origin link resolves; each page has its title, description, one h1,
