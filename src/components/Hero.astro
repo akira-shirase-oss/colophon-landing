@@ -2,8 +2,6 @@
 import ArrowButton from './ui/ArrowButton.astro'
 import styles from './Hero.module.css'
 
-// What Colophon is actually built on, set as plain words (no customer logos: it has no users yet)
-const stack = ['Rust', 'Svelte', 'PostgreSQL', 'Valkey', 'TypeScript']
 ---
 
 <section class={styles.hero}>
@@ -21,11 +19,4 @@ const stack = ['Rust', 'Svelte', 'PostgreSQL', 'Valkey', 'TypeScript']
       <ArrowButton href="https://github.com/akira-shirase-oss/colophon-cms">See the source</ArrowButton>
     </div>
   </div>
-</section>
-
-<section class={styles.trusted}>
-  <p class="t-small" style="color: var(--c-ink);">Built in the open with</p>
-  <ul class={styles.logos}>
-    {stack.map((name) => <li class={styles.logoBox}>{name}</li>)}
-  </ul>
 </section>
