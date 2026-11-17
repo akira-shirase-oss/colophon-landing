@@ -13,11 +13,21 @@
     "check:browser": "node scripts/check-csp-browser.mjs"
   },
   "dependencies": {
-    "astro": "7.4.12"
+    "@astrojs/svelte": "9.1.6",
+    "@lucide/svelte": "1.62.0",
+    "@tailwindcss/vite": "4.3.3",
+    "astro": "7.4.12",
+    "svelte": "5.57.2",
+    "tailwindcss": "4.3.3"
   },
   "devDependencies": {
     "oxlint": "^1.90.0",
     "typescript": "~7.0.2"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "overrides": {
+    "@astrojs/svelte": {
+      "typescript": "$typescript"
+    }
+  }
 }

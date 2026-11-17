@@ -1,11 +1,12 @@
 /* "What's built": one large card per capability (the section heading is for screen readers only).
-   Text on the left (~36%), on the right a panel with a faint grid and a few pixel marks, a Studio window
-   framed in the accent, and a status card or a second crop floating over the window's right edge.
-   Tablets and phones stack the text above the window. */
+   Text on one side (~36%), on the other a panel with a faint grid and a few pixel marks, a Studio
+   window framed in the accent, and a status card floating over the window's edge. The window
+   sides alternate (right, left, right, left). Tablets and phones stack the text above the window;
+   on phones the window is full width and its status card sits under it. */
 
 .list {
   /* Benefits' blue (#2f64e8) deepened: 6.3:1 on white, 5.7:1 on the card's darkest grey (WCAG AA) */
-  --accent: #2756d0;
+  --feature-accent: #2756d0;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -20,6 +21,13 @@
   border-radius: 24px;
   border: 1px solid rgba(0, 0, 0, 0.06);
   background: linear-gradient(180deg, #fbfbfb 0%, #f3f3f3 100%);
+}
+/* window on the left, text on the right */
+.flip {
+  grid-template-columns: minmax(0, 64fr) minmax(0, 36fr);
+}
+.flip .text {
+  order: 2;
 }
 
 /* ---------- Text ---------- */
@@ -49,7 +57,7 @@
   font-size: 17px;
   line-height: 1.2;
   font-weight: 500;
-  color: var(--accent);
+  color: var(--feature-accent);
   border-radius: 4px;
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
@@ -65,7 +73,7 @@
   transform: translateX(3px);
 }
 .more:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--feature-accent);
   outline-offset: 4px;
 }
 
@@ -77,7 +85,7 @@
 }
 .panel {
   position: relative;
-  padding: 32px 80px 32px 32px;
+  padding: 24px 32px 24px 24px;
   border-radius: 16px;
   border: 1px solid rgba(0, 0, 0, 0.05);
   background:
@@ -85,6 +93,9 @@
     linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 1px, transparent 1px) 0 0 / 24px 24px,
     #fff;
   overflow: hidden;
+}
+.flip .panel {
+  padding: 24px 24px 24px 32px;
 }
 /* A few faint coloured pixels in the margins around the window; pure texture (a pseudo-element, so screen
    readers never meet it). Tints come from the Benefits palette. */
@@ -107,7 +118,7 @@
 
 .window {
   position: relative;
-  border: 4px solid var(--accent);
+  border: 4px solid var(--feature-accent);
   border-radius: 18px;
   background: #fff;
   overflow: hidden;
@@ -147,52 +158,75 @@
   white-space: nowrap;
 }
 
-/* Shows the rectangle --x, --y, --w × --h (image pixels) of a 1364 × 1128 mock-up, at any width */
-.crop {
+/* The Studio's main panel, cropped to the window: laid out at the window's width divided by
+   `zoom`, and scaled with `zoom`, which lays the text out again at the smaller size (sharp,
+   unlike a transform). The zoom never goes below 0.8 on desktops and 0.65 on phones, so the
+   Studio's 14px text stays at least 11px and 9px on screen; what doesn't fit is cropped. The
+   screen keeps a fixed shape, so nothing around it moves while fonts or images arrive. */
+.screen {
   position: relative;
-  aspect-ratio: var(--w) / var(--h);
-  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  /* clip, not hidden: nothing (a script, find in page) can scroll the crop */
+  overflow: clip;
+  container-type: inline-size;
+  background: oklch(0.975 0.004 75);
 }
-.crop img {
+.studio {
   position: absolute;
-  left: calc(var(--x) / var(--w) * -100%);
-  top: calc(var(--y) / var(--h) * -100%);
-  width: calc(1364 / var(--w) * 100%);
-  height: auto;
+  inset: 0;
+  zoom: 0.65;
+}
+@container (min-width: 400px) {
+  .studio {
+    zoom: 0.7;
+  }
+}
+@container (min-width: 560px) {
+  .studio {
+    zoom: 0.8;
+  }
+}
+@container (min-width: 720px) {
+  .studio {
+    zoom: 0.9;
+  }
+}
+@container (min-width: 880px) {
+  .studio {
+    zoom: 1;
+  }
 }
 
-.float {
+/* a receipt-style status card over the window's bottom-right corner, where the Studio pages keep
+   their least important parts */
+.receipt {
   position: absolute;
   z-index: 1;
   right: -24px;
   bottom: -28px;
+  width: 300px;
+  padding: 16px 18px 6px;
+  border-radius: 16px;
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.07);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.05),
     0 20px 44px -16px rgba(0, 0, 0, 0.22);
 }
-
-/* a second Studio screen, cropped tall */
-.shot {
-  width: 30%;
-  border-radius: 18px;
-  overflow: hidden;
-}
-
-/* a receipt-style status card */
-.receipt {
-  width: 272px;
-  padding: 16px 18px 6px;
-  border-radius: 16px;
+/* the site builder's card sits in the window's empty top corner, clear of the canvas */
+.clear .receipt {
+  top: 40px;
+  bottom: auto;
 }
 .receiptHead {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 6px 12px;
 }
 .receiptLabel {
+  white-space: nowrap;
   font-family: var(--font-body);
   font-size: 13px;
   line-height: 1.2;
@@ -208,6 +242,7 @@
   font-family: var(--font-body);
   font-size: 13px;
   line-height: 1;
+  white-space: nowrap;
   color: #1f1f1f;
   background: var(--tint);
 }
@@ -232,6 +267,7 @@
   line-height: 1.2;
   font-weight: 500;
   color: var(--c-ink);
+  overflow-wrap: anywhere;
 }
 .rows {
   margin-top: 10px;
@@ -259,10 +295,14 @@
   .list {
     gap: 20px;
   }
-  .card {
+  .card,
+  .flip {
     grid-template-columns: minmax(0, 1fr);
     gap: 36px;
     padding: 36px;
+  }
+  .flip .text {
+    order: 0;
   }
   .text {
     max-width: 640px;
@@ -277,12 +317,17 @@
   .more {
     margin-top: 24px;
   }
-  .panel {
+  .panel,
+  .flip .panel {
     padding: 32px 112px 32px 32px;
   }
-  .float {
+  .receipt {
     right: -16px;
     bottom: -20px;
+  }
+  .clear .receipt {
+    top: 40px;
+    bottom: auto;
   }
 }
 
@@ -291,7 +336,8 @@
   .list {
     gap: 12px;
   }
-  .card {
+  .card,
+  .flip {
     gap: 24px;
     padding: 24px 20px 28px;
     border-radius: 20px;
@@ -307,9 +353,20 @@
     margin-top: 20px;
     font-size: 16px;
   }
-  .panel {
-    padding: 12px;
-    border-radius: 14px;
+  /* the window takes the stage's full width: no panel around it */
+  .panel,
+  .flip .panel {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    overflow: visible;
+  }
+  .panel::before {
+    content: none;
+  }
+  .screen {
+    aspect-ratio: 1 / 1;
   }
   .window {
     border-width: 3px;
@@ -330,17 +387,19 @@
     padding: 2px 14px;
     font-size: 12px;
   }
-  /* the window shows in full: the second crop is left out (so its image never loads) */
-  .shot {
-    display: none;
-  }
-  /* the status card moves under the window, overlapping only its bottom edge by 28px */
-  .receipt {
+  /* the window shows in full; the status card sits under it, overlapping only its bottom edge by
+     28px, and the site builder's not at all, so the canvas stays clear */
+  .receipt,
+  .clear .receipt {
     position: relative;
+    top: auto;
     right: auto;
     bottom: auto;
-    width: min(272px, 85%);
-    margin: -40px 12px 0 auto;
+    width: min(300px, 85%);
+    margin: -28px 12px 0 auto;
     padding: 14px 16px 4px;
+  }
+  .clear .receipt {
+    margin-top: 12px;
   }
 }
