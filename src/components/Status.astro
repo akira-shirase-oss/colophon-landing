@@ -6,11 +6,11 @@ import styles from './Blog.module.css'
 
 type Props = { note?: string }
 const { note } = Astro.props
+// Astro drops whitespace between lines of markup, so the spaces between the parts are explicit.
+const text = note ? `${status.line} ${note}` : status.line
 ---
 
 <p class={styles.status}>
-  <strong>Status.</strong>
-  {status.line}
-  {note && <> {note}</>}
-  See <a href={status.done.href}>{status.done.text}</a> and <a href={status.log.href}>{status.log.text}</a>.
+  <strong>Status.</strong>{' '}{text}{' '}See <a href={status.done.href}>{status.done.text}</a> and{' '}
+  <a href={status.log.href}>{status.log.text}</a>.
 </p>
