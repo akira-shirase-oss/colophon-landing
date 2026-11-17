@@ -1,111 +1,204 @@
 ---
-import SectionHeading from './ui/SectionHeading.astro'
 import styles from './Features.module.css'
 
-const items = [
+// What part of a mock-up to show, in the image's own pixels (every feature image is 1364 × 1128).
+// The mock-ups carry their own window bar; the crop starts below it, so the page draws one bar of its own.
+type Crop = { x: number; y: number; w: number; h: number }
+
+// A small status card that floats over the window. Every line is true of Colophon today (docs/modules on GitHub).
+type Receipt = {
+  label: string
+  status: string
+  tone: 'green' | 'blue'
+  title: string
+  rows: [string, string][]
+  /** what a screen reader hears instead of the card's parts */
+  says: string
+}
+
+type Item = {
+  title: string
+  body: string
+  alt: string
+  image: string
+  crop: Crop
+  /** where "Learn more" goes, and the words a screen reader adds after "Learn more" */
+  href: string
+  topic: string
+  float: { shot: Crop } | { receipt: Receipt }
+}
+
+const docs = 'https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/modules'
+
+const items: Item[] = [
   {
     title: 'Sites without custom CSS',
     body: 'Build pages, menus and themes from a fixed set of sections and design tokens, then publish them like any article.',
     alt: 'Illustration of the site builder: a home page made of sections, with a section library and design tokens beside it',
+    image: '/images/feature-1.webp',
+    crop: { x: 98, y: 142, w: 1266, h: 970 },
+    href: `${docs}/15-web-blog.md`,
+    topic: 'the website builder in the module notes on GitHub',
+    // the article editor (feature-mobile.webp), cropped tall to its title and body
+    float: { shot: { x: 418, y: 296, w: 420, h: 644 } },
   },
   {
     title: "Media that can't break a page",
     body: 'Every upload is checked before it can be published, so a release never goes out pointing at a broken image.',
     alt: 'Illustration of the media library: a grid of uploaded images, each marked as checked',
+    image: '/images/feature-2.webp',
+    crop: { x: 98, y: 144, w: 1266, h: 970 },
+    href: `${docs}/07-media.md`,
+    topic: 'how uploads are checked in the module notes on GitHub',
+    float: {
+      receipt: {
+        label: 'Upload',
+        status: 'Verified',
+        tone: 'green',
+        title: 'alpine-lake.jpg',
+        rows: [
+          ['Type', 'JPEG, read from the file'],
+          ['Metadata', 'Stripped'],
+          ['Renditions', 'w320, w1280'],
+        ],
+        says: 'Example upload alpine-lake.jpg, verified: its type read from the file as JPEG, metadata stripped, renditions w320 and w1280 made.',
+      },
+    },
   },
   {
     title: 'Rollbacks that get reviewed',
     body: 'Returning to an older version opens a normal change for review instead of skipping the process.',
     alt: 'Illustration of a rollback waiting for review: the entries it will restore and the review stages it must pass',
+    image: '/images/feature-3.webp',
+    crop: { x: 98, y: 156, w: 1266, h: 970 },
+    href: '/blog/roll-back-a-bad-publish/',
+    topic: 'reviewed rollbacks on the blog',
+    float: {
+      receipt: {
+        label: 'Publish request',
+        status: 'In review',
+        tone: 'blue',
+        title: 'Rollback to release 1',
+        rows: [
+          ['Live now', 'Release 2'],
+          ['Once approved', 'Release 3'],
+          ['Review', 'Same as any publish'],
+        ],
+        says: 'Example publish request "Rollback to release 1", in review. Release 2 is live now; once approved, the rollback goes live as release 3, reviewed like any publish.',
+      },
+    },
   },
   {
     title: 'Generated API docs and SDK',
-    body: "The API document is generated from the server's own route table, the TypeScript SDK's types from that document, and the CLI and MCP tools go through the same API.",
+    body: "The API document is generated from the server's own route table, and the TypeScript SDK's types from that document.",
     alt: 'Illustration of the developer settings: REST, GraphQL, SDK, CLI and MCP tabs above a list of scoped API tokens',
+    image: '/images/feature-4.webp',
+    crop: { x: 98, y: 158, w: 1266, h: 970 },
+    href: `${docs}/13-sdk.md`,
+    topic: 'the generated SDK in the module notes on GitHub',
+    float: {
+      receipt: {
+        label: 'API document',
+        status: 'Generated',
+        tone: 'green',
+        title: 'openapi.json',
+        rows: [
+          ['Source', "The server's route table"],
+          ['SDK types', 'api.types.ts'],
+          ['CLI and MCP', 'The same /api/v1'],
+        ],
+        says: "Example API document openapi.json, generated from the server's route table. The SDK's types are generated from it, and the CLI and MCP tools use the same API.",
+      },
+    },
   },
 ]
+
+const cropStyle = (c: Crop) => `--x: ${c.x}; --y: ${c.y}; --w: ${c.w}; --h: ${c.h}`
 ---
 
 <section class="section" id="features">
-  <div class={`container ${styles.inner}`}>
-    <div class={styles.head}>
-      <SectionHeading badge="What's built" class={styles.heading}>
-        The core is done.
-        <br />
-        <span class="soft">The rest is in arcs</span>
-      </SectionHeading>
-      <p class={`t-body-lg ${styles.intro}`}>
-        Writing, editing, publishing and
-        <a class="inline-link" href="/blog/website-not-updating-after-publish/">delivery checks</a> are built and
-        tested. Newer work arrives in arcs, and each one is tested against failure before it counts.
-      </p>
-    </div>
+  <div class="container">
+    <h2 class="visually-hidden">What's built</h2>
 
-    <div class={styles.body} data-features>
-      <div class={styles.menu} role="tablist" aria-label="Capabilities">
-        {
-          items.map((it, i) => (
-            <>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={String(i === 0)}
-                class={styles.item}
-                data-active={String(i === 0)}
-              >
-                <img src="/icons/double-arrow.svg" alt="" width="24" height="24" class={styles.arrow} />
-                <span class={styles.content}>
-                  <span class={`t-h4 ${styles.title}`}>{it.title}</span>
-                  <span class={styles.desc}>
-                    <span class="t-small">{it.body}</span>
-                  </span>
-                </span>
-              </button>
-              {i === 0 && (
-                <div class={styles.inlineImage}>
-                  <img src="/images/feature-mobile.webp" alt="" loading="lazy" />
+    <ul class={styles.list}>
+      {
+        items.map((it, i) => (
+          <li class={styles.card}>
+            <div class={styles.text}>
+              <h3 class={styles.title}>{it.title}</h3>
+              <p class={styles.body}>{it.body}</p>
+              <a class={styles.more} href={it.href}>
+                Learn more<span class="visually-hidden"> about {it.topic}</span>
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 8h10M9 4l4 4-4 4" />
+                </svg>
+              </a>
+            </div>
+
+            <div class={styles.stage}>
+              <div class={styles.panel}>
+                <div class={styles.window}>
+                  <div class={styles.bar} aria-hidden="true">
+                    <span class={styles.dots}>
+                      <span />
+                      <span />
+                      <span />
+                    </span>
+                    <span class={styles.address}>Colophon Studio</span>
+                  </div>
+                  <div class={styles.crop} style={cropStyle(it.crop)}>
+                    <img
+                      src={it.image}
+                      alt={it.alt}
+                      width="1364"
+                      height="1128"
+                      loading={i === 0 ? 'eager' : 'lazy'}
+                      decoding="async"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {'shot' in it.float ? (
+                <div class={`${styles.float} ${styles.shot}`} aria-hidden="true">
+                  <div class={styles.crop} style={cropStyle(it.float.shot)}>
+                    <img src="/images/feature-mobile.webp" alt="" width="1364" height="1128" loading="lazy" decoding="async" />
+                  </div>
+                </div>
+              ) : (
+                <div class={`${styles.float} ${styles.receipt}`} role="img" aria-label={it.float.receipt.says}>
+                  <div class={styles.receiptHead}>
+                    <span class={styles.receiptLabel}>{it.float.receipt.label}</span>
+                    <span class={`${styles.status} ${styles[it.float.receipt.tone]}`}>
+                      <span class={styles.dot} />
+                      {it.float.receipt.status}
+                    </span>
+                  </div>
+                  <p class={styles.receiptTitle}>{it.float.receipt.title}</p>
+                  <dl class={styles.rows}>
+                    {it.float.receipt.rows.map(([k, v]) => (
+                      <div>
+                        <dt>{k}</dt>
+                        <dd>{v}</dd>
+                      </div>
+                    ))}
+                  </dl>
                 </div>
               )}
-            </>
-          ))
-        }
-      </div>
-
-      <div class={styles.image} role="tabpanel">
-        {
-          items.map((it, i) => (
-            <img
-              src={`/images/feature-${i + 1}.webp`}
-              alt={i === 0 ? it.alt : ''}
-              data-alt={it.alt}
-              data-active={String(i === 0)}
-              loading={i === 0 ? 'eager' : 'lazy'}
-            />
-          ))
-        }
-      </div>
-    </div>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
   </div>
 </section>
-
-<script>
-  // One active capability; on tablets and phones its screenshot sits right under its button.
-  const root = document.querySelector<HTMLElement>('[data-features]')!
-  const buttons = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')]
-  const images = [...root.querySelectorAll<HTMLImageElement>('[role="tabpanel"] img')]
-  const inline = buttons[0].nextElementSibling as HTMLElement
-
-  buttons.forEach((button, i) =>
-    button.addEventListener('click', () => {
-      buttons.forEach((b, j) => {
-        b.setAttribute('aria-selected', String(i === j))
-        b.dataset.active = String(i === j)
-      })
-      images.forEach((img, j) => {
-        img.alt = i === j ? img.dataset.alt! : ''
-        img.dataset.active = String(i === j)
-      })
-      button.after(inline)
-    }),
-  )
-</script>

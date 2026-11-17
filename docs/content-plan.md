@@ -185,8 +185,8 @@ delivery, a real CDN adapter, the 24-hour soak result).
 - Every published post links to at least three related posts in its body, where the topic comes
   up, and is linked from at least three others.
 - Landing sections linked from posts: `/#pricing` (the Status cards). The home page links into
-  the blog from running text: Features (delivery checks), Status (load tests) and For developers
-  (permissions).
+  the blog from What's built (the rollbacks card's Learn more), and from running text in Status
+  (load tests) and For developers (permissions).
 - No post links to a draft. `npm run check` fails on any same-origin link, image or fragment that
   doesn't resolve in the build, and on missing titles, descriptions, canonicals, share cards, alt
   text, or a sitemap or feed that doesn't match the published posts.
