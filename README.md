@@ -22,6 +22,22 @@ npm run build    # static production build into dist/
   `<script>`s in the component; everything else is plain HTML with no JavaScript.
 - The FAQ also emits `FAQPage` structured data (JSON-LD).
 
+## Security headers and checks
+
+`public/_headers` holds the headers Cloudflare Pages sends with every response: a Content-Security-Policy,
+HSTS, nosniff, `X-Frame-Options`, Referrer-Policy, Permissions-Policy and COOP. The policy allows only the
+site's own files plus a SHA-256 hash for each inline script.
+
+```bash
+npm run build
+npm run check            # dist/: headers present, and the CSP fits every page
+npm run check:browser    # every page in headless Chromium with those headers: no CSP violations
+```
+
+When a component's `<script>` changes, its hash changes and `npm run check` fails with the new value: read
+the script, then swap the hash in `public/_headers`. `check:browser` needs Playwright, which is not a
+dependency here; see the top of `scripts/check-csp-browser.mjs`.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
