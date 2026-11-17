@@ -1,77 +1,187 @@
 ---
-title: "What was live on your site last Tuesday?"
-description: "Most CMSs keep history per entry. Colophon numbers every publish as a release, so you can read the whole site at any past release, minus what was taken down since."
+title: "How to see what your website said on a past date"
+description: "Version history per entry can't show what your whole site said on a given day. The options on any stack, and how numbered releases make it one lookup."
 pubDate: 2026-11-16
 updatedDate: 2026-11-17
-tags: ["releases", "history"]
+tags: ["history", "releases", "versioning", "audit"]
+status: "For this topic: there's no way yet to browse a rendered page at an old release, and the release-to-date lookup below goes through the API."
 draft: false
 ---
 
-Someone asks what your site said on a particular day. It might be a complaint about a price, an editor checking a correction, a lawyer, or a bug that only showed up for a few hours. You open the CMS and find version history for each entry, one at a time. That tells you how one page changed. It does not easily tell you what the whole site looked like at one moment.
+Someone asks what your site said on a particular day. It might be a complaint about a price, an editor checking when a correction went out, a lawyer, or a bug that only showed for a few hours. You open the CMS and find version history for each entry, one at a time. That tells you how one page changed. It doesn't easily tell you what the whole site looked like at one moment.
 
-This post explains how I built Colophon to answer that question directly, and where it still falls short.
+This post covers the ways to answer that question on any stack, what each one can and can't show, and the data model that turns it into a single lookup. Colophon, the CMS I build, is the worked example in the second half. It is the starting point for everything on this blog about history, [rolling back a bad publish](/blog/roll-back-a-bad-publish/) and [not losing edits](/blog/cms-lost-edits/).
 
-## Per-entry history versus whole-site history
+## The short answer
 
-Most content systems keep revisions per entry. Every save creates a version, and you can compare and restore old ones. That is useful, and Colophon has it too: revisions never change once written, and restoring an old one creates a new revision instead of rewriting the past.
+Per-entry version history answers "how did this page change?", not "what was live at 3 pm on Tuesday?". For the second question you need either a snapshot of the whole site from that moment (a web archive, an old build, a git commit, a database restored to that time) or a CMS that records when each version was live. The snapshot options work on any stack but each has gaps. The data-model option is cheap once it exists: keep, for every entry, the span during which each version was published, and number your publishes so "Tuesday at 3 pm" becomes one number.
 
-The trouble starts when the question covers more than one entry. "What was live last Tuesday at 3 pm?" means: for every entry, which version was published at that moment, and which entries were not published at all. With per-entry history you have to rebuild that answer yourself, entry by entry, from timestamps. If one entry was published, unpublished and published again, you need every one of those intervals, not just the last.
+## Why per-entry history can't answer it
 
-Colophon keeps a second kind of history alongside revisions: the history of what was published, for the site as a whole.
+Most content systems keep [revisions](/blog/headless-cms-glossary/#revision) per entry: every save creates a version, and you can compare and restore old ones. That is useful, and it answers a different question.
 
-## Every publish is a numbered release
+"What was live last Tuesday at 3 pm?" means: for every entry, which version was published at that moment, and which entries weren't published at all. With per-entry history you rebuild that answer yourself, entry by entry, from timestamps. Versions saved but never published get in the way. An entry that was published, taken down and published again needs every one of those spans, not only the last. And a list page or a navigation menu that was built from twenty entries needs all twenty answered for the same moment.
 
-In Colophon a publish is a changeset: a reviewed set of exact revisions, even when it holds a single entry. Each publish commits as one release. Releases are numbered. Within an environment the number goes up by exactly one per committed release, and it never goes down.
+## Options that work on any stack
 
-The Studio says it in plain words on the Releases page: "Every publish is a numbered release." Each release in the list shows its number, its title, how many entries changed, who published it and when.
+| Option | What it shows | Good for | Gaps |
+|---|---|---|---|
+| A web archive, such as the Wayback Machine | Rendered pages, as a crawler saw them | Public pages, with no setup | Only what was crawled, and only when; the nearest capture may be days off |
+| Old builds kept by your host | The exact HTML you deployed | Static sites | Only as far back as builds are kept; a deploy time is not a publish time |
+| Git history (git-based CMSs) | Content files at any commit | Decap, Keystatic, Tina and similar | A commit is not a deploy; pages built from several files need a build to see |
+| Database point-in-time recovery | Everything, as stored at a moment | Disasters and audits with time to spare | Heavy: restore a copy, then query it; drafts and published content are mixed |
+| Audit or activity logs | Who changed what, and when | The "who" | Rarely stores the content itself |
 
-Under the hood, each entry keeps a publication history: a list of intervals over release numbers, each one saying "this revision was live from release A up to, but not including, release B". The intervals for one entry never overlap, and at most one is open. So for any release number, each entry has at most one answer, or none.
+Two of these are worth trying right now.
 
-That is what makes the question cheap to ask. "What was live at release 41?" is a lookup, not a reconstruction.
+**Ask the Wayback Machine for the capture nearest your moment.** Its availability API returns the closest snapshot it has, and its timestamp, which you must check:
 
-## Reading the site as it was at a release
+```sh
+curl -s "https://archive.org/wayback/available?url=example.com/pricing&timestamp=20261110150000"
+```
 
-The public content API reads the latest release by default. Add `?generation=` and it reads a past one instead. (Inside Colophon a release number is called a generation. The Studio says "release"; the API says "generation". They are the same number.)
+**On a git-based CMS, read the content as it was committed at that time.** This finds the last commit on `main` before the moment and prints a file from it:
+
+```sh
+rev=$(git rev-list -1 --before="2026-11-10 15:00:00 +0000" main)
+git show "$rev:content/pages/pricing.md"
+```
+
+Both answer "what existed", not quite "what readers saw". A commit still had to be built and deployed, and a capture shows one URL from one crawler's point of view. If the answer matters, say which of the two you have.
+
+## The data model that makes it cheap
+
+The idea behind every cheap answer is the same: record when each version was live, for every entry, and give the moments a name.
+
+Number every publish. A publish that changes five entries is release 41; the next publish is release 42. Then, for each entry, keep a [publication interval](/blog/headless-cms-glossary/#publication-interval) for each time a version was live: "this version was live from release A up to, but not including, release B". An entry has at most one open interval, and its intervals never overlap. "What was live at release 41" becomes: every interval that contains 41.
+
+<figure>
+<svg viewBox="0 0 640 300" role="img" aria-labelledby="intervals-title intervals-desc" xmlns="http://www.w3.org/2000/svg" font-family="Geist, sans-serif">
+<title id="intervals-title">Publication intervals for three entries across releases 39 to 44</title>
+<desc id="intervals-desc">Pricing: version 1 live from release 39 until release 42, then version 2 from 42 onwards. About: version 1 live from 39 onwards. Promo: version 1 live from release 40 until 43, when it was taken down. A dashed line at release 41, Tuesday at 3 pm, crosses pricing version 1, about version 1 and promo version 1: that is what was live.</desc>
+<g font-size="17" fill="#000" font-weight="600">
+<text x="0" y="69">Pricing</text>
+<text x="0" y="129">About</text>
+<text x="0" y="189">Promo</text>
+</g>
+<g fill="#f2f2f2" stroke="#000" stroke-width="1.5">
+<rect x="160" y="48" width="270" height="30" rx="6"/>
+<rect x="430" y="48" width="200" height="30" rx="6"/>
+<rect x="160" y="108" width="470" height="30" rx="6"/>
+<rect x="250" y="168" width="270" height="30" rx="6"/>
+</g>
+<g font-size="15" fill="#000">
+<text x="172" y="68">version 1</text>
+<text x="442" y="68">version 2 →</text>
+<text x="172" y="128">version 1 →</text>
+<text x="262" y="188">version 1</text>
+<text x="530" y="188" fill="#5e5e5e">taken down</text>
+</g>
+<path d="M520 160v46" stroke="#000" stroke-width="3"/>
+<path d="M340 30v200" stroke="#000" stroke-width="1.5" stroke-dasharray="5 5"/>
+<text x="348" y="24" font-size="15" fill="#000" font-weight="600">Tuesday 3 pm = release 41</text>
+<g stroke="#8c8c8c" stroke-width="1"><path d="M160 238h470"/><path d="M160 232v12M250 232v12M340 232v12M430 232v12M520 232v12M610 232v12"/></g>
+<g font-size="15" fill="#5e5e5e" text-anchor="middle">
+<text x="160" y="266">39</text><text x="250" y="266">40</text><text x="340" y="266">41</text><text x="430" y="266">42</text><text x="520" y="266">43</text><text x="610" y="266">44</text>
+<text x="395" y="292">release number</text>
+</g>
+</svg>
+<figcaption>Each bar is the span during which one version was live. Whatever the dashed line crosses is the site at release 41.</figcaption>
+</figure>
+
+In a relational database it is one table and one query. A sketch in PostgreSQL, where the exclusion constraint makes overlapping intervals for one entry impossible rather than unlikely:
+
+```sql
+create extension if not exists btree_gist;
+
+create table publications (
+  entry_id    bigint not null,
+  revision_id bigint not null,
+  valid_from  bigint not null,   -- the release that published this revision
+  valid_to    bigint,            -- the release that replaced or removed it; null while live
+  exclude using gist (entry_id with =, int8range(valid_from, valid_to) with &&)
+);
+
+-- What was live at release 41: one lookup, no reconstruction.
+select entry_id, revision_id
+from publications
+where valid_from <= 41
+  and (valid_to is null or valid_to > 41);
+```
+
+The last piece is a table of releases with the time each was published, which turns a date into a number: the last release published before the moment is the one that was live.
+
+## How Colophon answers it
+
+Colophon is built on that model. Every publish is a numbered [release](/blog/headless-cms-glossary/#release), committed in one transaction; within an environment the number goes up by exactly one per release and never goes back. Each entry keeps its publication intervals over release numbers, enforced by the database. Revisions never change once written, so "release 41" names exact content.
+
+The public content API reads the latest release by default. Add `?generation=` and it reads a past one instead (the API calls a release number a generation):
 
 ```http
 GET /content/v1/{project}/{environment}/{collection}?generation=41
 ```
 
-The answer carries a `Colophon-Generation` header naming the release it was read at, and each entry in it says which release its version went live in (`published_in`). A few details matter if you are using this for an audit:
+To go from a date to a release, list the releases, which records when each was published, and take the last one at or before your moment. A sketch in TypeScript for Node 22 or later, written against the API document on Colophon's `main` as of 17 November 2026:
+
+```ts
+const api = process.env.COLOPHON_API!; // e.g. https://cms.example.com
+const project = process.env.COLOPHON_PROJECT!; // the project's id
+const token = process.env.COLOPHON_TOKEN!; // an API token that can read
+const environment = 'production';
+
+type Release = { generation: number; published_at: string };
+
+/** The release that was live at `moment`, or null if nothing was published yet. */
+async function releaseAt(moment: Date): Promise<number | null> {
+  let cursor: string | null = null;
+  do {
+    const url = new URL(`/api/v1/projects/${project}/environments/${environment}/releases`, api);
+    if (cursor !== null) url.searchParams.set('cursor', cursor);
+    const response = await fetch(url, { headers: { authorization: `Bearer ${token}` } });
+    if (!response.ok) throw new Error(`releases: HTTP ${response.status}`);
+    const page = (await response.json()) as { data: Release[]; next_cursor: string | null };
+    // Newest first, so the first one published at or before the moment was live then.
+    const live = page.data.find((release) => new Date(release.published_at) <= moment);
+    if (live) return live.generation;
+    cursor = page.next_cursor;
+  } while (cursor !== null);
+  return null;
+}
+
+const generation = await releaseAt(new Date('2026-11-10T15:00:00Z'));
+if (generation === null) throw new Error('nothing was published yet at that moment');
+const pages = await fetch(new URL(`/content/v1/${project}/${environment}/pages?generation=${generation}`, api));
+console.log(`release ${pages.headers.get('colophon-generation')}`, await pages.json());
+```
+
+A few details matter if you use this for an audit:
 
 - **Pages don't mix releases.** A list's cursor carries the release number of its first page, so paging through a long collection keeps reading the same release even if someone publishes in the middle.
-- **A release that doesn't exist is refused.** Asking for a number that hasn't been committed is a `422 invalid_generation` error, not a silent fallback to the latest.
-- **References follow the pin.** When a query expands referenced entries, the referenced entries are read at the same release as the page.
-- **The cache can't confuse them.** Every cache key includes the release number, so a cached answer for release 41 is never served for release 42.
+- **References follow the pin.** When a query expands referenced entries, they are read at the same release as the page.
+- **A release that doesn't exist is refused**, never answered quietly from the latest one.
+- **The cache can't confuse them.** Every cache key includes the release number, so an answer cached for release 41 is never served for release 42.
 
-The TypeScript SDK has the same idea: `delivery(project).atGeneration(41)` returns a client whose every read is pinned to that one release. A static site build can pin itself the same way; [using Colophon as a headless CMS for Astro](/blog/colophon-with-astro/) shows how.
+A static build can pin itself the same way, which keeps every page of one build on one release; [using Colophon as a headless CMS for Astro](/blog/astro-headless-cms/) shows how. A release published in Colophon still has to reach readers through rebuilds and caches, and each release keeps a receipt of that: [why your site shows old content after publishing](/blog/website-not-updating-after-publish/).
 
-## Turning a date into a release
+## What history won't show you
 
-There is no `?at=2026-11-10T15:00` parameter. The API takes a release number. To answer "last Tuesday", you look at the releases list, which records when each release was published, and take the last release published before the moment you care about. That release was live until the next one went out. Then you read the site at that number.
+- **Content taken down stays down.** If an entry was unpublished, a read pinned to an old release doesn't return it; the answer is that it's gone, at every release number. The release list still shows that a release changed entries and how many it took down, but the content isn't served. For some audits that is a limit to know about; it is also what makes a takedown real.
+- **Gated content stays gated.** A pin to an old release doesn't let a visitor read members-only content their role can't read today.
+- **No rendered pages yet.** In the Studio, a release's page has a slider that steps through releases and shows each receipt, but there's no way yet to browse a rendered page of your site as it was at that release. Past content is read through the API.
+- **A release time is not a reader time.** A release was live in Colophon from the moment it committed. When readers saw it depends on your site; the receipt records what a site check saw, and when.
 
-One more thing happens between "published in Colophon" and "readers saw it": your website has to rebuild or clear its cache. That is a separate problem, and each release records its own receipt of what reached your site: ["Published" should mean readers can see it](/blog/published-means-readers-can-see-it/).
-
-## Rolling back is just another release
-
-If release 41 was right and release 42 was a mistake, Colophon does not move the counter backwards. In the Studio, a past release's page has a "Roll back to this release" button. Through the API it is `POST .../releases/{generation}/rollback`.
-
-Either way, the rollback builds an ordinary changeset. It pins the version that was live at that release for every entry that has changed since, plus an unpublish for every entry that is live now but wasn't then. That changeset then goes through the same review and the same publish as any other change, and it becomes a new release, say 43. Releases 41 and 42 stay in the history exactly as they were.
-
-I chose this on purpose, and wrote up the reasoning in [rollback is a change too](/blog/rollback-is-a-change-too/). A rollback that skipped review would be the one way to change the live site without anyone approving it. Making it a normal changeset means the review rules cover it without any special case. A test in the repository walks through it: publish release 1, publish release 2, roll back to 1 as release 3, then check that reads pinned at 1, 2 and 3 and the latest each return what they should.
-
-## What history will not show you
-
-Time travel never brings back content that has since been taken down. If an entry was unpublished, a pinned read at an old release doesn't return it; the current answer is that it is gone. A rollback doesn't restore a publication that was revoked either. History is a record of what was published, not a way around a takedown. For some audits that's a limit you need to know about: the release list still shows that the release changed entries and how many it took down, but the content itself is no longer served.
-
-Gated content works the same way. A pin to an old release doesn't let a visitor read members-only content their role can't read today.
+Undoing a release is the other half of history. A rollback in Colophon doesn't move the counter back: it builds a reviewed change that becomes a new release, and both stay in the history. [Rolling back a release as a reviewed change](/blog/roll-back-a-bad-publish/) covers why.
 
 ## How other CMSs handle this
 
-Some systems are moving in this direction at the record level. In June 2026 DatoCMS [added publication ranges to record versions](https://www.datocms.com/product-updates/see-exactly-when-each-version-of-a-record-was-live), with `published_from` and `published_until` metadata. Their announcement documents two limits: a version republished without edits "reflects its latest interval rather than a full multi-interval log", and intervals are not reconstructed for versions that were already live when the feature shipped. It is still per-record history, which is the model I wanted to step away from. The same is true of the open-source CMSs I compared: Strapi, Payload and Directus all keep history per entry or per item, not per release of the whole site (see [Colophon vs Strapi](/blog/colophon-vs-strapi/), [vs Payload](/blog/colophon-vs-payload/) and [vs Directus](/blog/colophon-vs-directus/)).
+Some CMSs are moving in this direction at the record level. In June 2026 DatoCMS [added publication ranges to record versions](https://www.datocms.com/product-updates/see-exactly-when-each-version-of-a-record-was-live), with `published_from` and `published_until` metadata (checked 16 November 2026). Their announcement documents two limits: a version republished without edits "reflects its latest interval rather than a full multi-interval log", and intervals aren't reconstructed for versions that were already live when the feature shipped. It is still per-record history. Strapi, Payload and Directus also keep history per entry or per item, not per release of the whole site; the comparisons with [Strapi](/blog/colophon-vs-strapi/), [Payload](/blog/colophon-vs-payload/) and [Directus](/blog/colophon-vs-directus/) have the details and sources. Git-based CMSs get whole-site history from git itself, with the gap between a commit and a deploy described above.
 
-## Where it stands
+## FAQ
 
-Colophon is pre-release (0.1.0-alpha.1) and has no users. I'm building it in public, alone. The pieces above are built and tested: numbered releases, publication intervals, pinned reads through `?generation=`, the SDK's pinned client, and rollback as a reviewed changeset. In the Studio, a release's page has a slider that steps through releases ("Release 3 of 7") and shows each one's receipt. What it does not do yet is show you a rendered page of your site at that release; for now, reading content at a past release goes through the API. My own site isn't running on Colophon in production yet either. That is the next real test.
+**Can I prove what a reader saw, not just what was published?** Only with a record made at the time, from the reader's side: a web archive capture, a stored copy of the HTML, or a check of the live page that kept what it saw. A CMS can prove what it served; caches and builds sit between that and the reader.
 
-I write up each step in the build log at [404human.dev/colophon](https://404human.dev/colophon/).
+**How far back can I go?** As far as your records go. Web archives depend on crawls, hosts on how many builds they keep, git on its history. In Colophon, revisions and publication history aren't deleted by retention, so every release can be read back, except content taken down since.
+
+**Why number releases instead of using timestamps?** Two publishes can land in the same millisecond, clocks on different servers disagree, and "the site at 15:00" is ambiguous if a publish was half-applied at 15:00. A number that goes up by one per complete publish has none of those problems. Timestamps are still recorded; they map a date to a number.
+
+**Is this the same as a backup?** No. A backup restores everything, drafts included, to a moment, and is for disasters. Release history answers questions about what was published while the system keeps running.
