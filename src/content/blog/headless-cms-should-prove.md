@@ -2,6 +2,7 @@
 title: "What a headless CMS should be able to prove"
 description: "Six questions about publishing that a headless CMS should answer with evidence, not a spinner, and how Colophon answers each one today."
 pubDate: 2026-11-16
+updatedDate: 2026-11-17
 tags: ["publishing", "reliability", "headless cms", "releases"]
 draft: false
 ---
@@ -65,4 +66,4 @@ The list above is what's built. A few things are not, and I'd rather say so here
 
 ## Where it stands
 
-Colophon is pre-release (0.1.0-alpha.1) and has no users. It will be open source under the MIT licence; the licence file is being added to the repository before the first release. I'm building it in public, alone, and the [status section](/#pricing) on the home page says what's done; the list above says what isn't. Each step, including what broke, is in the build log at [404human.dev/colophon](https://404human.dev/colophon/).
+Colophon is pre-release (0.1.0-alpha.1) and has no users. It's open source under the [MIT licence](https://github.com/akira-shirase-oss/colophon-cms/blob/main/LICENSE). I'm building it in public, alone, and the [status section](/#pricing) on the home page says what's done; the list above says what isn't. Each step, including what broke, is in the build log at [404human.dev/colophon](https://404human.dev/colophon/).

@@ -2,6 +2,7 @@
 title: "Self-hosting Colophon: what runs today"
 description: "What it takes to run Colophon, the open-source Rust CMS, on your own machine today, what an operator gets, and what a production install is still missing."
 pubDate: 2026-11-16
+updatedDate: 2026-11-17
 tags: ["self-hosting", "operations", "postgresql", "rust"]
 # Draft until the README path is rehearsed again on current main. The commands below are
 # quoted from Colophon's README on main as of 2026-11-16; the last stored mechanical rehearsal
@@ -60,7 +61,6 @@ These are built and tested in the repository:
 - **No container image.** There's no Dockerfile or published image yet; you build the binary yourself.
 - **No published binaries or packages.** An install script and a Homebrew formula template exist, but no release has been published, so they have nothing to download yet.
 - **No production deployment guide.** The repository's design calls for a TLS proxy in front, PostgreSQL and the cache on a private network, and separate origins for administration and public content. That's written as design, not as a tested guide.
-- **No licence file yet.** Colophon will be MIT-licensed; the file isn't committed yet.
 - **Limited observability.** Logs and health endpoints, but no Prometheus-style metrics or OpenTelemetry export yet.
 - **Backups cover PostgreSQL only.** Versioning for uploaded files in object storage is undecided for production.
 - **No independent install yet.** One of the gates for version 0.1 is a person other than me installing Colophon from the README alone and recording the friction. That hasn't happened.
