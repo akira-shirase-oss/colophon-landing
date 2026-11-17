@@ -30,12 +30,13 @@ site's own files plus a SHA-256 hash for each inline script.
 
 ```bash
 npm run build
-npm run check            # dist/: headers present, and the CSP fits every page
+npm run check            # dist/: headers and CSP fit every page; no leaks, drafts or unsafe new-tab links
 npm run check:browser    # every page in headless Chromium with those headers: no CSP violations
 ```
 
 When a component's `<script>` changes, its hash changes and `npm run check` fails with the new value: read
-the script, then swap the hash in `public/_headers`. `check:browser` needs Playwright, which is not a
+the script, then swap the hash in `public/_headers`. The leak scan also looks for the build user's name and home directory, and for any names in
+`LEAK_SCAN_NAMES` (comma-separated; keep that list out of the repo). `check:browser` needs Playwright, which is not a
 dependency here; see the top of `scripts/check-csp-browser.mjs`.
 
 ## License

@@ -5,11 +5,17 @@
 // headers  dist/_headers sends the security headers, and its Content-Security-Policy allows exactly
 //          what the built pages use: a hash for every inline script and no stale ones, same-origin
 //          images, fonts and stylesheets, no inline event handlers.
+// leaks    nothing private ships: no source maps, env or git files, dev-server paths, local paths,
+//          the build user's name or home directory, names listed in LEAK_SCAN_NAMES (comma-separated,
+//          kept out of the repo), or credential-shaped strings.
+// drafts   no `draft: true` post is built, linked, or named in the feed or sitemap.
+// links    every target="_blank" link carries rel="noopener" or rel="noreferrer".
 //
 // Exits 1 and lists every failure, or prints one line per check that passed.
 import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
-import { extname, join, relative, resolve } from 'node:path'
+import { homedir, userInfo } from 'node:os'
+import { extname, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
@@ -244,8 +250,120 @@ function checkPolicy(csp) {
 }
 
 // ---------------------------------------------------------------------------------------------
+// leaks: nothing private in the build
+
+const TEXT = new Set(['.html', '.css', '.js', '.mjs', '.json', '.xml', '.txt', '.svg', '.webmanifest', '.map', '.md', ''])
+
+function checkLeaks() {
+  const forbiddenFiles = [
+    [/\.map$/, 'a source map'],
+    [/(^|\/)\.env($|\.)/, 'an env file'],
+    [/(^|\/)\.git($|\/)/, 'git metadata'],
+    [/(^|\/)(\.DS_Store|\.npmrc|Thumbs\.db)$/, 'a local or credentials file'],
+    [/\.(log|pem|key|p12|pfx|sqlite3?|db|bak|swp)$/, 'a log, key, database or backup file'],
+    [/(^|\/)node_modules\//, 'node_modules'],
+    [/(^|\/)(package(-lock)?\.json|tsconfig\.json|astro\.config\.mjs)$/, 'project config'],
+    [/(^|\/)src\//, 'source files'],
+  ]
+  for (const file of files.map(rel)) {
+    for (const [pattern, what] of forbiddenFiles) if (pattern.test(file)) fail('leaks', `${file} is ${what}`)
+  }
+
+  // The build user's own name and home directory (a generic CI account name is skipped: "runner"
+  // is also an English word), plus private names from the environment, never from this repo.
+  const generic = new Set(['runner', 'root', 'ubuntu', 'node', 'user', 'admin', 'build', 'ci', 'vscode', 'codespace'])
+  const user = userInfo().username
+  const names = [
+    homedir(),
+    ...(user.length >= 3 && !generic.has(user.toLowerCase()) ? [user] : []),
+    ...(process.env.LEAK_SCAN_NAMES ?? '').split(',').map((n) => n.trim()).filter((n) => n.length >= 3),
+  ]
+  const nameHits = (text) => names.filter((n) => text.toLowerCase().includes(n.toLowerCase()))
+
+  // Checked in every file, images and fonts included: metadata can carry paths and names.
+  const everywhere = [
+    [/\/Users\/[^/\s"'<>]+\//, 'a macOS home path'],
+    [/\/home\/[^/\s"'<>]+\//, 'a Linux home path'],
+    [/[A-Za-z]:\\\\?Users\\\\?/, 'a Windows home path'],
+    [/file:\/\/\//, 'a file:// URL'],
+  ]
+  // Checked in text files.
+  const inText = [
+    [/sourceMappingURL=/, 'a source map reference'],
+    [/\/@fs\/|\/@vite\/|\/@id\//, 'a Vite dev-server path'],
+    [/data-astro-source-(file|loc)/, 'an Astro dev annotation (it holds absolute paths)'],
+    [/\b(AKIA|ASIA)[0-9A-Z]{16}\b/, 'an AWS access key'],
+    [/-----BEGIN (?:[A-Z]+ )*PRIVATE KEY-----/, 'a private key'],
+    [/\bgh[pousr]_[A-Za-z0-9]{36,}/, 'a GitHub token'],
+    [/\bgithub_pat_[A-Za-z0-9_]{40,}/, 'a GitHub token'],
+    [/\bxox[abprs]-[A-Za-z0-9-]{10,}/, 'a Slack token'],
+    [/\b[rs]k_live_[A-Za-z0-9]{16,}/, 'a Stripe live key'],
+    [/\bsk-(?:proj-|ant-)?[A-Za-z0-9_-]{32,}/, 'an OpenAI or Anthropic key'],
+    [/\bAIza[0-9A-Za-z_-]{35}\b/, 'a Google API key'],
+    [/\bnpm_[A-Za-z0-9]{36}\b/, 'an npm token'],
+    [/\bcolophon_api_[A-Za-z0-9_-]{16,}/, 'a Colophon API token'],
+    [/\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/, 'a JWT'],
+  ]
+
+  for (const path of files) {
+    const file = rel(path)
+    const bytes = readFileSync(path).toString('latin1')
+    for (const [pattern, what] of everywhere) if (pattern.test(bytes)) fail('leaks', `${file} contains ${what}`)
+    for (const hit of nameHits(bytes)) fail('leaks', `${file} contains a private name (${hit.length} characters, not printed)`)
+    if (!TEXT.has(extname(file)) && !file.endsWith('_headers')) continue
+    const text = readFileSync(path, 'utf8')
+    for (const [pattern, what] of inText) if (pattern.test(text)) fail('leaks', `${file} contains ${what}`)
+  }
+  return names.length
+}
+
+// ---------------------------------------------------------------------------------------------
+// drafts: posts marked `draft: true` never reach the build
+
+function checkDrafts() {
+  const dir = join(root, 'src', 'content', 'blog')
+  if (!existsSync(dir)) return 0
+  const drafts = []
+  for (const name of readdirSync(dir, { recursive: true })) {
+    if (!/\.mdx?$/.test(name)) continue
+    const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(readFileSync(join(dir, name), 'utf8'))?.[1] ?? ''
+    if (!/^draft:\s*true\s*$/m.test(front)) continue
+    const field = (key) => new RegExp(`^${key}:\\s*(.+)$`, 'm').exec(front)?.[1].trim().replace(/^(['"])(.*)\1$/, '$2')
+    drafts.push({ id: field('slug') ?? name.replace(/\.mdx?$/, '').split(sep).join('/'), title: field('title') })
+  }
+  const texts = files.filter((f) => TEXT.has(extname(f))).map((f) => ({ file: rel(f), text: readFileSync(f, 'utf8') }))
+  for (const { id, title } of drafts) {
+    if (existsSync(join(dist, 'blog', id))) fail('drafts', `the draft "${id}" was built at blog/${id}/`)
+    for (const { file, text } of texts) {
+      if (text.includes(`/blog/${id}`)) fail('drafts', `${file} links to the draft "${id}"`)
+      const escaped = title?.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      if (title && (text.includes(title) || text.includes(escaped))) fail('drafts', `${file} names the draft "${title}"`)
+    }
+  }
+  return drafts.length
+}
+
+// ---------------------------------------------------------------------------------------------
+// links: new tabs never get a handle on this page
+
+function checkLinks() {
+  for (const page of html) {
+    for (const tag of tagsOf(page.text)) {
+      if (tag.name !== 'a' || (tag.attrs.get('target') ?? '').toLowerCase() !== '_blank') continue
+      const rel = (tag.attrs.get('rel') ?? '').toLowerCase().split(/\s+/)
+      if (!rel.includes('noopener') && !rel.includes('noreferrer')) {
+        fail('links', `${page.file}: <a target="_blank" href="${tag.attrs.get('href')}"> needs rel="noopener" or rel="noreferrer"`)
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
 
 checkHeaders()
+const namesScanned = checkLeaks()
+const draftCount = checkDrafts()
+checkLinks()
 
 if (failures.length) {
   console.error(`check-dist: ${failures.length} failure(s) in ${dist}\n`)
@@ -254,3 +372,6 @@ if (failures.length) {
 }
 console.log(`check-dist: ${html.length} pages, ${files.length} files in ${relative(root, dist) || dist}`)
 console.log('  headers  ok: _headers present, CSP covers every inline script and asset')
+console.log(`  leaks    ok: no private files, paths, ${namesScanned} private names or credential shapes`)
+console.log(`  drafts   ok: ${draftCount} draft post(s), none built, linked or named`)
+console.log('  links    ok: every target="_blank" link has noopener or noreferrer')
