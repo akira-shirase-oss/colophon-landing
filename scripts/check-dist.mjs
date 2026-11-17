@@ -10,6 +10,8 @@
 //          kept out of the repo), or credential-shaped strings.
 // drafts   no `draft: true` post is built, linked, or named in the feed or sitemap.
 // links    every target="_blank" link carries rel="noopener" or rel="noreferrer".
+// jsonld   every JSON-LD block is valid JSON with no "<" in it, so its data can't end the script
+//          (`</script>`) or swallow the rest of the page (`<!--`).
 //
 // Exits 1 and lists every failure, or prints one line per check that passed.
 import { createHash } from 'node:crypto'
@@ -45,26 +47,33 @@ const css = files.filter((f) => extname(f) === '.css').map((f) => ({ file: rel(f
 // ---------------------------------------------------------------------------------------------
 // A small HTML reader: enough for Astro's output, not a general parser.
 
-/** Every <script>: its attributes and its raw text, which is exactly what a browser hashes. */
-const scriptsOf = (text) =>
-  [...text.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)].map((m) => ({
-    attrs: attributes(m[1]),
-    body: m[2],
-  }))
-
-/** Every <style> element's text. */
-const stylesOf = (text) => [...text.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style\s*>/gi)].map((m) => m[1])
-
-/** Every start tag outside comments, scripts and styles, as { name, attrs }. */
-function tagsOf(text) {
-  const markup = text
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/(<script\b[^>]*>)[\s\S]*?<\/script\s*>/gi, '$1')
-    .replace(/(<style\b[^>]*>)[\s\S]*?<\/style\s*>/gi, '$1')
-  return [...markup.matchAll(/<([a-zA-Z][\w-]*)((?:\s+[^\s"'>/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+))?)*)\s*\/?>/g)].map(
-    (m) => ({ name: m[1].toLowerCase(), attrs: attributes(m[2]) }),
-  )
+/**
+ * Every element in document order as { name, attrs, body? }. A start tag is matched whole, quoted
+ * attribute values included, so markup inside an attribute (`content="</script>"`) is never mistaken
+ * for a tag. <script> and <style> carry their raw text in `body`, exactly what a browser hashes.
+ * Comments are skipped: nothing in them runs or loads.
+ */
+function elementsOf(text) {
+  const out = []
+  const tag = /<!--[\s\S]*?(?:-->|$)|<([a-zA-Z][\w-]*)((?:\s+[^\s"'>/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+))?)*)\s*\/?>/g
+  for (let m; (m = tag.exec(text)); ) {
+    if (!m[1]) continue
+    const name = m[1].toLowerCase()
+    const element = { name, attrs: attributes(m[2]) }
+    if (name === 'script' || name === 'style') {
+      const close = new RegExp(`</${name}[\\s/>]`, 'ig')
+      close.lastIndex = tag.lastIndex
+      const end = close.exec(text)
+      element.body = text.slice(tag.lastIndex, end ? end.index : text.length)
+      tag.lastIndex = end ? text.indexOf('>', end.index) + 1 || text.length : text.length
+    }
+    out.push(element)
+  }
+  return out
 }
+const scriptsOf = (text) => elementsOf(text).filter((e) => e.name === 'script')
+const stylesOf = (text) => elementsOf(text).filter((e) => e.name === 'style').map((e) => e.body)
+const tagsOf = elementsOf
 
 function attributes(source) {
   const attrs = new Map()
@@ -359,11 +368,34 @@ function checkLinks() {
 }
 
 // ---------------------------------------------------------------------------------------------
+// jsonld: structured data stays data
+
+function checkJsonLd() {
+  let blocks = 0
+  for (const page of html) {
+    for (const script of scriptsOf(page.text)) {
+      if ((script.attrs.get('type') ?? '').trim().toLowerCase() !== 'application/ld+json') continue
+      blocks++
+      if (script.body.includes('<')) {
+        fail('jsonld', `${page.file}: a JSON-LD block contains "<", which can end the script or swallow the page; serialise it with jsonLd()`)
+      }
+      try {
+        JSON.parse(script.body)
+      } catch {
+        fail('jsonld', `${page.file}: a JSON-LD block is not valid JSON (cut short by "</script>" in its data?): ${script.body.slice(0, 70)}…`)
+      }
+    }
+  }
+  return blocks
+}
+
+// ---------------------------------------------------------------------------------------------
 
 checkHeaders()
 const namesScanned = checkLeaks()
 const draftCount = checkDrafts()
 checkLinks()
+const jsonLdBlocks = checkJsonLd()
 
 if (failures.length) {
   console.error(`check-dist: ${failures.length} failure(s) in ${dist}\n`)
@@ -375,3 +407,4 @@ console.log('  headers  ok: _headers present, CSP covers every inline script and
 console.log(`  leaks    ok: no private files, paths, ${namesScanned} private names or credential shapes`)
 console.log(`  drafts   ok: ${draftCount} draft post(s), none built, linked or named`)
 console.log('  links    ok: every target="_blank" link has noopener or noreferrer')
+console.log(`  jsonld   ok: ${jsonLdBlocks} JSON-LD blocks, all valid JSON with no "<"`)
