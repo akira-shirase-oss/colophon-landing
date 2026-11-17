@@ -1,91 +1,134 @@
 ---
 title: "Colophon vs Strapi: an honest comparison"
-description: "Strapi is mature, popular and easy to install. Colophon is pre-release. Here is where each stands on history, releases, review, permissions and publish proof."
+description: "Colophon and Strapi compared on publish receipts, release history, review, scheduling, permissions and AI agents, with dated, linked sources."
 pubDate: 2026-11-16
 updatedDate: 2026-11-17
 tags: ["comparison", "strapi", "headless cms", "open source"]
+status: "Still owed for this comparison: an import tested on a real production Strapi export, and a passing 24-hour soak."
 draft: false
 ---
 
-I'm building Colophon, so I'm not a neutral judge of it. I'll try to be useful anyway: Strapi facts come from Strapi's own docs and pricing pages, checked on 16 November 2026 and linked below, and Colophon facts come from its repository. Where Strapi is ahead, which is often, I say so.
+I build Colophon, so read this with that in mind. The Strapi facts below come from Strapi's own docs and pricing pages, checked on 16 November 2026 and listed under Sources at the end. The Colophon facts come from its repository, and each one is built and tested there. If anything about Strapi here is wrong or out of date, tell me and I'll correct it.
 
 ## The short answer
 
-If you need a headless CMS for a real site today, choose Strapi over Colophon. Strapi 5 is mature, has a large community and plugin marketplace, installs in about 75 seconds with only Node, and has a managed cloud. Colophon is pre-release (0.1.0-alpha.1), has no users yet, and isn't published to npm or any package registry.
+Colophon is for teams who need to know, with evidence, what their website published: what went live, when, who approved it, and whether readers can see it yet. If that is the question you keep asking, Colophon is built for you, and these are the reasons:
 
-Colophon is worth watching if your questions are about proof: what exactly went live, whether readers can see it yet, whether a rollback was reviewed, and what an AI agent is allowed to do. It's built around those questions, and that's where it differs most from Strapi.
+- **Every publish leaves a receipt.** Each publish is a numbered [release](/blog/headless-cms-glossary/#release), and its receipt says whether it is only in the CMS, on its way to your site, verified at a stated number of locations by a check of the live page, or in need of attention.
+- **Whole-site history and a reviewed rollback, free.** You can read the whole site as it was at any past release, and a rollback is a new release that goes through review like any other change.
+- **Review that covers exactly what was approved.** An approval counts only for the exact revisions it was given on, and expires after seven days.
+- **Scheduled publishing that survives downtime**, and **drafts that survive crashes and collisions**.
+- **Field-level permissions**, with PostgreSQL enforcing project isolation and an append-only audit log in the free core.
+- **AI agents that can draft but never approve their own work**, and run under budgets and rate limits.
+- **No user code running in the server**, which keeps the attack surface small.
+- **MIT, with no enterprise tier.** Every feature in this post is in the same MIT-licensed code.
+- **Measured behaviour.** Load results are stored with their failures, and labelled as laptop numbers.
+
+The honest cost: Colophon is pre-release. What that means in practice is in [what to know before choosing Colophon](#what-to-know-before-choosing-colophon).
 
 ## At a glance
 
-| | Strapi 5 | Colophon |
+Strapi facts checked on 16 November 2026.
+
+| | Colophon | Strapi 5 |
 |---|---|---|
-| Status | Stable; v5.62.0 released 12 November 2026 | Pre-release, 0.1.0-alpha.1, no users |
-| Licence | MIT, with enterprise code under a separate licence | MIT |
-| Stack | Node.js, TypeScript; React admin | Rust server; Svelte Studio |
-| Databases | PostgreSQL, MySQL, MariaDB, SQLite | PostgreSQL only |
-| Hosting | Self-hosted, or Strapi Cloud | Self-hosted only, built from source |
-| Version history | Growth and Enterprise plans; edits made in the admin only | Every save from every path, kept |
-| Grouped releases | Growth and Enterprise; latest drafts, not pinned versions | Every publish; pinned exact revisions |
-| Review workflows | Enterprise | Built in; approval bound to exact content |
-| Publish confirmation | Not built in | Delivery receipts with site checks |
-| Audit logs | Enterprise | Roles, members and tokens, append-only |
-| MCP server | Built in, free | Built in; agents can't approve or publish |
+| Status | Pre-release, 0.1.0-alpha.1, no users | Stable; v5.62.0 released 12 November 2026 |
+| Licence | MIT | MIT, with enterprise code under a separate licence |
+| Stack | Rust server; Svelte Studio | Node.js, TypeScript; React admin |
+| Databases | PostgreSQL only | PostgreSQL, MySQL, MariaDB, SQLite |
+| Hosting | Self-hosted only, built from source | Self-hosted, or Strapi Cloud |
+| Version history | Every save from every path, kept | Growth and Enterprise plans; edits made in the admin only |
+| Grouped releases | Every publish; pinned exact revisions | Growth and Enterprise; latest drafts, not pinned versions |
+| Review workflows | Built in; approval bound to exact content | Enterprise |
+| Publish confirmation | Delivery receipts with site checks | Not built in |
+| Audit logs | Roles, members and tokens, append-only | Enterprise |
+| Draft preview | Website-starter pages only; for headless sites on the roadmap | Built in; Live Preview on paid plans |
+| Locales through the API | Stored and published; the public API can't select one yet | Built in and free, through to the API |
+| MCP server | Built in; agents can't approve or publish | Built in, free |
 
-## Where Strapi is ahead
+## Every publish leaves a receipt
 
-Being plain about this matters more than the table.
+When a CMS says published, only one thing has certainly happened: its own database changed. Your readers see a CDN copy or a static page, and either can still be old. Colophon tracks the rest. After a release commits, its worker can tell your site to rebuild, ask your CDN to drop the copies that changed, and run a site check that reads your live page for the release it was built from. The release's [receipt](/blog/headless-cms-glossary/#receipt) carries one label: Published in Colophon, Website update pending, Verified at N locations, or Needs attention with what failed and what to do next. Only a check of the live site can verify a release, and it always says from how many places it looked.
 
-- **Maturity and ecosystem.** Strapi has years of production use, around 73,500 [GitHub stars](https://github.com/strapi/strapi), a plugin marketplace, and answers for most problems a search away. Colophon has none of that yet.
-- **Installation.** `npx create-strapi@latest` and you're running. In a hands-on test I did on 28 October 2026 (Strapi 5.60.0 Community, SQLite, development mode), install took about 75 seconds with only Node ([the write-up](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/research/strapi-vs-colophon-hands-on.md)). Colophon needs Docker for PostgreSQL, Valkey and an S3-compatible store, plus a Rust toolchain and Node to build the server and the Studio.
-- **Hosting choices.** Strapi runs on several databases and has [Strapi Cloud](https://strapi.io/pricing-cloud). Colophon is PostgreSQL only, and there's no hosted version.
-- **Editor features Colophon doesn't have yet.** Strapi has [preview](https://docs.strapi.io/cms/features/preview), with Live Preview on paid plans; Colophon has no draft preview for editors yet. Strapi's [internationalization](https://docs.strapi.io/cms/features/internationalization) is built in and free, through to the API; Colophon stores locales and localized entries, but its public delivery API can't select a locale yet. Strapi's [media library](https://docs.strapi.io/cms/features/media-library) is mature; Colophon's media fields work, but images inside rich text are still placeholders.
+Strapi tells you the entry is published in Strapi. Whether your CDN or static site picked it up is yours to work out. Strapi's webhooks can carry auth headers you configure, but they don't sign payloads themselves; the docs recommend you add HMAC signing yourself. How the layers between a CMS and a reader go stale, and how to check each one on any stack, is in [why your site shows old content after publishing](/blog/website-not-updating-after-publish/).
 
-## Content modeling
+## Release history, rollback and drafts
 
-Both cover the usual shapes. Strapi has components, dynamic zones and single types; Colophon has objects, lists, page-builder blocks, shared components and single types, plus references the database won't let dangle.
+In Colophon, every save from the Studio, the CLI or the API is an insert-only revision, and retention never deletes revisions. A save must start from the current draft, so two editors can't overwrite each other silently, and a retry after a lost answer can't save twice ([how that works](/blog/cms-lost-edits/)). Above the entries, every publish is a release of exact revisions, committed in one transaction. Because each entry keeps a history of which revision was live from which release to which, you can read the whole site as it was at any past release; [seeing what your website said on a past date](/blog/website-history-past-date/) shows how. A rollback builds a publish request from an older release, goes through review and lands as a new release, so the history keeps both the mistake and the fix. Content that was taken down since stays down. More in [how to roll back a bad publish](/blog/roll-back-a-bad-publish/).
 
-The difference is where the schema lives. Strapi's [Content-Type Builder](https://docs.strapi.io/cms/features/content-type-builder) is "available in Development environment only": schema changes are files in your project that reach production as a code deploy. In my hands-on test, saving a content type restarted the development server, about 5 seconds each time.
-
-Colophon keeps content types as versioned data in PostgreSQL, changed at runtime through the same API as everything else, and checks every change against the entries already stored. A change that would break stored content is refused with the entries it would break, or planned as a migration with a dry run over every stored entry. More in [content modeling that checks your stored entries](/blog/content-modeling-in-colophon/).
-
-## History, releases and rollback
-
-This is the biggest gap between the two.
-
-Strapi's [Content History](https://docs.strapi.io/cms/features/content-history) is on the Growth and Enterprise plans, kept 14 days on Growth and up to 90 on Enterprise. In Strapi's words, "A version is only created when a document is modified through the Content Manager in the admin panel." Changes made through the REST API, GraphQL or the Document Service aren't versioned. Restoring a version replaces the current draft.
-
-Strapi's [Releases](https://docs.strapi.io/cms/features/releases), also Growth and Enterprise, group entries to publish together, optionally on a schedule. A release publishes "the latest saved version of the draft", and the docs say "A release cannot be pinned to a specific version of an entry." Once published, it "cannot be edited or published again."
-
-In Colophon every publish is a release. A publish request pins exact revisions, an approval counts only for a hash of them, and publishing commits one numbered release in one transaction. Every save from the Studio, the CLI or the API is an insert-only revision, and retention never deletes revisions. Each entry's publication history means you can read the site as it was at any past release with `?generation=N` (content taken down since stays down). Rollback builds a reviewed publish request that becomes a new release. More in [what was live on your site last Tuesday?](/blog/what-was-live-last-tuesday/) and [rollback is a change too](/blog/rollback-is-a-change-too/).
+Strapi's Content History is on the Growth and Enterprise plans, kept 14 days on Growth and up to 90 on Enterprise. In Strapi's words, "A version is only created when a document is modified through the Content Manager in the admin panel." Changes made through the REST API, GraphQL or the Document Service aren't versioned, and restoring a version replaces the current draft. Strapi's Releases, also Growth and Enterprise, group entries to publish together, optionally on a schedule. A release publishes "the latest saved version of the draft", and the docs say "A release cannot be pinned to a specific version of an entry." Once published, it "cannot be edited or published again."
 
 ## Review and approvals
 
-Strapi's [Review Workflows](https://docs.strapi.io/cms/features/review-workflows) are Enterprise only, with stages, per-stage permissions and assignees. Without an Enterprise plan, review is a convention, not a rule.
+In Colophon, editors ask for review and publishers and owners approve. An approval is tied to a hash of every revision in the publish request, so an edit made after approval needs approving again, and approvals expire after seven days. Named review stages are built in too. Self-review is allowed by default and shown with a visible badge, which suits a team of one, and a project can require a different reviewer instead. All of this is in the free core, and it's the same rule that covers rollbacks, schedules and AI agents.
 
-Colophon's review is part of the free core. Editors ask for review; publishers and owners approve. Review stages exist too. An approval is tied to the exact content approved and expires after seven days. Self-review is allowed by default and shown with a visible badge, for teams of one.
+Strapi's Review Workflows are Enterprise only, with stages, per-stage permissions and assignees. Without an Enterprise plan, review is a convention your team keeps rather than a rule the CMS enforces.
 
-## Proving the publish reached readers
+## Scheduled publishing
 
-Strapi tells you the entry is published in Strapi. Whether your CDN or static site picked it up is yours to work out, Strapi's [webhooks](https://docs.strapi.io/cms/backend-customization/webhooks) can carry auth headers you configure, but they don't sign payloads themselves; the docs recommend you add HMAC signing yourself.
+A Colophon schedule stores a local time and an IANA time zone. At a daylight-saving change, where a local time happens twice or not at all, it asks you to choose rather than picking silently. The schedule is a row in PostgreSQL, not a timer in memory, so if no worker is running at the scheduled moment, it runs when one starts and is labelled as published late. When it falls due, it rechecks the approval, the content and the author's role first, and publishes nothing if any of them changed. [Four ways scheduled publishing goes wrong](/blog/scheduled-publishing-pitfalls/) covers each case.
 
-Colophon gives each release a receipt: published in Colophon, website update pending, verified at N locations, or needs attention with the reason. Verification comes only from a site check that read the release's marker on the live site. Colophon's webhooks aren't signed yet either, and its CDN purge is tested against a fake CDN; a real CDN adapter isn't built. Details: ["Published" should mean readers can see it](/blog/published-means-readers-can-see-it/).
+Strapi schedules its Releases, on Growth and Enterprise. Its docs state a clear rule for downtime: "If the server restarts less than 5 minutes after the scheduled time, the release is published automatically," and after that "the release ends as `Failed` and all its entries are skipped". From Strapi 5.62.0, a "Create release from skipped" action recovers the skipped entries.
+
+## Content modelling and schema changes
+
+Colophon keeps content types as versioned data in PostgreSQL, changed at runtime through the same API as everything else, and checks every change against the entries already stored. A change that would break stored content is refused with the entries it would break, or turned into a migration plan with a dry run over every entry and an approval before it applies. That suits teams where the people shaping content aren't the people deploying code. Details: [content modelling that checks your stored entries](/blog/content-modeling-in-colophon/).
+
+Both cover the usual shapes: Strapi has components, dynamic zones and single types; Colophon has groups, lists, page-builder blocks, shared components and single types, plus references the database won't let dangle. The difference is where the schema lives. Strapi's Content-Type Builder is "available in Development environment only": schema changes are files in your project that reach production as a code deploy. In my hands-on test, saving a content type restarted the development server, about 5 seconds each time.
 
 ## Permissions and audit
 
-Both are strong here. Strapi's [RBAC](https://docs.strapi.io/cms/features/rbac) is a free feature with custom roles, per-field and per-locale permissions, and conditions such as "the administrator must be the creator". Its [audit logs](https://docs.strapi.io/cms/features/audit-logs) require Enterprise.
+Colophon's roles are data: four defaults, plus roles you define, narrowed to single fields or to entries a person created. The Studio, the CLI, scripts and agents all go through one policy check. Some rules are enforced by PostgreSQL itself: projects are isolated by [row-level security](/blog/headless-cms-glossary/#row-level-security), the public API reads through a role that can't see drafts, and the audit log of changes to roles, members, invitations and tokens is append-only. The audit log is narrower than a full activity log: content edits are attributed through revision history instead. Details: [field-level permissions](/blog/field-level-permissions/).
 
-Colophon's roles are data with the same kind of reach: per-field permissions and "own entries" conditions. Its audit log is in the free core but narrower: it records changes to roles, members, invitations and tokens, not every content edit. Content edits are attributed through revision history instead. More in [field-level permissions](/blog/field-level-permissions/).
+Strapi is strong here too. Its RBAC is a free feature with custom roles, per-field and per-locale permissions, and conditions such as "the administrator must be the creator". Its audit logs require Enterprise.
 
 ## AI agents
 
-Strapi has a [built-in MCP server](https://docs.strapi.io/cms/features/strapi-mcp-server), free, scoped by an admin token's permissions. Strapi AI features are paid add-ons; the schema assistant is on Strapi AI Growth.
+Colophon's MCP server lets an agent read, draft, propose a publish request and ask for review. No tool approves or publishes, and the API itself refuses any API token's approval of something an API token submitted, so minting a second token doesn't get around it. Tokens can carry ceilings, such as documents per day, concurrent jobs and requests per minute, and work allowances are reserved in PostgreSQL before the work starts, so parallel requests can't race past them. A stored evaluation run against the real API recorded zero unauthorized actions. Details: [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
 
-Colophon's MCP server is built in too, and scoped by an API token. The difference is a rule the server enforces: no MCP tool approves or publishes, and the API refuses any API token's approval of something an API token submitted. Details: [give AI agents CMS access, not the publish button](/blog/ai-agents-without-the-publish-button/).
+Strapi has a built-in MCP server, free, scoped by an admin token's permissions. Strapi's AI features are paid add-ons; the schema assistant is on Strapi AI Growth.
 
-## Moving between them
+## What runs inside the server
 
-Colophon's import reads Strapi v4 and v5 exports, with a dry run that reports an outcome for every item before anything is written. I haven't tested a real production Strapi site's export, so treat it as a starting point.
+Colophon runs no user code in the server: no plugins, no hooks and no custom validator functions. Validation rules, permissions and schema changes are declared as data, and integrations go through the API, webhooks and the MCP server. Less code running with the server's rights means less that can go wrong with them. The trade is extensibility: you can't reshape Colophon's behaviour from inside.
 
-## Where it stands
+Strapi is built to be extended, with a plugin marketplace and backend customisation in your own project's code. If you rely on that, it's a real difference.
 
-Colophon is pre-release and built by one person in public. If you try it, read the [status section](/#pricing) first for what's done; the sections above say what isn't. Progress, including what broke, is in the build log at [404human.dev/colophon](https://404human.dev/colophon/). If anything about Strapi here is wrong or out of date, tell me and I'll correct it.
+## Running it yourself
+
+Colophon is one Rust binary that runs as the API, the background worker or both, beside PostgreSQL, a Valkey cache that can be lost without losing data, and S3-compatible storage for uploads. Operators get health checks that report a degraded cache honestly, structured logs, encrypted backups with WAL archiving, and a restore procedure that has been rehearsed on clean infrastructure. Today you build it from source.
+
+Strapi installs with `npx create-strapi@latest`. In [my hands-on notes](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/research/strapi-vs-colophon-hands-on.md) from 28 October 2026 (Strapi 5.60.0 Community, SQLite, development mode), install took about 75 seconds with only Node. Strapi runs on several databases and has Strapi Cloud.
+
+## Performance you can check
+
+Every Colophon load run stores a result file with the machine, the commit, the request counts and its own verdict, and failed runs stay in the record. Two examples: 540,063 anonymous reads over 30 minutes at 300 a second, with 0 failures, a p95 of 6.4 ms and server memory peaking around 41 MB; and a server killed behind a load balancer mid-run, with all 6,001 acknowledged writes stored. Both ran on one laptop, so they are evidence about how the code behaves, not a capacity claim. [Load-testing a CMS](/blog/load-testing-a-cms/) has the method and the caveats.
+
+I haven't run the same scenarios against Strapi, so none of this is a comparison of speed.
+
+## Moving from Strapi
+
+Colophon's import reads Strapi v4 and v5 export shapes. A dry run reports an outcome for every item before anything is written, including the keys it read but didn't store. Recreate your content types first, because the import moves entries, not schemas, and imported entries arrive as drafts that you publish through a reviewed release. I haven't tested a real production Strapi site's export yet, so treat it as a starting point.
+
+## What to know before choosing Colophon
+
+- **It's pre-release.** Version 0.1.0-alpha.1, built in public by one person, with no users yet. The [status section](/#pricing) on the home page says what's done.
+- **PostgreSQL only, self-hosted only.** There's no hosted version, and today you build it from source: no container image, published binaries or npm packages yet.
+- **Two delivery pieces are partial.** Webhook payloads aren't signed yet, and cache clears are tested against a stand-in CDN; the adapter for a real CDN is on the roadmap.
+- **On the roadmap:** draft preview for headless sites (the Studio already previews pages of its own website starter), choosing a locale in the public content API (locales are stored and published today), and images inside rich text (the editor inserts a placeholder for now).
+- **The 24-hour soak hasn't passed yet.**
+
+## Who it isn't for
+
+If you need a plugin marketplace, a choice of databases or a managed cloud today, Strapi fits that need and Colophon doesn't try to. Colophon fits a team that wants proof of what it published and is happy to run PostgreSQL itself.
+
+The [Payload](/blog/colophon-vs-payload/) and [Directus](/blog/colophon-vs-directus/) comparisons use the same template, and [six publishing tests to run on any headless CMS](/blog/headless-cms-publishing-checklist/) lists the questions behind all three.
+
+## Sources
+
+Checked on 16 November 2026:
+
+- Strapi: [Releases](https://docs.strapi.io/cms/features/releases), [Content History](https://docs.strapi.io/cms/features/content-history), [Review Workflows](https://docs.strapi.io/cms/features/review-workflows), [RBAC](https://docs.strapi.io/cms/features/rbac), [audit logs](https://docs.strapi.io/cms/features/audit-logs), [webhooks](https://docs.strapi.io/cms/backend-customization/webhooks), [Content-Type Builder](https://docs.strapi.io/cms/features/content-type-builder), [preview](https://docs.strapi.io/cms/features/preview), [internationalization](https://docs.strapi.io/cms/features/internationalization), [MCP server](https://docs.strapi.io/cms/features/strapi-mcp-server), [Strapi Cloud pricing](https://strapi.io/pricing-cloud) and the [GitHub repository](https://github.com/strapi/strapi).
+- Colophon: the [repository](https://github.com/akira-shirase-oss/colophon-cms), its [changelog's known limitations](https://github.com/akira-shirase-oss/colophon-cms/blob/main/CHANGELOG.md#known-limitations) and its [licence](https://github.com/akira-shirase-oss/colophon-cms/blob/main/LICENSE).
+
+If anything about Strapi here is wrong or out of date, tell me and I'll correct it.
