@@ -40,7 +40,7 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
-      - name: Dist checks (headers and CSP, leaks, drafts, links, JSON-LD)
+      - name: Dist checks (headers and CSP, leaks, drafts, links, SEO, JSON-LD)
         # Optional repository secret: private names the leak scan must never find in dist/.
         env:
           LEAK_SCAN_NAMES: ${{ secrets.LEAK_SCAN_NAMES }}

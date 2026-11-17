@@ -9,7 +9,13 @@
 //          the build user's name or home directory, names listed in LEAK_SCAN_NAMES (comma-separated,
 //          kept out of the repo), or credential-shaped strings.
 // drafts   no `draft: true` post is built, linked, or named in the feed or sitemap.
-// links    every target="_blank" link carries rel="noopener" or rel="noreferrer".
+// links    every target="_blank" link carries rel="noopener" or rel="noreferrer", and every link,
+//          image, script and stylesheet on the site's own origin resolves to a built file (and its
+//          #fragment to an id on that page).
+// seo      each page has one non-empty, unique <title> and meta description, one <h1>, a canonical
+//          URL that is its own address (or robots noindex instead), Open Graph and Twitter card tags
+//          with an image and its alt text, and alt on every <img>; each post has BlogPosting data with
+//          its dates and author; the sitemap lists exactly the indexable pages and the feed every post.
 // jsonld   every JSON-LD block is valid JSON with no "<" in it, so its data can't end the script
 //          (`</script>`) or swallow the rest of the page (`<!--`).
 //
@@ -367,6 +373,119 @@ function checkLinks() {
   }
 }
 
+/** The address a built page is served at: index.html → /, blog/x/index.html → /blog/x/. */
+const urlOf = (file) => `/${file.split(sep).join('/')}`.replace(/index\.html$/, '').replace(/\.html$/, '')
+
+/** The built file a same-origin path serves, or undefined. Cloudflare Pages serves /x/ from x/index.html. */
+function fileFor(path) {
+  const clean = decodeURIComponent(path).replace(/^\/+/, '')
+  const candidates = clean === '' || clean.endsWith('/') ? [`${clean}index.html`] : [clean, `${clean}/index.html`, `${clean}.html`]
+  return candidates.map((c) => join(dist, c)).find((c) => existsSync(c) && !c.endsWith(sep))
+}
+
+function checkInternalLinks() {
+  const ids = new Map(html.map((p) => [urlOf(p.file), new Set([...p.text.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]))]))
+  let checked = 0
+  for (const page of html) {
+    for (const tag of tagsOf(page.text)) {
+      const attr = { a: 'href', link: 'href', img: 'src', script: 'src', source: 'src' }[tag.name]
+      const raw = attr && tag.attrs.get(attr)
+      if (!raw || !sameOrigin(raw) || /^(mailto|tel|data):/i.test(raw)) continue
+      const url = new URL(raw, `${site}${urlOf(page.file)}`)
+      checked++
+      const target = url.pathname === urlOf(page.file) || raw.startsWith('#') ? join(dist, page.file) : fileFor(url.pathname)
+      if (!target) {
+        fail('links', `${page.file}: <${tag.name} ${attr}="${raw}"> points at nothing in the build`)
+        continue
+      }
+      const fragment = decodeURIComponent(url.hash.slice(1))
+      const targetIds = ids.get(urlOf(relative(dist, target)))
+      if (fragment && targetIds && !targetIds.has(fragment)) {
+        fail('links', `${page.file}: <${tag.name} ${attr}="${raw}"> names #${fragment}, which that page has no id for`)
+      }
+    }
+  }
+  return checked
+}
+
+// ---------------------------------------------------------------------------------------------
+// seo: every page can be found, titled, shared and described
+
+function checkSeo() {
+  const meta = (text, key, value) =>
+    tagsOf(text)
+      .filter((t) => t.name === 'meta' && t.attrs.get(key) === value)
+      .map((t) => t.attrs.get('content') ?? '')
+  const seen = { title: new Map(), description: new Map() }
+  const indexable = []
+  for (const page of html) {
+    const tags = tagsOf(page.text)
+    const titles = [...page.text.matchAll(/<title>([^<]*)<\/title>/g)].map((m) => decode(m[1]).trim())
+    const descriptions = meta(page.text, 'name', 'description')
+    if (titles.length !== 1 || !titles[0]) fail('seo', `${page.file}: wants one non-empty <title>, has ${titles.length}`)
+    if (descriptions.length !== 1 || !descriptions[0].trim()) fail('seo', `${page.file}: wants one non-empty meta description`)
+    for (const [kind, value] of [['title', titles[0]], ['description', descriptions[0]]]) {
+      if (!value) continue
+      if (seen[kind].has(value)) fail('seo', `${page.file} and ${seen[kind].get(value)} share the ${kind} "${value}"`)
+      else seen[kind].set(value, page.file)
+    }
+    const h1s = tags.filter((t) => t.name === 'h1').length
+    if (h1s !== 1) fail('seo', `${page.file}: wants one <h1>, has ${h1s}`)
+
+    const noindex = meta(page.text, 'name', 'robots').some((c) => /noindex/i.test(c))
+    const canonicals = tags.filter((t) => t.name === 'link' && t.attrs.get('rel') === 'canonical').map((t) => t.attrs.get('href'))
+    if (noindex) {
+      if (canonicals.length) fail('seo', `${page.file}: is noindex but names a canonical URL`)
+    } else {
+      indexable.push(`${site}${urlOf(page.file)}`)
+      if (canonicals.length !== 1 || canonicals[0] !== `${site}${urlOf(page.file)}`) {
+        fail('seo', `${page.file}: canonical is ${canonicals.join(', ') || 'missing'} (want ${site}${urlOf(page.file)})`)
+      }
+    }
+    for (const [key, name] of [
+      ['property', 'og:title'],
+      ['property', 'og:description'],
+      ['property', 'og:image'],
+      ['property', 'og:image:alt'],
+      ['name', 'twitter:card'],
+      ['name', 'twitter:image'],
+      ['name', 'twitter:image:alt'],
+    ]) {
+      const values = meta(page.text, key, name)
+      if (values.length !== 1 || !values[0].trim()) fail('seo', `${page.file}: wants one ${name}`)
+    }
+    for (const image of [...meta(page.text, 'property', 'og:image'), ...meta(page.text, 'name', 'twitter:image')]) {
+      if (!image.startsWith(`${site}/`) || !fileFor(new URL(image).pathname)) fail('seo', `${page.file}: share image ${image} isn't a built file on ${site}`)
+    }
+    for (const img of tags.filter((t) => t.name === 'img')) {
+      if (!img.attrs.has('alt')) fail('seo', `${page.file}: <img src="${img.attrs.get('src')}"> has no alt (use alt="" for decoration)`)
+    }
+    if (/^blog\/[^/]+\/index\.html$/.test(page.file.split(sep).join('/'))) {
+      const posting = scriptsOf(page.text)
+        .filter((sc) => sc.attrs.get('type') === 'application/ld+json')
+        .map((sc) => { try { return JSON.parse(sc.body) } catch { return {} } })
+        .find((d) => d['@type'] === 'BlogPosting')
+      if (!posting) fail('seo', `${page.file}: no BlogPosting JSON-LD`)
+      else for (const key of ['headline', 'datePublished', 'dateModified', 'author']) {
+        if (!posting[key]) fail('seo', `${page.file}: BlogPosting has no ${key}`)
+      }
+    }
+  }
+
+  const xml = (name) => (existsSync(join(dist, name)) ? readFileSync(join(dist, name), 'utf8') : '')
+  const locs = [...xml('sitemap.xml').matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => decode(m[1]))
+  if (!locs.length) fail('seo', 'sitemap.xml is missing or lists nothing')
+  for (const url of indexable) if (!locs.includes(url)) fail('seo', `sitemap.xml leaves out ${url}`)
+  for (const loc of locs) if (!indexable.includes(loc)) fail('seo', `sitemap.xml lists ${loc}, which isn't an indexable page`)
+  if (new Set(locs).size !== locs.length) fail('seo', 'sitemap.xml lists a page twice')
+
+  const posts = indexable.filter((u) => /\/blog\/[^/]+\/$/.test(u))
+  const items = [...xml('rss.xml').matchAll(/<item>[\s\S]*?<link>([^<]+)<\/link>/g)].map((m) => decode(m[1]))
+  for (const url of posts) if (!items.includes(url)) fail('seo', `rss.xml leaves out ${url}`)
+  for (const url of items) if (!posts.includes(url)) fail('seo', `rss.xml has an item for ${url}, which isn't a built post`)
+  return { indexable: indexable.length, posts: posts.length }
+}
+
 // ---------------------------------------------------------------------------------------------
 // jsonld: structured data stays data
 
@@ -395,6 +514,8 @@ checkHeaders()
 const namesScanned = checkLeaks()
 const draftCount = checkDrafts()
 checkLinks()
+const linksChecked = checkInternalLinks()
+const seo = checkSeo()
 const jsonLdBlocks = checkJsonLd()
 
 if (failures.length) {
@@ -406,5 +527,6 @@ console.log(`check-dist: ${html.length} pages, ${files.length} files in ${relati
 console.log('  headers  ok: _headers present, CSP covers every inline script and asset')
 console.log(`  leaks    ok: no private files, paths, ${namesScanned} private names or credential shapes`)
 console.log(`  drafts   ok: ${draftCount} draft post(s), none built, linked or named`)
-console.log('  links    ok: every target="_blank" link has noopener or noreferrer')
+console.log(`  links    ok: every target="_blank" link has noopener or noreferrer; ${linksChecked} same-origin links resolve`)
+console.log(`  seo      ok: titles, descriptions, one h1, canonicals, share cards, alt; ${seo.indexable} pages in the sitemap, ${seo.posts} posts in the feed`)
 console.log(`  jsonld   ok: ${jsonLdBlocks} JSON-LD blocks, all valid JSON with no "<"`)
