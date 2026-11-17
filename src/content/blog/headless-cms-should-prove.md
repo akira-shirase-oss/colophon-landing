@@ -20,7 +20,7 @@ I'm building Colophon, an open-source CMS in Rust and Svelte, around the idea th
 
 ## 1. Did my save land?
 
-A save is either acknowledged and durable, or clearly not saved. Colophon writes every save as a new, insert-only revision, and accepts it only if it started from the current draft. A stale save is refused with a `409` that names the current revision, so two editors can't overwrite each other silently. Every save carries an idempotency key, so a retry after a lost answer replays the first result instead of saving twice.
+A save is either acknowledged and durable, or clearly not saved. Colophon writes every save as a new, insert-only revision, and accepts it only if it started from the current draft. A stale save is refused with a `409` that names the current revision, so two editors can't overwrite each other silently. Every save carries an idempotency key, so a retry after a lost answer replays the first result instead of saving twice. The server also validates every save against its content type, and a change to a content type is checked against every stored entry first: [content modeling that checks your stored entries](/blog/content-modeling-in-colophon/).
 
 Two crash tests kill the server just before and just after a commit and check both outcomes. A deterministic simulator runs thousands of seeded schedules of colliding editors and lost answers on every push. Details: [what happens to your draft when the CMS crashes](/blog/crash-safe-drafts/).
 
@@ -30,7 +30,7 @@ In Colophon you don't publish entries one by one. You publish a changeset: a set
 
 Publishing an approved changeset is one database transaction. It moves the environment from the release number the publisher saw to the next one, and records what went live. If someone else published first, the transaction finds the number has moved and refuses with `409 generation_moved`; nothing is half-applied. So a release either commits whole or not at all, and two releases can't claim the same number.
 
-Telling your website happens after the commit, never inside it. The same transaction writes a row to an outbox, and a background worker picks it up under a lease. If the worker dies mid-delivery, the lease runs out and another worker sends the announcement again with the same idempotency key, so your site can tell it's a repeat. A slow worker holding an old release can never deliver it after a newer one.
+Telling your website happens after the commit, never inside it. The same transaction writes a row to an outbox, and a background worker picks it up under a lease. If the worker dies mid-delivery, the lease runs out and another worker sends the announcement again with the same idempotency key, so your site can tell it's a repeat. A slow worker holding an old release can never deliver it after a newer one. A scheduled publish goes through the same routine and rechecks the approval when it falls due: [scheduled publishing that survives downtime](/blog/scheduled-publishing-that-survives-downtime/).
 
 ## 3. What exactly went live?
 
@@ -68,4 +68,4 @@ The changelog keeps the rest in its [known limitations](https://github.com/akira
 
 ## Where it stands
 
-Colophon is pre-release (0.1.0-alpha.1) and has no users. It's open source under the [MIT licence](https://github.com/akira-shirase-oss/colophon-cms/blob/main/LICENSE). I'm building it in public, alone, and the [status section](/#pricing) on the home page says what's done; the list above says what isn't. Each step, including what broke, is in the build log at [404human.dev/colophon](https://404human.dev/colophon/).
+Colophon is pre-release (0.1.0-alpha.1) and has no users. It's open source under the [MIT licence](https://github.com/akira-shirase-oss/colophon-cms/blob/main/LICENSE). I'm building it in public, alone, and the [status section](/#pricing) on the home page says what's done; the list above says what isn't. To build a site on it, start with [using Colophon as a headless CMS for Astro](/blog/colophon-with-astro/); to weigh it against the usual choices, read the comparisons with [Strapi](/blog/colophon-vs-strapi/), [Payload](/blog/colophon-vs-payload/) and [Directus](/blog/colophon-vs-directus/). Each step, including what broke, is in the build log at [404human.dev/colophon](https://404human.dev/colophon/).

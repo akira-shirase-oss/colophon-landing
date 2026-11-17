@@ -2,6 +2,7 @@
 title: "What was live on your site last Tuesday?"
 description: "Most CMSs keep history per entry. Colophon numbers every publish as a release, so you can read the whole site at any past release, minus what was taken down since."
 pubDate: 2026-11-16
+updatedDate: 2026-11-17
 tags: ["releases", "history"]
 draft: false
 ---
@@ -43,7 +44,7 @@ The answer carries a `Colophon-Generation` header naming the release it was read
 - **References follow the pin.** When a query expands referenced entries, the referenced entries are read at the same release as the page.
 - **The cache can't confuse them.** Every cache key includes the release number, so a cached answer for release 41 is never served for release 42.
 
-The TypeScript SDK has the same idea: `delivery(project).atGeneration(41)` returns a client whose every read is pinned to that one release.
+The TypeScript SDK has the same idea: `delivery(project).atGeneration(41)` returns a client whose every read is pinned to that one release. A static site build can pin itself the same way; [using Colophon as a headless CMS for Astro](/blog/colophon-with-astro/) shows how.
 
 ## Turning a date into a release
 

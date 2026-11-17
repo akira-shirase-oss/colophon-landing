@@ -2,6 +2,7 @@
 title: "Content modeling that checks your stored entries"
 description: "Colophon's content types: 19 field types, references that can't dangle, page-builder blocks, and schema changes checked against every stored entry first."
 pubDate: 2026-11-16
+updatedDate: 2026-11-17
 tags: ["content modeling", "schema", "migrations", "headless cms"]
 draft: false
 ---
@@ -58,7 +59,7 @@ Some rules can't be checked one document at a time. Uniqueness is the classic ca
 
 This is where I think CMSs differ most, and where I spent the most care.
 
-Colophon keeps content types as versioned definitions in PostgreSQL, not as files in your code. Owners and developers change them at runtime, through the same API as everything else. Every revision records which version of its type it was validated against.
+Colophon keeps content types as versioned definitions in PostgreSQL, not as files in your code. Owners and developers change them at runtime, through the same API as everything else; who holds that right is a role question, covered in [field-level permissions](/blog/field-level-permissions/). Every revision records which version of its type it was validated against.
 
 When you change a type, Colophon sorts the change into one of three kinds:
 
@@ -73,7 +74,7 @@ A refused change isn't a dead end. It can become a migration plan:
 3. **Resolve.** For entries no rule can fix, a person supplies the corrected content, validated against the new definition like any save.
 4. **Approve and apply.** The plan is approved against its own hash, so a plan that changed after approval needs approving again. A background worker then applies it entry by entry. If the worker is killed partway, the run resumes.
 
-Every step is an API call that the Studio, the CLI and scripts share. Agents can read migration plans through the MCP server, but planning, approving and applying stay with people.
+Every step is an API call that the Studio, the CLI and scripts share. Agents can read migration plans through the MCP server, but planning, approving and applying stay with people ([why agents get no approval tools](/blog/ai-agents-without-the-publish-button/)).
 
 ## Locales
 

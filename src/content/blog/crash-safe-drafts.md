@@ -2,6 +2,7 @@
 title: "What happens to your draft when the CMS crashes"
 description: "How Colophon keeps an acknowledged save from being lost or doubled when the server dies, two editors collide, or the network drops mid-save."
 pubDate: 2026-11-16
+updatedDate: 2026-11-17
 tags: ["reliability", "editing", "autosave", "testing"]
 draft: false
 ---
@@ -38,7 +39,7 @@ In the Studio, that conflict opens a screen with both versions side by side. You
 
 Either way, the history keeps both, because both were real revisions.
 
-Agents and scripts get the same rule. An agent's update through Colophon's MCP adapter sends the revision it read, and a stale one comes back as an error naming the current revision and saying nothing was saved.
+Agents and scripts get the same rule. An agent's update through Colophon's MCP adapter sends the revision it read, and a stale one comes back as an error naming the current revision and saying nothing was saved. The rest of what an agent may do is in [give AI agents CMS access, not the publish button](/blog/ai-agents-without-the-publish-button/).
 
 ## When the network drops
 
@@ -64,7 +65,7 @@ The simulator is checked two ways. A deliberately broken rule has to be caught, 
 
 - **Live co-editing.** Two people typing in the same document at once, Google Docs style, is not a goal. Colophon detects the collision and asks a person to choose.
 - **Unsent typing on a lost device.** If a laptop dies before the browser stores the edit, that edit is gone. The guarantee starts when the server acknowledges a save.
-- **The whole-system crash demo.** A recorded run that kills the server and worker at random during saves and publishes, then checks that nothing was lost or doubled, is on the list for version 0.1. It isn't recorded yet.
+- **The whole-system crash demo.** A recorded run that kills the server and worker at random during saves and publishes, then checks that nothing was lost or doubled, is on the list for version 0.1. It isn't recorded yet. What is recorded, including a server killed behind a load balancer with no acknowledged write lost, is in [Colophon's load tests, with the caveats](/blog/colophon-load-test-numbers/).
 
 ## Where it stands
 

@@ -42,7 +42,7 @@ A list answer looks like this:
 }
 ```
 
-`slug` is there when the content type has a URL name field. `published_in` is the release this version went live in.
+`slug` is there when the content type has a URL name field (the field types are in [content modeling that checks your stored entries](/blog/content-modeling-in-colophon/)). `published_in` is the release this version went live in.
 
 ## Step 1: read a collection at one release
 
