@@ -5,10 +5,13 @@ import { posts } from '../lib/posts'
 export const GET: APIRoute = async ({ site }) => {
   const base = site!.href
   const list = await posts()
+  const changed = (p: (typeof list)[number]) => p.data.updatedDate ?? p.data.pubDate
+  // The blog index changes whenever a post is published or updated.
+  const newest = list.map(changed).reduce<Date | undefined>((a, d) => (a && a >= d ? a : d), undefined)
   const urls = [
     { loc: new URL('/', base).href },
-    { loc: new URL('/blog/', base).href, lastmod: list[0]?.data.pubDate },
-    ...list.map((p) => ({ loc: new URL(`/blog/${p.id}/`, base).href, lastmod: p.data.updatedDate ?? p.data.pubDate })),
+    { loc: new URL('/blog/', base).href, lastmod: newest },
+    ...list.map((p) => ({ loc: new URL(`/blog/${p.id}/`, base).href, lastmod: changed(p) })),
   ]
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
