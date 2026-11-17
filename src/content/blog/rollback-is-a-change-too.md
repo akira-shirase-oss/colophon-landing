@@ -2,6 +2,7 @@
 title: "Rollback is a change too: reverting a release"
 description: "In Colophon, rolling back published content opens a normal publish request. It gets reviewed, lands as a new numbered release, and history only moves forward."
 pubDate: 2026-11-16
+updatedDate: 2026-11-17
 tags: ["rollback", "review", "releases"]
 draft: false
 ---
@@ -32,7 +33,7 @@ Rewriting history has a second cost. If the record of releases can be rewound, y
 
 ## What happens when you roll back in Colophon
 
-In the Studio, every release has a receipt page. On an older release, people who can edit content see a button: **Roll back to this release**. There is also a release slider for stepping through releases one by one.
+In the Studio, every release has a receipt page. On an older release, people who can edit content see a button: **Roll back to this release**. There is also a release slider for stepping through releases one by one; reading what a past release held is covered in [what was live on your site last Tuesday?](/blog/what-was-live-last-tuesday/)
 
 Pressing the button doesn't publish anything. It builds a publish request titled "Rollback to release N" and takes you to it. The request says which release it restores, with a link back.
 
@@ -58,7 +59,7 @@ What keeps it workable: self-review is allowed by default. If you are the only p
 
 So a solo maintainer pays a couple of extra clicks. A team that has chosen two-person review pays for that choice during an incident too. I think that's consistent. If a change needs a second reviewer on a normal day, it needs one on a bad day.
 
-What you get back is a record. The rollback is a release with a number, a title, who published it and when, and a link to the request it came from, which links to the release it restores. Its delivery receipt works the same as any release's, so you can see whether the website actually picked it up. One honest note: Colophon's separate audit log today covers access changes such as roles, members and tokens, not publishes. The record of a rollback lives in the release history and its publish request.
+What you get back is a record. The rollback is a release with a number, a title, who published it and when, and a link to the request it came from, which links to the release it restores. Its delivery receipt works the same as any release's, so you can see whether the website actually picked it up ([how receipts work](/blog/published-means-readers-can-see-it/)). One honest note: Colophon's separate audit log today covers access changes such as roles, members and tokens, not publishes. The record of a rollback lives in the release history and its publish request.
 
 ## What a rollback won't bring back
 
@@ -66,7 +67,7 @@ Some things are deliberately not restored.
 
 Content that was taken down stays down. Unpublishing in Colophon revokes every earlier publication of that entry, so a rollback to a release from before the takedown does not bring it back. History can't be used to get around a removal.
 
-Old revisions must fit the current content model. If a field became required or changed type since the target release, publishing the rollback is refused, naming the entry and the field that fails.
+Old revisions must fit the current content model. If a field became required or changed type since the target release, publishing the rollback is refused, naming the entry and the field that fails. How content types change is in [content modeling that checks your stored entries](/blog/content-modeling-in-colophon/).
 
 Images have one known gap. Every uploaded version of an image is kept and can be addressed by its own URL, but an image's plain URL serves its current version. Making a rollback serve the exact image bytes a release used is planned follow-up work, not done.
 

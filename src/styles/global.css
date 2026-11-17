@@ -266,6 +266,16 @@ figcaption {
   max-width: 1240px;
 }
 
+/* A link inside running text on the home page: ink and an underline, as on the blog. */
+.inline-link {
+  color: var(--c-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--c-line);
+  text-underline-offset: 3px;
+}
+.inline-link:hover {
+  text-decoration-color: currentColor;
+}
 .visually-hidden {
   position: absolute;
   width: 1px;

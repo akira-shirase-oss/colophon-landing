@@ -2,6 +2,7 @@
 title: "Scheduled publishing that survives downtime"
 description: "How Colophon schedules a publish: a local time and time zone, explicit choices at daylight-saving edges, a full recheck when it runs, and a delayed label."
 pubDate: 2026-11-16
+updatedDate: 2026-11-17
 tags: ["scheduling", "publishing", "reliability", "time zones"]
 draft: false
 ---
@@ -35,7 +36,7 @@ An approval in Colophon is bound to a hash of every revision in the request. If 
 
 When the schedule falls due, everything is checked again, as if the author pressed publish at that moment: the approval, the hash, the author's current role, whether they're still in the project, and whether a URL name the release would publish is now taken by another entry. If anything fails, the schedule is blocked, with the reason in plain words, and nothing is published. Edited content blocks the release rather than silently publishing the edit or the old version.
 
-The publish runs as the person who scheduled it, so "who published this" stays true, and demoting or removing someone stops the schedules they set.
+The publish runs as the person who scheduled it, so "who published this" stays true, and demoting or removing someone stops the schedules they set. Roles are covered in [field-level permissions](/blog/field-level-permissions/).
 
 ## When the server is down at the scheduled time
 
@@ -45,7 +46,7 @@ It isn't presented as on time, though. A publish that starts more than 60 second
 
 There's one limit worth knowing. Because a schedule must fall before its approval expires, downtime long enough to outlast the approval ends with the schedule blocked as expired, not published days late on a stale review.
 
-For comparison, Strapi documents a different choice for its scheduled releases: "If the server restarts less than 5 minutes after the scheduled time, the release is published automatically," and after that "the release ends as `Failed` and all its entries are skipped" ([Strapi Releases docs](https://docs.strapi.io/cms/features/releases), checked 16 November 2026), and, from Strapi 5.62.0, a "Create release from skipped" action recovers the skipped entries. That's a clear, documented rule. Colophon's rule is: run late, say so, and recheck everything first.
+For comparison, Strapi documents a different choice for its scheduled releases: "If the server restarts less than 5 minutes after the scheduled time, the release is published automatically," and after that "the release ends as `Failed` and all its entries are skipped" ([Strapi Releases docs](https://docs.strapi.io/cms/features/releases), checked 16 November 2026), and, from Strapi 5.62.0, a "Create release from skipped" action recovers the skipped entries. That's a clear, documented rule. Colophon's rule is: run late, say so, and recheck everything first. The rest of the Strapi picture is in [Colophon vs Strapi](/blog/colophon-vs-strapi/).
 
 ## When two workers race
 

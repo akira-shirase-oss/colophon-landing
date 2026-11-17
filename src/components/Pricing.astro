@@ -14,13 +14,17 @@ type Stage = {
   featured?: boolean
 }
 
-// Colophon has no pricing yet; these cards report build status instead.
+// Colophon has no pricing yet; these cards report build status instead, in the words of the
+// milestone table in Colophon's README (Core is P0–P3, and P3's public demo is owed; Automation is P5,
+// gate met; Operations is P6–P7, and P6's 24-hour soak, usability sessions and independent install
+// are owed). Readers see words, not milestone codes. Values and units stay one line each: the cards
+// have a fixed height.
 const stages: Stage[] = [
   {
     name: 'Core',
-    value: { phase: 'P0–P3', proof: '1 seed' },
-    unit: { phase: 'Done', proof: 'replays any failure exactly' },
-    description: 'The base layer that every later phase builds on, finished and covered by tests.',
+    value: { phase: 'Built', proof: '1 seed' },
+    unit: { phase: 'the public demo is still owed', proof: 'replays any failure exactly' },
+    description: 'The base layer that every later phase builds on, built and covered by tests.',
     features: [
       { label: 'Numbered releases', done: true },
       { label: 'Pinned-release reads', done: true },
@@ -35,8 +39,8 @@ const stages: Stage[] = [
   },
   {
     name: 'Automation',
-    value: { phase: 'P5', proof: '0' },
-    unit: { phase: 'Closed', proof: 'unauthorized actions in the eval' },
+    value: { phase: 'Done', proof: '0' },
+    unit: { phase: 'its safety gate passed', proof: 'unauthorized actions in the eval' },
     description: 'Tokens, budgets and quotas that keep scripts and AI agents inside clear limits.',
     features: [
       { label: 'No token self-approval', done: true },
@@ -53,8 +57,8 @@ const stages: Stage[] = [
   },
   {
     name: 'Operations',
-    value: { phase: 'P6–P7', proof: '400s' },
-    unit: { phase: 'Proven, one soak test to go', proof: 'from backup capture to serving' },
+    value: { phase: 'Built', proof: '400s' },
+    unit: { phase: 'three gates are still owed', proof: 'from backup capture to serving' },
     description: 'Backups, load tests and member accounts, each exercised against real failures.',
     features: [
       { label: 'Encrypted backups', done: true },
@@ -71,7 +75,7 @@ const stages: Stage[] = [
 ]
 
 const views: { id: View; label: string }[] = [
-  { id: 'phase', label: 'Phase' },
+  { id: 'phase', label: 'Status' },
   { id: 'proof', label: 'Proof' },
 ]
 ---
@@ -84,13 +88,14 @@ const views: { id: View; label: string }[] = [
         <h2 class="t-h2">Where it stands, <span class="soft">with the evidence</span></h2>
       </div>
       <p class={`t-body ${styles.intro}`}>
-        A phase only closes when its test results are stored. The 24-hour soak is the last open item in the load tests.
+        A phase only closes when its test results are stored. The 24-hour soak is the last open item in the
+        <a class="inline-link" href="/blog/colophon-load-test-numbers/">load tests</a>.
       </p>
     </div>
 
     <div class={styles.plans} data-status>
       <div class={styles.tabsRow}>
-        <div class={styles.tabs} role="radiogroup" aria-label="Show phase or proof">
+        <div class={styles.tabs} role="radiogroup" aria-label="Show status or proof">
           <span class={styles.tabBg} aria-hidden="true" data-pill></span>
           {
             views.map((v, i) => (

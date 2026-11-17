@@ -2,6 +2,7 @@
 title: "Colophon vs Payload CMS: an honest comparison"
 description: "Payload is a mature, MIT-licensed, code-first CMS that lives in your Next.js app. Colophon is a pre-release Rust CMS built around publish proof. How they differ."
 pubDate: 2026-11-16
+updatedDate: 2026-11-17
 tags: ["comparison", "payload", "headless cms", "open source"]
 draft: false
 ---
@@ -19,7 +20,7 @@ If you're building on Next.js and want your CMS in the same codebase and the sam
 | | Payload 3 | Colophon |
 |---|---|---|
 | Status | Stable; v3.93.0 released 4 November 2026; v4 in beta | Pre-release, 0.1.0-alpha.1, no users |
-| Licence | MIT | MIT; the licence file isn't in the repository yet |
+| Licence | MIT | MIT |
 | Stack | TypeScript; React admin on the Next.js App Router | Rust server; Svelte Studio |
 | Databases | MongoDB, PostgreSQL, SQLite | PostgreSQL only |
 | Schema | Code, in your Payload config | Versioned data in PostgreSQL, changed at runtime |

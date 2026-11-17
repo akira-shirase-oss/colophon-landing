@@ -32,7 +32,9 @@ site's own files plus a SHA-256 hash for each inline script.
 npm test                 # unit tests: JSON-LD output can't leave its <script> element
 npm run build
 npm run check            # dist/: headers and CSP fit every page; no leaks, drafts or unsafe new-tab links;
-                         # every JSON-LD block is valid JSON with no "<"
+                         # every same-origin link resolves; each page has its title, description, one h1,
+                         # canonical (or noindex), share card and alt text; the sitemap and feed list exactly
+                         # the published pages; every JSON-LD block is valid JSON with no "<"
 npm run check:browser    # every page in headless Chromium with those headers: no CSP violations
 ```
 

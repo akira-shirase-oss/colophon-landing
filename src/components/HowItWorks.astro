@@ -3,6 +3,12 @@ import SectionHeading from './ui/SectionHeading.astro'
 import styles from './HowItWorks.module.css'
 
 const tabs = ['Write and review', 'Publish a release', 'Prove it was seen']
+// The screens are illustrations of the Studio, not screenshots, and the alt text says so.
+const alts = [
+  "Illustration of the article editor: a draft with a reviewer's comment beside it, ready to send for review",
+  'Illustration of publishing a release: a dialog listing the articles and the image it will make live',
+  'Illustration of a release receipt: a timeline from published to seen on the live site, with where it was checked',
+]
 ---
 
 <!--
@@ -30,7 +36,7 @@ const tabs = ['Write and review', 'Publish a release', 'Prove it was seen']
           tabs.map((_, i) => (
             <img
               src={`/images/how/how-${i + 1}.webp`}
-              alt=""
+              alt={alts[i]}
               data-active={String(i === 0)}
               loading={i === 0 ? 'eager' : 'lazy'}
               aria-hidden={String(i !== 0)}

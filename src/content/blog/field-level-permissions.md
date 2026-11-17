@@ -2,6 +2,7 @@
 title: "Field-level permissions in a headless CMS"
 description: "Roles down to a single field or an editor's own entries in Colophon: which checks the API runs, and which rules PostgreSQL itself refuses to break."
 pubDate: 2026-11-16
+updatedDate: 2026-11-17
 tags: ["permissions", "roles", "security", "postgresql"]
 draft: false
 ---
@@ -61,7 +62,7 @@ The field-level checks above live in one policy function in Colophon's Rust code
 - **The owner role can't be changed.** Database triggers refuse any update or delete of the owner role or its permissions, even as the application's own login.
 - **A project can't lose its last owner.** A deferred trigger refuses any commit that would leave none.
 - **Some powers are never a token's.** API tokens for scripts and agents can never hold member, role or token management, or read the audit log. The API refuses those grants, and so does a database check.
-- **The audit log is append-only.** Changes to roles, members, invitations and tokens, and a few operational events such as schema migration approvals, are recorded in the same transaction that makes them. The server's database login can only add to it and read it, and a trigger refuses updates, deletes and truncation, including from the table's owner. There are two sanctioned deletes, each through its own database function: the retention sweep, which removes events after 90 days by default, and deleting a whole project, which removes that project's events with it. Whoever administers the database itself could still disable a trigger, so this protects the record from the application, not from the database's operator.
+- **The audit log is append-only.** Changes to roles, members, invitations and tokens, and a few operational events such as schema migration approvals, are recorded in the same transaction that makes them. The server's database login can only add to it and read it, and a trigger refuses updates, deletes and truncation, including from the table's owner. There are two sanctioned deletes, each through its own database function: the retention sweep, which removes events after 90 days by default, and deleting a whole project, which removes that project's events with it. That second one is an operator's job, run from the database owner's login; the server's own login can't call it. Whoever administers the database itself could still disable a trigger, so this protects the record from the application, not from the database's operator.
 
 ## Tokens for scripts and agents
 

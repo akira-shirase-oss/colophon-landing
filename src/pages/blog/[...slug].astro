@@ -22,6 +22,7 @@ const url = new URL(`/blog/${post.id}/`, Astro.site).href
   type="article"
   published={pubDate}
   modified={updatedDate}
+  noindex={draft}
   jsonLd={{
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -38,7 +39,6 @@ const url = new URL(`/blog/${post.id}/`, Astro.site).href
     publisher: { '@type': 'Organization', name: 'Colophon', url: Astro.site?.href },
   }}
 >
-  {draft && <meta slot="head" name="robots" content="noindex" />}
   <div style="display: flex; flex-direction: column; align-items: center; overflow: clip;">
     <Nav />
     <main class={styles.page}>
