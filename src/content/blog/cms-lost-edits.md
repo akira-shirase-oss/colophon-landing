@@ -37,9 +37,9 @@ In the Studio, that conflict opens a screen with both versions side by side. You
 - **Keep my version** saves yours on top of theirs; theirs stays in the history.
 - **Use their version** discards your unsaved changes.
 
-Either way, the history keeps both, because both were real revisions.
+Either way, the history keeps both, because both were real revisions. Reading what was published at any past moment, rather than one entry's revisions, is a different question, covered in [how to see what your website said on a past date](/blog/website-history-past-date/).
 
-Agents and scripts get the same rule. An agent's update through Colophon's MCP adapter sends the revision it read, and a stale one comes back as an error naming the current revision and saying nothing was saved. The rest of what an agent may do is in [give AI agents CMS access, not the publish button](/blog/ai-agents-without-the-publish-button/).
+Agents and scripts get the same rule. An agent's update through Colophon's MCP adapter sends the revision it read, and a stale one comes back as an error naming the current revision and saying nothing was saved. The rest of what an agent may do is in [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
 
 ## When the network drops
 
@@ -59,10 +59,10 @@ The simulator is checked two ways. A deliberately broken rule has to be caught, 
 
 ## What this does not cover
 
+Publishing has the same kind of protection as saving, which is the subject of [six publishing questions a CMS should answer](/blog/headless-cms-publishing-checklist/). These are the gaps on the saving side:
+
+
 - **Live co-editing.** Two people typing in the same document at once, Google Docs style, is not a goal. Colophon detects the collision and asks a person to choose.
 - **Unsent typing on a lost device.** If a laptop dies before the browser stores the edit, that edit is gone. The guarantee starts when the server acknowledges a save.
-- **The whole-system crash demo.** A recorded run that kills the server and worker at random during saves and publishes, then checks that nothing was lost or doubled, is on the list for version 0.1. It isn't recorded yet. What is recorded, including a server killed behind a load balancer with no acknowledged write lost, is in [Colophon's load tests, with the caveats](/blog/colophon-load-test-numbers/).
+- **The whole-system crash demo.** A recorded run that kills the server and worker at random during saves and publishes, then checks that nothing was lost or doubled, is on the list for version 0.1. It isn't recorded yet. What is recorded, including a server killed behind a load balancer with no acknowledged write lost, is in [Colophon's load tests, with the caveats](/blog/load-testing-a-cms/).
 
-## Where it stands
-
-Colophon is pre-release (0.1.0-alpha.1) and has no users yet. I'm building it in public, alone. Insert-only revisions, expected-revision saves, idempotent retries, the conflict screen, the crash tests and the simulator are built and run in CI. Publishing has the same kind of protection, which is the subject of [what a headless CMS should be able to prove](/blog/headless-cms-should-prove/). The engineering behind each step goes in the build log at [404human.dev/colophon](https://404human.dev/colophon/).

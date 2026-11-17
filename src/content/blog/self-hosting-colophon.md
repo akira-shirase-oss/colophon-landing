@@ -68,4 +68,4 @@ These are built and tested in the repository:
 
 ## Where it stands
 
-Colophon is pre-release (0.1.0-alpha.1) and has no users; my own site doesn't run on it yet. If you try the steps above and something doesn't work as written, that's exactly the feedback the independent-install gate is for. The operational behaviour under failure is measured in [Colophon's load tests, with the caveats](/blog/colophon-load-test-numbers/), and the build log is at [404human.dev/colophon](https://404human.dev/colophon/).
+Colophon is pre-release (0.1.0-alpha.1) and has no users; my own site doesn't run on it yet. If you try the steps above and something doesn't work as written, that's exactly the feedback the independent-install gate is for. The operational behaviour under failure is measured in [Colophon's load tests, with the caveats](/blog/load-testing-a-cms/), and the build log is at [404human.dev/colophon](https://404human.dev/colophon/).

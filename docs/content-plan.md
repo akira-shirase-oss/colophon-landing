@@ -140,25 +140,30 @@ site is SvelteKit), Sanity (hosted-only, so the self-hosting contrast is fair) a
 ## Pieces
 
 Highest priority first. Titles stay at or under 49 characters so the page title, which appends
-" | Colophon", stays at or under 60. Descriptions stay at or under 170 characters (the schema
-enforces it).
+" | Colophon", stays at or under 60. Descriptions are 120 to 155 characters. The schema enforces
+both, and `npm run check` fails on any page title over 60 or description over 155.
+
+Addresses say what a post teaches. A renamed post keeps its old address working through a 301
+in `public/_redirects` (both spellings, with and without the trailing slash), and `npm run check`
+fails if a redirect is chained, lands on nothing, or anything still links to an old address.
 
 | Slug | Target search intent | Status |
 |---|---|---|
-| `colophon-vs-strapi` | "strapi alternative", "strapi vs …", "open source headless cms comparison" | published |
-| `headless-cms-should-prove` | "headless cms publishing", "cms publish verification", hub page for the cluster | published |
-| `ai-agents-without-the-publish-button` | "cms mcp server", "ai agents cms permissions", "mcp approval workflow" | published |
-| `published-means-readers-can-see-it` | "cms published but site not updated", "cdn cache not updating after publish" | published (refreshed) |
-| `crash-safe-drafts` | "cms lost my changes", "autosave conflict cms", "cms crash data loss" | published |
-| `colophon-load-test-numbers` | "headless cms performance benchmark", "rust cms performance" | published |
-| `colophon-vs-payload` | "payload cms alternative", "payload vs …", "payload cms figma" | published |
-| `colophon-vs-directus` | "directus alternative", "directus license", "directus vs …" | published |
-| `content-modeling-in-colophon` | "headless cms content modeling", "change content type without losing data" | published |
+| `website-not-updating-after-publish` | "website not updating after publish", "cdn showing old content after update" | published (rewritten 17 November; was `published-means-readers-can-see-it`) |
+| `headless-cms-glossary` | "headless cms glossary", "what is a cache tag / idempotency key" | published 17 November |
+| `website-history-past-date` | "what was on my website on a specific date", "content audit trail cms" | published (rewritten 17 November; was `what-was-live-last-tuesday`) |
+| `headless-cms-publishing-checklist` | "headless cms evaluation checklist", hub page for the publishing posts | published (was `headless-cms-should-prove`) |
+| `colophon-vs-strapi` | "strapi alternative", "strapi vs …", "open source headless cms comparison" | published (shared comparison template, 17 November) |
+| `colophon-vs-payload` | "payload cms alternative", "payload vs …" | published (shared comparison template, 17 November) |
+| `colophon-vs-directus` | "directus alternative", "directus license", "directus vs …" | published (shared comparison template, 17 November) |
+| `ai-agents-cms-permissions` | "cms mcp server permissions", "ai agent cms approval" | published (was `ai-agents-without-the-publish-button`) |
+| `cms-lost-edits` | "cms lost my changes", "two editors overwrite each other cms" | published (was `crash-safe-drafts`) |
+| `roll-back-a-bad-publish` | "rollback published content cms", "undo publish" | published (was `rollback-is-a-change-too`) |
+| `scheduled-publishing-pitfalls` | "scheduled post not published", "scheduled publishing daylight saving time" | published (was `scheduled-publishing-that-survives-downtime`) |
+| `load-testing-a-cms` | "headless cms performance benchmark", "load testing cms k6" | published (was `colophon-load-test-numbers`) |
+| `astro-headless-cms` | "astro headless cms", "astro cms tutorial" | published (was `colophon-with-astro`) |
 | `field-level-permissions` | "field level permissions cms", "headless cms rbac", "row level security cms" | published |
-| `scheduled-publishing-that-survives-downtime` | "cms scheduled publishing timezone", "scheduled publish failed" | published |
-| `colophon-with-astro` | "headless cms for astro", "astro cms tutorial" | published |
-| `what-was-live-last-tuesday` | "cms content history", "what was on my website on a date", "content audit trail" | published (refreshed) |
-| `rollback-is-a-change-too` | "rollback published content", "cms revert release" | published (refreshed) |
+| `content-modeling-in-colophon` | "headless cms content modeling", "change content type without losing data" | published; to be split, with a redirect, when the schema-change half is rewritten |
 | `self-hosting-colophon` | "self-hosted headless cms", "self host rust cms" | draft: README path not re-rehearsed on current `main` |
 
 Next, in order: a SvelteKit guide; Colophon vs Sanity; a short explainer of the release
@@ -168,14 +173,17 @@ delivery, a real CDN adapter, the 24-hour soak result).
 
 ## Internal links
 
-- `headless-cms-should-prove` is the hub. Every topical post links back to it or to a sibling,
-  and the hub links to every topical post.
+- `headless-cms-publishing-checklist` is the hub for publishing, and `website-history-past-date`
+  for history and rollback. Every topical post links up to its hub or to a sibling, and each hub
+  links to its posts in its body.
+- The first use of a jargon term links to its entry in `headless-cms-glossary` (each term has
+  its own anchor), and each glossary entry links to the post that goes deeper.
 - Each comparison links to the topical posts that back its claims (history, receipts,
   permissions, agents, scheduling) and to the other comparisons.
 - Topical posts link to the comparison that contrasts them where a competitor's documented
   behaviour is quoted.
 - Every published post links to at least three related posts in its body, where the topic comes
-  up, and is linked from at least two others.
+  up, and is linked from at least three others.
 - Landing sections linked from posts: `/#pricing` (the Status cards). The home page links into
   the blog from running text: Features (delivery checks), Status (load tests) and For developers
   (permissions).
@@ -193,7 +201,12 @@ Knowledge, not repository artifacts: no file paths, commit hashes, decision numb
 crate, package or binary names, test names or milestone codes in what readers see. Say the
 thing itself, and link the repository or a document once where a reader would want the source.
 API paths, error codes, headers and the release marker are fine: they are what a developer types
-or reads back. Each post ends with "Where it stands" and the build log link.
+or reads back. Error codes appear in code and response samples, not as prose. A post doesn't end
+with its own status paragraph: the shared status line under every title comes from
+`src/data/status.ts`, and a post may add one sentence on what is missing for its topic
+(frontmatter `status`). Limits stay in the section they apply to. Each problem post teaches the
+problem in terms that work with any CMS first, gives the reader something to check or run, and
+shows Colophon in one section near the end, with its limits.
 
 ## Don't claim yet
 

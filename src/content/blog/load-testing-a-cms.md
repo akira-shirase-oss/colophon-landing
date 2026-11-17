@@ -1,6 +1,6 @@
 ---
 title: "Colophon's load tests, with the caveats"
-description: "Measured load results for Colophon's Rust CMS server: warm and cold reads, cache stampedes, outages and a failed 24-hour run. Laptop numbers, labelled as such."
+description: "Load results for a Rust CMS server: warm and cold reads, a cache stampede, outages and a failed 24-hour run. Laptop numbers, labelled as such."
 pubDate: 2026-11-16
 updatedDate: 2026-11-17
 tags: ["performance", "load testing", "reliability", "rust"]
@@ -48,8 +48,8 @@ Stale reads are impossible here by construction: every cache key includes the re
 Speed matters less than behaviour when something breaks. Three scenarios pause a dependency in the middle of a run. These are clean reruns from 7 November, on committed code with no local changes; the 4 November runs before them held too.
 
 - **Cache paused for about a minute.** All 24,000 reads during the outage were answered from PostgreSQL, none as a cache hit, with 0 errors. The readiness check said `degraded` throughout the outage, never ready and never broken. No write failed.
-- **PostgreSQL paused and the worker killed.** During the outage, every read and write got an honest "unavailable" error: 0 fake commits, 0 corrupt read-backs of acknowledged writes ([why an acknowledged save survives](/blog/crash-safe-drafts/)). Afterwards, all 7,227 recovery requests succeeded and the killed worker's job was reclaimed and finished.
-- **CDN purges failing and the site frozen.** A fake CDN answered every purge with 503 for about a minute. 480 publishes landed at the API during the outage, none failed, retries waited at least the 5 seconds the CDN asked for, and no release was marked verified while the fault held; ["Published" should mean readers can see it](/blog/published-means-readers-can-see-it/) explains why.
+- **PostgreSQL paused and the worker killed.** During the outage, every read and write got an honest "unavailable" error: 0 fake commits, 0 corrupt read-backs of acknowledged writes ([why an acknowledged save survives](/blog/cms-lost-edits/)). Afterwards, all 7,227 recovery requests succeeded and the killed worker's job was reclaimed and finished.
+- **CDN purges failing and the site frozen.** A fake CDN answered every purge with 503 for about a minute. 480 publishes landed at the API during the outage, none failed, retries waited at least the 5 seconds the CDN asked for, and no release was marked verified while the fault held; [why your site shows old content after publishing](/blog/website-not-updating-after-publish/) explains why.
 
 ## A server killed behind a load balancer
 
@@ -57,7 +57,7 @@ With three API servers and two workers behind HAProxy, one server was killed wit
 
 ## An agent that won't stop
 
-Colophon lets scripts and AI agents work through API tokens with request quotas. The noisy-agent scenario runs normal editorial traffic, then adds a token capped at 60 requests a minute that tries about 600 a second. What else a token can and can't do is in [give AI agents CMS access, not the publish button](/blog/ai-agents-without-the-publish-button/).
+Colophon lets scripts and AI agents work through API tokens with request quotas. The noisy-agent scenario runs normal editorial traffic, then adds a token capped at 60 requests a minute that tries about 600 a second. What else a token can and can't do is in [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
 
 - 99.7% of the agent's attempts were refused with `429` and a `Retry-After` header.
 - Editors' p95 latency under that noise was 1.83 times their own baseline; the gate is twice the baseline plus 2 ms. A second project's editors saw 1.86 times.
@@ -90,6 +90,6 @@ Some full runs miss their own thresholds, and they stay in the store. On 7 Novem
 - **Clean commits, for some cases.** Several of the 4 November runs were made on working trees with uncommitted changes; their result files say so.
 - **Other CMSs.** I haven't run the same scenarios against Strapi, Payload or anyone else, so none of this is a comparison.
 
-## Where it stands
+## Where the evidence is
 
-Colophon is pre-release (0.1.0-alpha.1) and has no users. The result files behind every number here, failed runs included, and the soak's definition and status are in [Colophon's repository](https://github.com/akira-shirase-oss/colophon-cms/tree/main/perf). Why the server behaves this way under failure is covered in [what a headless CMS should be able to prove](/blog/headless-cms-should-prove/). New runs, failures included, go in the build log at [404human.dev/colophon](https://404human.dev/colophon/).
+The result files behind every number here, failed runs included, and the soak's definition and status are in [Colophon's repository](https://github.com/akira-shirase-oss/colophon-cms/tree/main/perf). Why the server behaves this way under failure is covered in [six publishing questions a CMS should answer](/blog/headless-cms-publishing-checklist/).

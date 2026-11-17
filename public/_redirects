@@ -1,0 +1,23 @@
+# Permanent redirects for Cloudflare Pages (syntax: https://developers.cloudflare.com/pages/configuration/redirects/).
+# One line per retired address: source, destination, status. Each renamed post keeps both spellings of its
+# old address (with and without the trailing slash) pointing at the new one, so old links and bookmarks work.
+# `npm run check` fails if a destination isn't a built page, a source is still built or linked, a redirect
+# points at another redirect, or a retired post address lacks either spelling.
+/blog/headless-cms-should-prove /blog/headless-cms-publishing-checklist/ 301
+/blog/headless-cms-should-prove/ /blog/headless-cms-publishing-checklist/ 301
+/blog/published-means-readers-can-see-it /blog/website-not-updating-after-publish/ 301
+/blog/published-means-readers-can-see-it/ /blog/website-not-updating-after-publish/ 301
+/blog/what-was-live-last-tuesday /blog/website-history-past-date/ 301
+/blog/what-was-live-last-tuesday/ /blog/website-history-past-date/ 301
+/blog/rollback-is-a-change-too /blog/roll-back-a-bad-publish/ 301
+/blog/rollback-is-a-change-too/ /blog/roll-back-a-bad-publish/ 301
+/blog/scheduled-publishing-that-survives-downtime /blog/scheduled-publishing-pitfalls/ 301
+/blog/scheduled-publishing-that-survives-downtime/ /blog/scheduled-publishing-pitfalls/ 301
+/blog/crash-safe-drafts /blog/cms-lost-edits/ 301
+/blog/crash-safe-drafts/ /blog/cms-lost-edits/ 301
+/blog/ai-agents-without-the-publish-button /blog/ai-agents-cms-permissions/ 301
+/blog/ai-agents-without-the-publish-button/ /blog/ai-agents-cms-permissions/ 301
+/blog/colophon-with-astro /blog/astro-headless-cms/ 301
+/blog/colophon-with-astro/ /blog/astro-headless-cms/ 301
+/blog/colophon-load-test-numbers /blog/load-testing-a-cms/ 301
+/blog/colophon-load-test-numbers/ /blog/load-testing-a-cms/ 301

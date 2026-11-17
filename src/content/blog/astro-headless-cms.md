@@ -180,7 +180,7 @@ In the Studio, open Settings, then Website connections, and add a connection:
 
 Both kinds of connection must point at a public `https` address. Colophon checks that when you save the connection and again before every attempt, so an address that later resolves somewhere private is refused too. On a development machine, the repository's local settings turn on a development-only switch that lets connections reach local `http` addresses, which is how the demo sites run; never carry those settings into production.
 
-I haven't tested specific hosts' deploy hooks, so check that yours accepts a `POST` with a JSON body. Two things to know about the webhook today: its payloads aren't signed yet, and the repository's own demo hook rebuilds from the API rather than trusting the payload. That's a good pattern anyway: a forged call can then cause at most an extra build, because the build reads its content from Colophon. How receipts work is covered in ["Published" should mean readers can see it](/blog/published-means-readers-can-see-it/).
+I haven't tested specific hosts' deploy hooks, so check that yours accepts a `POST` with a JSON body. Two things to know about the webhook today: its payloads aren't signed yet, and the repository's own demo hook rebuilds from the API rather than trusting the payload. That's a good pattern anyway: a forged call can then cause at most an extra build, because the build reads its content from Colophon. How receipts work, and how to find which layer is serving an old copy, is covered in [why your site shows old content after publishing](/blog/website-not-updating-after-publish/).
 
 ## What this setup doesn't do yet
 
@@ -188,6 +188,6 @@ I haven't tested specific hosts' deploy hooks, so check that yours accepts a `PO
 - **Locales.** The delivery API can't select a locale yet.
 - **Live pages.** One of the demo sites renders on request and listens to Colophon's event stream to refresh open pages after a publish. That's a different setup, not covered here.
 
-## Where it stands
+## Where to read next
 
-Colophon is pre-release (0.1.0-alpha.1) and has no users. The delivery API, the generation marker, site rebuilds and site checks are built and tested, and the five demo sites in Colophon's repository show this end to end on a local machine. To see what a release pins and how to read an old one, read [what was live on your site last Tuesday?](/blog/what-was-live-last-tuesday/) The build log is at [404human.dev/colophon](https://404human.dev/colophon/).
+To see what a release pins and how to read an old one, read [how to see what your website said on a past date](/blog/website-history-past-date/). Terms such as release, receipt and site check are defined in the [headless CMS glossary](/blog/headless-cms-glossary/).
