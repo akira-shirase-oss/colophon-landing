@@ -99,13 +99,13 @@ Payload's admin can be extended with your own React components, and its access c
 
 Colophon is one Rust binary that runs as the API, the background worker or both, beside PostgreSQL, a Valkey cache that can be lost without losing data, and S3-compatible storage for uploads. Operators get honest health checks, structured logs, encrypted backups with WAL archiving and a restore procedure rehearsed on clean infrastructure. Today you build it from source.
 
-Payload installs into your Next.js app and runs wherever that app runs. On hosting, Payload's site says Payload "has joined Figma", that the open-source core continues, and that on Payload Cloud "deployment of new projects is currently paused". Existing Cloud projects keep running, and self-hosting Payload is unaffected.
+Payload installs into your Next.js app and runs wherever that app runs. On hosting, Payload's site says Payload "has joined Figma", that the open-source core continues, and that on Payload Cloud "deployment of new projects is currently paused". Existing Cloud projects keep running.
 
 ## Performance you can check
 
 Every Colophon load run stores its machine, commit, counts and verdict, failures included. For example, 540,063 anonymous reads over 30 minutes at 300 a second finished with 0 failures and a p95 of 6.4 ms, and a server killed behind a load balancer mid-run lost none of its 6,001 acknowledged writes. All of it ran on one laptop, so it shows how the code behaves, not what a production install can carry. [Load-testing a CMS](/blog/load-testing-a-cms/) has the method and the caveats.
 
-Payload's comparison pages make speed claims against other CMSs. I haven't run the same tests against Payload, so I make none here.
+Payload's comparison pages make speed claims against other CMSs: its [Strapi comparison](https://payloadcms.com/compare/strapi) says Payload is "7x faster than Strapi", citing its [performance benchmarks](https://payloadcms.com/blog/performance-benchmarks) from 28 September 2022 (checked 17 November 2026). I haven't run the same tests against Payload, so I make none here.
 
 ## Moving from Payload
 
@@ -116,12 +116,12 @@ There's no Payload importer. Colophon imports its own JSONL and JSON arrays, plu
 - **It's pre-release.** Version 0.1.0-alpha.1, built in public by one person, with no users yet. The [status section](/#pricing) on the home page says what's done.
 - **PostgreSQL only, self-hosted only.** There's no hosted version, and today you build it from source: no container image, published binaries or npm packages yet.
 - **Two delivery pieces are partial.** Webhook payloads aren't signed yet, and cache clears are tested against a stand-in CDN; the adapter for a real CDN is on the roadmap.
-- **On the roadmap:** draft preview for headless sites (the Studio already previews pages of its own website starter), choosing a locale in the public content API, and images inside rich text (the editor inserts a placeholder for now).
+- **[On the roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md):** draft preview for headless sites (the Studio already previews pages of its own website starter), choosing a locale in the public content API, and images inside rich text (the editor inserts a placeholder for now).
 - **The 24-hour soak hasn't passed yet.**
 
 ## Who it isn't for
 
-If you want the CMS inside your Next.js codebase, with the schema as TypeScript and types shared with your front end, Payload is designed for exactly that, and Colophon isn't. Colophon fits a team that wants the CMS as its own service, with history and proof of every publish.
+If you want the CMS inside your Next.js codebase, with the schema as TypeScript and types shared with your front end, Payload is designed for exactly that, and Colophon isn't. Colophon fits a team that wants the CMS as its own service, with a history of every publish and a check of what reached the live site.
 
 The [Strapi](/blog/colophon-vs-strapi/) and [Directus](/blog/colophon-vs-directus/) comparisons use the same template, and [six publishing tests to run on any headless CMS](/blog/headless-cms-publishing-checklist/) lists the questions behind all three.
 

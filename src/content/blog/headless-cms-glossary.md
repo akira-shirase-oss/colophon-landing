@@ -29,7 +29,7 @@ A reviewer's yes to a proposed change before it goes live. An approval is only a
 
 A record of who did what and when, kept so it can't be quietly edited later. Useful audit logs are append-only and written in the same transaction as the change they record.
 
-**In Colophon:** the audit log records changes to roles, members, invitations and API tokens, plus a few operational events. Database triggers refuse edits and deletes. Content edits and publishes are recorded in revision history and releases instead. Read more: [field-level permissions](/blog/field-level-permissions/).
+**In Colophon:** the audit log records changes to roles, members, invitations and API tokens, plus a few operational events. Database triggers refuse edits and deletes; rows older than 90 days are removed by the retention sweep. Content edits and publishes are recorded in revision history and releases instead. Read more: [field-level permissions](/blog/field-level-permissions/).
 
 ## C
 
@@ -37,7 +37,7 @@ A record of who did what and when, kept so it can't be quietly edited later. Use
 
 What happens when a popular cached answer expires and every waiting request goes to the database at once. The usual fix is to let one request refill the cache while the others wait for its result, often called request coalescing or single-flight.
 
-**In Colophon:** misses for the same cache key share one fill. In a laptop load test, 1,000 callers on one key at its expiry caused 50 database fills across 22,106 requests. Read more: [Colophon's load tests, with the caveats](/blog/load-testing-a-cms/).
+**In Colophon:** misses for the same cache key share one fill. In a laptop run with 1,000 callers at each hot-key expiry, 22,106 requests caused 50 database fills in all. Read more: [Colophon's load tests, with the caveats](/blog/load-testing-a-cms/).
 
 <h3 id="cache-tag">Cache tag (surrogate key)</h3>
 
@@ -141,7 +141,7 @@ A unique key a client sends with a request so that sending it again has no extra
 
 <h3 id="isr">ISR</h3>
 
-Incremental static regeneration, a Next.js feature: pages are built statically, then rebuilt in the background after a time window or on demand. It narrows the gap between publishing and readers seeing a change, and adds a cache of its own to debug.
+Incremental static regeneration, originally a Next.js feature: pages are built statically, then rebuilt in the background after a time window or on demand. It narrows the gap between publishing and readers seeing a change, and adds a cache of its own to debug.
 
 Read more: [why your site shows old content after publishing](/blog/website-not-updating-after-publish/).
 
@@ -315,7 +315,7 @@ A record that something was deleted or taken down, kept instead of erasing every
 
 <h3 id="ttl">TTL</h3>
 
-Time to live: how long a cache may keep a copy before it must fetch a fresh one. On the web it usually comes from `Cache-Control` (`max-age` for browsers, `s-maxage` for shared caches such as CDNs).
+Time to live: how long a cache may keep a copy before it must fetch a fresh one. On the web it usually comes from `Cache-Control`: `max-age` sets freshness for every cache, and `s-maxage` overrides it for shared caches such as CDNs.
 
 Read more: [why your site shows old content after publishing](/blog/website-not-updating-after-publish/).
 

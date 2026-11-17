@@ -121,7 +121,7 @@ The public content API reads the latest release by default. Add `?generation=` a
 GET /content/v1/{project}/{environment}/{collection}?generation=41
 ```
 
-To go from a date to a release, list the releases, which records when each was published, and take the last one at or before your moment. A sketch in TypeScript for Node 22 or later, written against the API document on Colophon's `main` as of 17 November 2026:
+To go from a date to a release, list the releases, which records when each was published, and take the last one at or before your moment. The list holds the newest 100 releases. A sketch in TypeScript for Node 22 or later, written against Colophon's `main` as of 17 November 2026:
 
 ```ts
 const api = process.env.COLOPHON_API!; // e.g. https://cms.example.com
@@ -131,20 +131,20 @@ const environment = 'production';
 
 type Release = { generation: number; published_at: string };
 
-/** The release that was live at `moment`, or null if nothing was published yet. */
+/** The release that was live at `moment`, looked up among the newest 100; null if nothing was published yet. */
 async function releaseAt(moment: Date): Promise<number | null> {
-  let cursor: string | null = null;
-  do {
-    const url = new URL(`/api/v1/projects/${project}/environments/${environment}/releases`, api);
-    if (cursor !== null) url.searchParams.set('cursor', cursor);
-    const response = await fetch(url, { headers: { authorization: `Bearer ${token}` } });
-    if (!response.ok) throw new Error(`releases: HTTP ${response.status}`);
-    const page = (await response.json()) as { data: Release[]; next_cursor: string | null };
-    // Newest first, so the first one published at or before the moment was live then.
-    const live = page.data.find((release) => new Date(release.published_at) <= moment);
-    if (live) return live.generation;
-    cursor = page.next_cursor;
-  } while (cursor !== null);
+  const url = new URL(`/api/v1/projects/${project}/environments/${environment}/releases`, api);
+  const response = await fetch(url, { headers: { authorization: `Bearer ${token}` } });
+  if (!response.ok) throw new Error(`releases: HTTP ${response.status}`);
+  const { data } = (await response.json()) as { data: Release[] };
+  // Newest first, so the first one published at or before the moment was live then.
+  const live = data.find((release) => new Date(release.published_at) <= moment);
+  if (live) return live.generation;
+  // Release numbers start at 1. If the oldest one listed is later than that, older releases exist.
+  const oldest = data.at(-1);
+  if (oldest !== undefined && oldest.generation > 1) {
+    throw new Error(`the moment is older than the newest 100 releases (oldest listed: ${oldest.generation})`);
+  }
   return null;
 }
 
@@ -153,6 +153,8 @@ if (generation === null) throw new Error('nothing was published yet at that mome
 const pages = await fetch(new URL(`/content/v1/${project}/${environment}/pages?generation=${generation}`, api));
 console.log(`release ${pages.headers.get('colophon-generation')}`, await pages.json());
 ```
+
+For a moment older than the newest 100 releases, read releases one at a time with `GET …/releases/{generation}`, whose answer includes `published_at`. Release numbers run from 1 with no gaps, so a binary search over them finds the right one in a few requests.
 
 A few details matter if you use this for an audit:
 
@@ -168,7 +170,7 @@ A static build can pin itself the same way, which keeps every page of one build 
 - **Content taken down stays down.** If an entry was unpublished, a read pinned to an old release doesn't return it; the answer is that it's gone, at every release number. The release list still shows that a release changed entries and how many it took down, but the content isn't served. For some audits that is a limit to know about; it is also what makes a takedown real.
 - **Gated content stays gated.** A pin to an old release doesn't let a visitor read members-only content their role can't read today.
 - **No rendered pages yet.** In the Studio, a release's page has a slider that steps through releases and shows each receipt, but there's no way yet to browse a rendered page of your site as it was at that release. Past content is read through the API.
-- **A release time is not a reader time.** A release was live in Colophon from the moment it committed. When readers saw it depends on your site; the receipt records what a site check saw, and when.
+- **A release time is not a reader time.** A release was live in Colophon from the moment it committed. When readers saw it depends on your site; the receipt records what a site check saw, and when, for 30 days.
 
 Undoing a release is the other half of history. A rollback in Colophon doesn't move the counter back: it builds a reviewed change that becomes a new release, and both stay in the history. [Rolling back a release as a reviewed change](/blog/roll-back-a-bad-publish/) covers why.
 

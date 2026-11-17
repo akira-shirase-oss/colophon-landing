@@ -12,7 +12,7 @@ I build Colophon, so read this with that in mind. The Strapi facts below come fr
 
 ## The short answer
 
-Colophon is for teams who need to know, with evidence, what their website published: what went live, when, who approved it, and whether readers can see it yet. If that is the question you keep asking, Colophon is built for you, and these are the reasons:
+Colophon is for teams who need to know, with evidence, what their website published: what went live, when, who approved it, and whether it reached the live site. If that is the question you keep asking, Colophon is built for you, and these are the reasons:
 
 - **Every publish leaves a receipt.** Each publish is a numbered [release](/blog/headless-cms-glossary/#release), and its receipt says whether it is only in the CMS, on its way to your site, verified at a stated number of locations by a check of the live page, or in need of attention.
 - **Whole-site history and a reviewed rollback, free.** You can read the whole site as it was at any past release, and a rollback is a new release that goes through review like any other change.
@@ -62,7 +62,7 @@ Strapi's Content History is on the Growth and Enterprise plans, kept 14 days on 
 
 In Colophon, editors ask for review and publishers and owners approve. An approval is tied to a hash of every revision in the publish request, so an edit made after approval needs approving again, and approvals expire after seven days. Named review stages are built in too. Self-review is allowed by default and shown with a visible badge, which suits a team of one, and a project can require a different reviewer instead. All of this is in the free core, and it's the same rule that covers rollbacks, schedules and AI agents.
 
-Strapi's Review Workflows are Enterprise only, with stages, per-stage permissions and assignees. Without an Enterprise plan, review is a convention your team keeps rather than a rule the CMS enforces.
+Strapi's Review Workflows are Enterprise only, with stages, per-stage permissions and assignees. Without Enterprise you can limit who publishes through RBAC, but there are no review stages, assignees or recorded approvals.
 
 ## Scheduled publishing
 
@@ -74,7 +74,7 @@ Strapi schedules its Releases, on Growth and Enterprise. Its docs state a clear 
 
 Colophon keeps content types as versioned data in PostgreSQL, changed at runtime through the same API as everything else, and checks every change against the entries already stored. A change that would break stored content is refused with the entries it would break, or turned into a migration plan with a dry run over every entry and an approval before it applies. That suits teams where the people shaping content aren't the people deploying code. Details: [content modelling that checks your stored entries](/blog/content-modeling-in-colophon/).
 
-Both cover the usual shapes: Strapi has components, dynamic zones and single types; Colophon has groups, lists, page-builder blocks, shared components and single types, plus references the database won't let dangle. The difference is where the schema lives. Strapi's Content-Type Builder is "available in Development environment only": schema changes are files in your project that reach production as a code deploy. In my hands-on test, saving a content type restarted the development server, about 5 seconds each time.
+Both cover the usual shapes: Strapi has components, dynamic zones and single types; Colophon has groups, lists, page-builder blocks, shared components and single types, plus references the database won't let dangle. The difference is where the schema lives. Strapi's Content-Type Builder is "available in Development environment only", and each content type's schema is a file in your project ([Strapi's models docs](https://docs.strapi.io/cms/backend-customization/models)), so schema changes reach production with your code. In my hands-on test, saving a content type restarted the development server, about 5 seconds each time.
 
 ## Permissions and audit
 
@@ -86,7 +86,7 @@ Strapi is strong here too. Its RBAC is a free feature with custom roles, per-fie
 
 Colophon's MCP server lets an agent read, draft, propose a publish request and ask for review. No tool approves or publishes, and the API itself refuses any API token's approval of something an API token submitted, so minting a second token doesn't get around it. Tokens can carry ceilings, such as documents per day, concurrent jobs and requests per minute, and work allowances are reserved in PostgreSQL before the work starts, so parallel requests can't race past them. A stored evaluation run against the real API recorded zero unauthorized actions. Details: [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
 
-Strapi has a built-in MCP server, free, scoped by an admin token's permissions. Strapi's AI features are paid add-ons; the schema assistant is on Strapi AI Growth.
+Strapi has a built-in MCP server, free, scoped by an admin token's permissions. Strapi AI needs a paid plan: it is included in Growth and a paid add-on on Enterprise, and the schema assistant needs Growth.
 
 ## What runs inside the server
 
@@ -115,7 +115,7 @@ Colophon's import reads Strapi v4 and v5 export shapes. A dry run reports an out
 - **It's pre-release.** Version 0.1.0-alpha.1, built in public by one person, with no users yet. The [status section](/#pricing) on the home page says what's done.
 - **PostgreSQL only, self-hosted only.** There's no hosted version, and today you build it from source: no container image, published binaries or npm packages yet.
 - **Two delivery pieces are partial.** Webhook payloads aren't signed yet, and cache clears are tested against a stand-in CDN; the adapter for a real CDN is on the roadmap.
-- **On the roadmap:** draft preview for headless sites (the Studio already previews pages of its own website starter), choosing a locale in the public content API (locales are stored and published today), and images inside rich text (the editor inserts a placeholder for now).
+- **[On the roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md):** draft preview for headless sites (the Studio already previews pages of its own website starter), choosing a locale in the public content API (locales are stored and published today), and images inside rich text (the editor inserts a placeholder for now).
 - **The 24-hour soak hasn't passed yet.**
 
 ## Who it isn't for

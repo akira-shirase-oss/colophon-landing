@@ -12,7 +12,7 @@ I build Colophon, so read this with that in mind. The Directus facts below come 
 
 ## The short answer
 
-Directus and Colophon solve different problems. Directus is a data platform: point it at a SQL database and you get APIs, a no-code data studio, permissions and automation over your own tables. Colophon is a CMS for publishing a website, organised around numbered releases and evidence of what readers saw.
+Directus and Colophon solve different problems. Directus is a data platform: point it at a SQL database and you get APIs, a no-code data studio, permissions and automation over your own tables. Colophon is a CMS for publishing a website, organised around numbered releases and evidence of what reached the live site.
 
 If your job is publishing a website and your question is "what exactly did we publish, and did it reach readers?", Colophon is the better fit, for these reasons:
 
@@ -114,12 +114,12 @@ There's no Directus importer. Colophon imports JSONL and JSON arrays, plus Strap
 - **It's pre-release.** Version 0.1.0-alpha.1, built in public by one person, with no users yet. The [status section](/#pricing) on the home page says what's done.
 - **PostgreSQL only, self-hosted only.** There's no hosted version, and today you build it from source: no container image, published binaries or npm packages yet.
 - **Two delivery pieces are partial.** Webhook payloads aren't signed yet, and cache clears are tested against a stand-in CDN; the adapter for a real CDN is on the roadmap.
-- **On the roadmap:** draft preview for headless sites (the Studio already previews pages of its own website starter), choosing a locale in the public content API, and images inside rich text (the editor inserts a placeholder for now).
+- **[On the roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md):** draft preview for headless sites (the Studio already previews pages of its own website starter), choosing a locale in the public content API, and images inside rich text (the editor inserts a placeholder for now).
 - **The 24-hour soak hasn't passed yet.**
 
 ## Who it isn't for
 
-If you need an admin and API over an existing SQL database, or a back office as much as a CMS, Directus is built for that and Colophon isn't. Colophon fits a team publishing a website that wants proof of every publish.
+If you need an admin and API over an existing SQL database, or a back office as much as a CMS, Directus is built for that and Colophon isn't. Colophon fits a team publishing a website that wants a record of every publish and a check of what reached the live site.
 
 The [Strapi](/blog/colophon-vs-strapi/) and [Payload](/blog/colophon-vs-payload/) comparisons use the same template, and [six publishing tests to run on any headless CMS](/blog/headless-cms-publishing-checklist/) lists the questions behind all three.
 

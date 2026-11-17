@@ -74,7 +74,7 @@ curl -sS -D - "https://cms.example.com/api/posts/hello" | head -40
 If the body has the new text, the CMS side is fine; go to step 2. If it doesn't, look at:
 
 - `Age`: how many seconds this copy has sat in a shared cache. A large number means you are reading a cached answer, not the database.
-- `Cache-Control`: `max-age` is how long a browser may keep it, `s-maxage` how long a shared cache may.
+- `Cache-Control`: `max-age` sets how long the answer stays fresh in any cache, and `s-maxage` overrides it for shared caches such as CDNs ([RFC 9111](https://www.rfc-editor.org/rfc/rfc9111)).
 - `ETag` or `Last-Modified`: compare them with an earlier response. If they haven't changed, neither has the answer.
 - Any cache-status header the CMS or its CDN adds (step 3 lists the common ones).
 
@@ -104,9 +104,9 @@ curl -sS -D - -o /dev/null "https://www.example.com/blog/hello/"
 
 Look for `Age` and `Cache-Control` as in step 1, plus your CDN's own cache status:
 
-- **Cloudflare** sends `cf-cache-status`. `HIT` came from the edge's cache; `EXPIRED` means a cached copy was outdated and the origin answered; `STALE` and `UPDATING` mean an outdated copy was served, because the origin couldn't be reached or while a fresh one was being fetched ([Cloudflare cache responses](https://developers.cloudflare.com/cache/concepts/cache-responses/), checked 17 November 2026).
-- **Fastly** sends `X-Cache`: `HIT` or `MISS`, possibly several comma-separated entries when more than one cache handled the request. Stale serves are reported as `HIT` ([Fastly's X-Cache reference](https://www.fastly.com/documentation/reference/http/http-headers/X-Cache/), checked 17 November 2026).
-- **Vercel** sends `x-vercel-cache`, and its guide walks through telling a CDN problem from a data-cache or build-cache problem ([Vercel's cache-debugging guide](https://vercel.com/docs/caching/cdn-cache/debug-cache-issues), checked 17 November 2026).
+- **Cloudflare** sends `cf-cache-status`. `HIT` came from the edge's cache; `EXPIRED` means a cached copy was outdated and the origin answered; `STALE` and `UPDATING` mean an outdated copy was served, because the origin couldn't be reached or while a fresh one was being fetched ([Cloudflare cache responses](https://developers.cloudflare.com/cache/concepts/cache-responses/), checked 17 November 2026). No header at all, or `DYNAMIC`, means the answer didn't come from Cloudflare's cache.
+- **Fastly** sends `X-Cache`: `HIT` or `MISS`, and it may contain reports from more than one server when more than one cache handled the request. Stale serves are reported as `HIT` ([Fastly's X-Cache reference](https://www.fastly.com/documentation/reference/http/http-headers/X-Cache/), checked 17 November 2026).
+- **Vercel** reports a cache status for each request ([Vercel's cache status reference](https://vercel.com/docs/caching/cache-status)), and its guide walks through telling a CDN problem from a data-cache or build-cache problem ([Vercel's cache-debugging guide](https://vercel.com/docs/caching/cdn-cache/debug-cache-issues)), both checked 17 November 2026.
 
 A `HIT` with an old body and a large `Age` is the CDN. Purge that URL (or its tag) and request it again. If it still hits with the old body, the purge didn't reach this edge yet, or it was sent for a different URL than the one readers use: watch for trailing slashes, `www` and query strings.
 
@@ -132,35 +132,44 @@ One trade-off deserves a sentence of its own. [`stale-while-revalidate`](/blog/h
 
 Most of the debugging above gets faster if the live page tells you what it was built from. Put a marker in the HTML at build time. Any CMS can do this, because the build knows when it ran and what it read.
 
+Two markers are worth having. `build-time` says when the page was built, which answers step 2. `content-version` says what it was built from: a value you set from the content itself, such as the newest update time among the entries the build read, or a release number if your CMS has one. That is the value you know right after you publish, so it is the one to wait for.
+
 In Astro, in your base layout (the frontmatter runs once per page at build time on a static site):
 
 ```astro
 ---
 // src/layouts/Base.astro
+// contentVersion comes from your build's CMS reads: the newest updatedAt, or a release number.
+const { contentVersion } = Astro.props as { contentVersion: string }
 const builtAt = new Date().toISOString()
 ---
 <meta name="build-time" content={builtAt} />
+<meta name="content-version" content={contentVersion} />
 ```
 
-In Next.js with the App Router, through the Metadata API, whose `other` field becomes a `<meta>` tag:
+In Next.js with the App Router, through the Metadata API, whose `other` field becomes `<meta>` tags:
 
 ```ts
 // app/layout.tsx
 import type { Metadata } from 'next'
+// Your own helper: the newest updatedAt among the entries you read, or a release number.
+import { contentVersion } from '@/lib/cms'
 
-export const metadata: Metadata = {
-  other: { 'build-time': new Date().toISOString() },
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    other: { 'build-time': new Date().toISOString(), 'content-version': await contentVersion() },
+  }
 }
 ```
 
-Better still, use a version the CMS gives you: the newest update time among the entries you read, or a release number if your CMS has one. Then a short script can tell you when the live site has caught up:
+Then a short script can tell you when the live site has caught up with what you published. Pass it the version you expect, for example the update time your CMS shows for the entry you just published:
 
 ```sh
 #!/bin/sh
-# usage: wait-for-version.sh <expected version> <url>
+# usage: wait-for-version.sh <expected content-version> <url>
 want="$1"; url="$2"
 for attempt in $(seq 1 30); do
-  got=$(curl -fsS "$url" | grep -o 'name="build-time" content="[^"]*"' | sed 's/.*content="//; s/"$//')
+  got=$(curl -fsS "$url" | grep -o 'name="content-version" content="[^"]*"' | sed 's/.*content="//; s/"$//')
   if [ "$got" = "$want" ]; then echo "live: $got"; exit 0; fi
   echo "not yet: saw ${got:-no marker}"
   sleep 10
