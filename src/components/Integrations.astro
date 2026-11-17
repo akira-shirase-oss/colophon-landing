@@ -23,20 +23,9 @@ const surfaces = [
 ]
 ---
 
-<section class="section">
+<section class={`section ${styles.strip}`}>
   <div class={`container ${styles.inner}`}>
-    <div class={styles.head}>
-      <div class={styles.titleBadge}>
-        <p class="t-badge">For developers</p>
-        <h2 class="t-h2">One API, every surface. <span class="soft">Same rules on each</span></h2>
-      </div>
-      <p class={`t-body ${styles.intro}`}>
-        REST, GraphQL, the TypeScript SDK, the CLI and an MCP server all follow the
-        <a class="inline-link" href="/blog/field-level-permissions/">same permissions</a>. Test a Strapi or Sanity import
-        before you commit to it.
-      </p>
-    </div>
-
+    <h2 class="visually-hidden">Ways to connect: REST, GraphQL, the TypeScript SDK, the CLI and an MCP server</h2>
     <ul class={styles.surfaces}>
       {
         surfaces.map((x) => (
