@@ -32,8 +32,8 @@ jobs:
         run: node scripts/check-workflows.mjs
       - name: Install exactly what package-lock.json pins
         run: npm ci
-      - name: Production dependencies have no moderate or worse advisories
-        run: npm audit --omit=dev --audit-level=moderate
+      - name: Production dependencies have no moderate or worse advisories without a dated exception
+        run: node scripts/audit.mjs
       - name: Lint
         run: npm run lint
       - name: Unit tests
