@@ -1,5 +1,4 @@
 ---
-import SectionHeading from './ui/SectionHeading.astro'
 import styles from './Testimonials.module.css'
 
 // Colophon has no users yet, so this section quotes its own build log instead of customers.
@@ -31,16 +30,7 @@ const entries = [
 
 <section class="section">
   <div class={`container ${styles.inner}`}>
-    <div class={styles.head}>
-      <SectionHeading badge="From the build log" align="center" width={700}>
-        Made for people who
-        <br />
-        like to double-check
-      </SectionHeading>
-      <p class={`t-body ${styles.intro}`}>
-        Colophon is built in public, and every failure gets written up. These lines come straight from the build log.
-      </p>
-    </div>
+    <h2 class="visually-hidden">From the build log</h2>
 
     <ul class={styles.grid}>
       {
