@@ -330,20 +330,17 @@
     padding: 2px 14px;
     font-size: 12px;
   }
-  .float {
-    right: -8px;
-    bottom: -16px;
-  }
+  /* the window shows in full: the second crop is left out (so its image never loads) */
   .shot {
-    width: 36%;
-    border-radius: 12px;
+    display: none;
   }
-  /* the status card leaves the corner and overlaps the window's foot instead, so its text stays full size */
+  /* the status card moves under the window, overlapping only its bottom edge by 28px */
   .receipt {
     position: relative;
     right: auto;
     bottom: auto;
-    width: min(272px, calc(100% - 16px));
-    margin: -36px -8px 0 auto;
+    width: min(272px, 85%);
+    margin: -40px 12px 0 auto;
+    padding: 14px 16px 4px;
   }
 }
