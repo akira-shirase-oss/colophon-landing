@@ -2,6 +2,7 @@
 title: "\"Published\" should mean readers can see it"
 description: "Why a CMS says published while your site still shows old content, and how Colophon keeps a release pending until a check on the live site has seen it."
 pubDate: 2026-11-16
+updatedDate: 2026-11-17
 tags: ["publishing", "delivery", "cdn", "caching"]
 draft: false
 ---
@@ -44,6 +45,8 @@ Colophon has three kinds of website connection:
 - A **site rebuild** tells your site a release is out. It is a webhook, sent once per release, and retried if needed with the same key, which your site can use to drop repeats.
 - A **cache clear** asks the cache in front of your site, usually a CDN, to drop the copies the release changed.
 - A **site check** reads your live site after each release to confirm readers see it.
+
+Each one must point at a public `https` address, checked when the connection is saved and again before every attempt.
 
 For the check to work, the page has to say which release it was built from. The content API already sends a `Colophon-Generation` header with every answer. A static page can't set its own headers, so it carries a marker instead:
 

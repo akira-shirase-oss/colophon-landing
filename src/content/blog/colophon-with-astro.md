@@ -2,6 +2,7 @@
 title: "Using Colophon as a headless CMS for Astro"
 description: "Build a static Astro site from Colophon's public delivery API: page through a collection at one release, mark pages with it, and rebuild on publish."
 pubDate: 2026-11-16
+updatedDate: 2026-11-17
 tags: ["astro", "tutorial", "headless cms", "static sites"]
 draft: false
 ---
@@ -174,8 +175,10 @@ Release 0 means nothing has been published yet, so the marker is left out. The s
 
 In the Studio, open Settings, then Website connections, and add a connection:
 
-- **Site rebuild** is a webhook. After each release commits, Colophon's worker sends a `POST` with JSON naming the event (`release.committed`), the release number and the entries it changed, plus an `Idempotency-Key` header that stays the same if it has to resend. Point it at whatever starts your build. A `2xx` answer counts as delivered; timeouts and errors such as `429` and `503` are retried with backoff, up to five attempts. The address must be `https` and public.
+- **Site rebuild** is a webhook. After each release commits, Colophon's worker sends a `POST` with JSON naming the event (`release.committed`), the release number and the entries it changed, plus an `Idempotency-Key` header that stays the same if it has to resend. Point it at whatever starts your build. A `2xx` answer counts as delivered; timeouts and errors such as `429` and `503` are retried with backoff, up to five attempts.
 - **Site check** reads a page of your live site after each release and looks for the `colophon-generation` marker. When it sees the new release, or a later one, the release's receipt says verified at 1 location. Until then it says website update pending. If it never does, it says needs attention, and why.
+
+Both kinds of connection must point at a public `https` address. Colophon checks that when you save the connection and again before every attempt, so an address that later resolves somewhere private is refused too. On a development machine, the repository's `deploy/local.env` turns on a development-only setting that lets connections reach local `http` addresses, which is how the demo sites run; never copy that file into production.
 
 I haven't tested specific hosts' deploy hooks, so check that yours accepts a `POST` with a JSON body. Two things to know about the webhook today: its payloads aren't signed yet, and the repository's own demo hook rebuilds from the API rather than trusting the payload. That's a good pattern anyway: a forged call can then cause at most an extra build, because the build reads its content from Colophon. How receipts work is covered in ["Published" should mean readers can see it](/blog/published-means-readers-can-see-it/).
 

@@ -62,7 +62,9 @@ The list above is what's built. A few things are not, and I'd rather say so here
 - **No real CDN adapter yet.** Cache clears are tested against a fake CDN that caches by tag. The adapter for a real CDN isn't built.
 - **No draft preview for editors yet**, and no way to browse a rendered page of the site as it was at an old release. Reading a past release goes through the API.
 - **Webhook payloads aren't signed yet.**
-- **The 24-hour soak hasn't run.** Load results so far are from one laptop and say so: [Colophon's load tests, with the caveats](/blog/colophon-load-test-numbers/).
+- **The 24-hour soak hasn't passed.** Load results so far are from one laptop and say so: [Colophon's load tests, with the caveats](/blog/colophon-load-test-numbers/).
+
+The changelog keeps the rest in its [known limitations](https://github.com/akira-shirase-oss/colophon-cms/blob/main/CHANGELOG.md#known-limitations).
 
 ## Where it stands
 

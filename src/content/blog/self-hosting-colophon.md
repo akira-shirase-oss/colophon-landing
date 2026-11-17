@@ -5,7 +5,7 @@ pubDate: 2026-11-16
 updatedDate: 2026-11-17
 tags: ["self-hosting", "operations", "postgresql", "rust"]
 # Draft until the README path is rehearsed again on current main. The commands below are
-# quoted from Colophon's README on main as of 2026-11-16; the last stored mechanical rehearsal
+# quoted from Colophon's README on main as of 2026-11-17 (f3d22c0); the last stored mechanical rehearsal
 # (scripts/clean-install.sh, perf/results/2026-11-04T225448Z-clean-install-apple-m2-pro-12c.json)
 # ran against an older README, before Keycloak left the default stack. Rerun it, then publish.
 draft: true
@@ -42,7 +42,7 @@ COLOPHON_STUDIO_DIR="$PWD/apps/studio/build" cargo run --release -p colophon-ser
 
 Then open `http://localhost:58000/studio/`. In another terminal, `cargo run --release -p colophon-cli -- doctor` reports the server's status, role and each dependency, and exits 0 only when it's ready.
 
-The local stack is for development only. Its credentials are public, written in the repository, and every port is bound to `127.0.0.1` on purpose. Don't expose it.
+The local stack is for development only. Its credentials are public, written in the repository, and every port is bound to `127.0.0.1` on purpose. Don't expose it. `deploy/local.env` also turns on development-only settings, such as letting website connections reach local addresses, so never copy it into a production environment. Behind a reverse proxy, set `COLOPHON_TRUSTED_PROXIES` to the proxy's address, or every visitor counts as the proxy for per-client limits. The [security policy](https://github.com/akira-shirase-oss/colophon-cms/blob/main/SECURITY.md) has the operator notes and says how to report a vulnerability.
 
 ## What an operator gets
 
@@ -61,6 +61,7 @@ These are built and tested in the repository:
 - **No container image.** There's no Dockerfile or published image yet; you build the binary yourself.
 - **No published binaries or packages.** An install script and a Homebrew formula template exist, but no release has been published, so they have nothing to download yet.
 - **No production deployment guide.** The repository's design calls for a TLS proxy in front, PostgreSQL and the cache on a private network, and separate origins for administration and public content. That's written as design, not as a tested guide.
+- **No outbound proxy for deliveries.** Webhooks, cache clears and site checks never use `HTTP_PROXY`, so a host whose outbound traffic must go through a proxy can't send them yet.
 - **Limited observability.** Logs and health endpoints, but no Prometheus-style metrics or OpenTelemetry export yet.
 - **Backups cover PostgreSQL only.** Versioning for uploaded files in object storage is undecided for production.
 - **No independent install yet.** One of the gates for version 0.1 is a person other than me installing Colophon from the README alone and recording the friction. That hasn't happened.
