@@ -3,8 +3,10 @@ import { render } from 'astro:content'
 import Base from '../../layouts/Base.astro'
 import Nav from '../../components/Nav.astro'
 import Footer from '../../components/Footer.astro'
+import Status from '../../components/Status.astro'
 import styles from '../../components/Blog.module.css'
 import { posts, formatDate, type Post } from '../../lib/posts'
+import { glossaryTerms } from '../../lib/glossary'
 
 export async function getStaticPaths() {
   return (await posts()).map((post) => ({ params: { slug: post.id }, props: { post } }))
@@ -14,6 +16,38 @@ const { post } = Astro.props as { post: Post }
 const { Content } = await render(post)
 const { title, description, pubDate, updatedDate, draft, tags } = post.data
 const url = new URL(`/blog/${post.id}/`, Astro.site).href
+const posting = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: pubDate.toISOString(),
+  dateModified: (updatedDate ?? pubDate).toISOString(),
+  mainEntityOfPage: url,
+  url,
+  inLanguage: 'en',
+  ...(tags.length > 0 ? { keywords: tags.join(', ') } : {}),
+  image: new URL('/og.jpg', Astro.site).href,
+  author: { '@type': 'Organization', name: 'Colophon', url: Astro.site?.href },
+  publisher: { '@type': 'Organization', name: 'Colophon', url: Astro.site?.href },
+}
+// A glossary post also describes its terms, read from the post itself so the data matches the page.
+const terms = post.data.glossary ? glossaryTerms(post.body ?? '') : []
+const termSet = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTermSet',
+  '@id': `${url}#terms`,
+  name: title,
+  url,
+  hasDefinedTerm: terms.map((t) => ({
+    '@type': 'DefinedTerm',
+    '@id': `${url}#${t.id}`,
+    name: t.name,
+    description: t.description,
+    url: `${url}#${t.id}`,
+    inDefinedTermSet: `${url}#terms`,
+  })),
+}
 ---
 
 <Base
@@ -23,21 +57,7 @@ const url = new URL(`/blog/${post.id}/`, Astro.site).href
   published={pubDate}
   modified={updatedDate}
   noindex={draft}
-  jsonLd={{
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: title,
-    description,
-    datePublished: pubDate.toISOString(),
-    dateModified: (updatedDate ?? pubDate).toISOString(),
-    mainEntityOfPage: url,
-    url,
-    inLanguage: 'en',
-    ...(tags.length > 0 ? { keywords: tags.join(', ') } : {}),
-    image: new URL('/og.jpg', Astro.site).href,
-    author: { '@type': 'Organization', name: 'Colophon', url: Astro.site?.href },
-    publisher: { '@type': 'Organization', name: 'Colophon', url: Astro.site?.href },
-  }}
+  jsonLd={terms.length > 0 ? [posting, termSet] : posting}
 >
   <div style="display: flex; flex-direction: column; align-items: center; overflow: clip;">
     <Nav />
@@ -58,6 +78,7 @@ const url = new URL(`/blog/${post.id}/`, Astro.site).href
           </span>
           <h1 class={styles.postTitle}>{title}</h1>
           <p class="t-body-lg" style="line-height: 1.5;">{description}</p>
+          <Status note={post.data.status} />
         </header>
         <div class={styles.prose}>
           <Content />

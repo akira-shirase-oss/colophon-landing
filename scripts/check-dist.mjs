@@ -18,6 +18,10 @@
 //          its dates and author; the sitemap lists exactly the indexable pages and the feed every post.
 // jsonld   every JSON-LD block is valid JSON with no "<" in it, so its data can't end the script
 //          (`</script>`) or swallow the rest of the page (`<!--`).
+// redirects dist/_redirects matches public/_redirects; every rule is a permanent redirect from a plain
+//          path that is no longer built to a built page, never to another rule's source; a retired post
+//          address has a rule for both spellings (with and without the trailing slash); and no page, the
+//          sitemap or the feed still links to a retired address.
 //
 // Exits 1 and lists every failure, or prints one line per check that passed.
 import { createHash } from 'node:crypto'
@@ -426,6 +430,9 @@ function checkSeo() {
     if (descriptions.length !== 1 || !descriptions[0].trim()) fail('seo', `${page.file}: wants one non-empty meta description`)
     for (const [kind, value] of [['title', titles[0]], ['description', descriptions[0]]]) {
       if (!value) continue
+      // Search results cut titles past about 60 characters and descriptions past about 155.
+      const max = kind === 'title' ? 60 : 155
+      if (value.length > max) fail('seo', `${page.file}: the ${kind} is ${value.length} characters (at most ${max})`)
       if (seen[kind].has(value)) fail('seo', `${page.file} and ${seen[kind].get(value)} share the ${kind} "${value}"`)
       else seen[kind].set(value, page.file)
     }
@@ -509,6 +516,76 @@ function checkJsonLd() {
 }
 
 // ---------------------------------------------------------------------------------------------
+// redirects: renamed pages keep their old addresses working, and nothing links to the old ones
+
+function checkRedirects() {
+  const source = join(root, 'public', '_redirects')
+  const path = join(dist, '_redirects')
+  if (!existsSync(source)) return 0
+  if (!existsSync(path)) {
+    fail('redirects', 'dist/_redirects is missing: rebuild')
+    return 0
+  }
+  const text = readFileSync(path, 'utf8')
+  if (readFileSync(source, 'utf8') !== text) fail('redirects', 'dist/_redirects differs from public/_redirects: rebuild')
+
+  // Cloudflare Pages syntax: `source destination status`, one rule a line; 2,000 static rules at most
+  // (https://developers.cloudflare.com/pages/configuration/redirects/).
+  const rules = []
+  text.split(/\r?\n/).forEach((line, i) => {
+    const t = line.trim()
+    if (t === '' || t.startsWith('#')) return
+    const parts = t.split(/\s+/)
+    if (parts.length !== 3) return void fail('redirects', `_redirects line ${i + 1} wants "source destination status": ${t}`)
+    const [from, to, code] = parts
+    if (code !== '301' && code !== '308') fail('redirects', `_redirects line ${i + 1}: ${from} is a ${code}; a renamed page wants a permanent 301`)
+    if (!/^\/[^\s*:?#]*$/.test(from)) fail('redirects', `_redirects line ${i + 1}: the source ${from} must be a plain path (no splats, placeholders or queries)`)
+    if (!to.startsWith('/') || to.startsWith('//')) fail('redirects', `_redirects line ${i + 1}: the destination ${to} must be a path on this site`)
+    rules.push({ from, to, line: i + 1 })
+  })
+  if (rules.length > 2000) fail('redirects', `_redirects has ${rules.length} rules; Cloudflare's limit is 2,000 static rules`)
+
+  const sources = new Map()
+  for (const rule of rules) {
+    if (sources.has(rule.from)) fail('redirects', `${rule.from} has two rules (lines ${sources.get(rule.from).line} and ${rule.line})`)
+    sources.set(rule.from, rule)
+  }
+  const trim = (p) => (p.length > 1 ? p.replace(/\/+$/, '') : p)
+  const retired = new Map([...sources.values()].map((r) => [trim(r.from), r.to]))
+  for (const rule of rules) {
+    if (fileFor(rule.from)) fail('redirects', `${rule.from} is still a built page, so its redirect hides it or never runs`)
+    const target = new URL(rule.to, site).pathname
+    if (!fileFor(target)) fail('redirects', `${rule.from} → ${rule.to}, which isn't a built page`)
+    if (retired.has(trim(target))) fail('redirects', `${rule.from} → ${rule.to}, which is itself redirected: point it at the final page`)
+    if (/^\/blog\/[^/]+\/?$/.test(rule.from)) {
+      const other = rule.from.endsWith('/') ? rule.from.slice(0, -1) : `${rule.from}/`
+      if (!sources.has(other)) fail('redirects', `${rule.from} has a rule but ${other} doesn't; add both spellings`)
+      else if (sources.get(other).to !== rule.to) fail('redirects', `${rule.from} and ${other} go to different pages`)
+    }
+  }
+
+  // Nothing of ours points at a retired address: links resolve through a redirect, which costs a hop.
+  for (const page of html) {
+    for (const tag of tagsOf(page.text)) {
+      if (tag.name !== 'a' && tag.name !== 'link') continue
+      const raw = tag.attrs.get('href')
+      if (!raw || !sameOrigin(raw) || raw.startsWith('#')) continue
+      const to = retired.get(trim(new URL(raw, `${site}${urlOf(page.file)}`).pathname))
+      if (to) fail('redirects', `${page.file} links to the retired ${raw}; link to ${to} instead`)
+    }
+  }
+  for (const name of ['sitemap.xml', 'rss.xml']) {
+    const file = join(dist, name)
+    if (!existsSync(file)) continue
+    const body = readFileSync(file, 'utf8')
+    for (const [from, to] of retired) {
+      if (body.includes(`${site}${from}<`) || body.includes(`${site}${from}/<`)) fail('redirects', `${name} lists the retired ${from}; it should list ${to}`)
+    }
+  }
+  return rules.length
+}
+
+// ---------------------------------------------------------------------------------------------
 
 checkHeaders()
 const namesScanned = checkLeaks()
@@ -517,6 +594,7 @@ checkLinks()
 const linksChecked = checkInternalLinks()
 const seo = checkSeo()
 const jsonLdBlocks = checkJsonLd()
+const redirectRules = checkRedirects()
 
 if (failures.length) {
   console.error(`check-dist: ${failures.length} failure(s) in ${dist}\n`)
@@ -530,3 +608,4 @@ console.log(`  drafts   ok: ${draftCount} draft post(s), none built, linked or n
 console.log(`  links    ok: every target="_blank" link has noopener or noreferrer; ${linksChecked} same-origin links resolve`)
 console.log(`  seo      ok: titles, descriptions, one h1, canonicals, share cards, alt; ${seo.indexable} pages in the sitemap, ${seo.posts} posts in the feed`)
 console.log(`  jsonld   ok: ${jsonLdBlocks} JSON-LD blocks, all valid JSON with no "<"`)
+console.log(`  redirects ok: ${redirectRules} permanent redirects to built pages; nothing links to a retired address`)

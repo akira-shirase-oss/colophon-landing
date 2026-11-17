@@ -20,7 +20,7 @@ I'm building Colophon, an open-source CMS in Rust and Svelte. Here is how its sc
 
 In Colophon you schedule a publish request, the reviewed set of exact revisions that would otherwise be published by hand. The request has to be approved first, and the person scheduling it needs the right to publish it now.
 
-A schedule keeps what its author chose: a local date and time, and an IANA time zone such as `Europe/London`. It also stores the exact instant that resolves to, the hash of the publish request, and the approval it will publish under. One publish request can have one pending schedule.
+A schedule keeps what its author chose: a local date and time, and an IANA time zone such as `Europe/London`. It also stores the exact instant that resolves to, the hash of the publish request, and the approval it will publish under. One publish request can have one pending schedule. In the Studio, a publish request has a Schedule panel, and the Releases page lists what is scheduled.
 
 The time has to be in the future, within a year and a day, and before the approval expires. Approvals in Colophon last seven days, so a schedule can't outlive the review behind it.
 
@@ -52,11 +52,11 @@ For comparison, Strapi documents a different choice for its scheduled releases: 
 
 Colophon can run several workers. Each takes a due schedule with a row lock that skips rows another worker already holds, then runs the same publish routine the API uses, on the latest release number. The release and the schedule's published state commit in the same transaction. A test runs two workers against one schedule at once and checks it publishes exactly once.
 
-Publishing itself can't double up either. A release commits only from the release number the publisher saw, so two attempts can't both land. More on that in [what a headless CMS should be able to prove](/blog/headless-cms-should-prove/).
+Publishing itself can't double up either. A release commits only from the release number the publisher saw, so two attempts can't both land. More on that in [six publishing questions a CMS should answer](/blog/headless-cms-publishing-checklist/).
 
 ## Cancelling
 
-Cancelling a schedule waits for a run already in progress and never undoes a release. If you cancel at 08:59:59 and the publish began at 08:59:58, you'll see a published release, not a half-cancelled one. To take content down, publish a request that unpublishes it, which can be scheduled the same way.
+Cancelling a schedule waits for a run already in progress and never undoes a release. If you cancel at 08:59:59 and the publish began at 08:59:58, you'll see a published release, not a half-cancelled one. To take content down, publish a request that unpublishes it, which can be scheduled the same way. If a scheduled release went out wrong, [rolling it back](/blog/roll-back-a-bad-publish/) is another reviewed release.
 
 ## What it doesn't do
 
@@ -64,6 +64,3 @@ Cancelling a schedule waits for a run already in progress and never undoes a rel
 - **No crash test for the scheduler itself yet.** The scheduler is tested with a fake clock that's advanced in the test: on time, late and labelled delayed, cancelled, blocked by an edit or an expired approval, run as its author, and raced by two workers. The killed-process tests cover saving and delivery, not a worker killed mid-schedule.
 - **Delayed by how much is a label, not an alert.** Colophon records that a publish was late; it doesn't notify anyone yet.
 
-## Where it stands
-
-Colophon is pre-release (0.1.0-alpha.1) and has no users. Scheduling is built and tested against a real database, and its endpoint has a million-request load run on record. The Studio has a Schedule panel on a publish request and a Scheduled list on the Releases page. The build log is at [404human.dev/colophon](https://404human.dev/colophon/).

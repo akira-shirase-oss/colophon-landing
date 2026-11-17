@@ -231,3 +231,59 @@
     font-size: 15px;
   }
 }
+
+/* The shared status line under a post's title (src/components/Status.astro). */
+.status {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--c-surface);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--c-text);
+}
+.status strong {
+  font-weight: 600;
+  color: var(--c-ink);
+}
+.status a {
+  color: var(--c-ink);
+  text-decoration: underline;
+  text-decoration-color: #bdbdbd;
+  text-underline-offset: 3px;
+}
+
+/* Figures in posts: inline SVG diagrams with a one-sentence caption. */
+.prose :global(figure) {
+  margin: 32px 0;
+}
+.prose :global(figure svg) {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.prose :global(figcaption) {
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--c-text);
+}
+/* A glossary: terms as h3 with their own anchors, definitions as plain paragraphs. */
+.prose :global(dl) {
+  margin-bottom: 24px;
+}
+.prose :global(dt) {
+  margin-top: 28px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 500;
+  color: var(--c-ink);
+  scroll-margin-top: 120px;
+}
+.prose :global(dd) {
+  margin: 8px 0 0;
+}
+.prose :global(dd p) {
+  margin-bottom: 12px;
+}

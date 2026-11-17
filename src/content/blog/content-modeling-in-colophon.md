@@ -49,7 +49,7 @@ Every entry read also says what refers to it, so before you change or remove som
 
 Some rules can't be checked one document at a time. Uniqueness is the classic case: two editors saving the same slug at the same moment will both pass a check that reads first and writes second. So Colophon puts them in the database.
 
-- **Slugs** are lowercase letters, digits and hyphens, refused rather than silently rewritten, and unique per collection among drafts and among published entries. A clash is `409 slug_taken`, naming the other entry.
+- **Slugs** are lowercase letters, digits and hyphens, refused rather than silently rewritten, and unique per collection among drafts and among published entries. A clash is refused as a conflict that names the other entry.
 - **Unique fields** work the same way for top-level text, email, URL, number and date fields.
 - **Patterns** use Rust's regex engine, which matches in time linear in the input, so no pattern can stall a save.
 - **Defaults** fill fields a new entry leaves out.
@@ -64,17 +64,17 @@ Colophon keeps content types as versioned definitions in PostgreSQL, not as file
 When you change a type, Colophon sorts the change into one of three kinds:
 
 - **Widening**, like a longer length limit or a new optional field. Nothing stored can break, so it applies.
-- **Narrowing**, like a new required field, a stricter pattern or a changed field type. It applies only if every stored draft and published revision still passes. If any don't, the change is refused with `422 needs_migration`, naming up to 20 of the entries in the way, whether each is a draft or published, and why each would fail.
+- **Narrowing**, like a new required field, a stricter pattern or a changed field type. It applies only if every stored draft and published revision still passes. If any don't, the change is refused with a list of up to 20 of the entries in the way, whether each is a draft or published, and why each would fail.
 - **Refused outright**, like pointing a reference at a different collection, which would silently change what existing links mean.
 
 A refused change isn't a dead end. It can become a migration plan:
 
-1. **Plan.** Colophon checks every draft and published entry against the new definition and marks each one `ok` or `needs_input`, with the reason.
+1. **Plan.** Colophon checks every draft and published entry against the new definition and marks each one as fine or needing input, with the reason.
 2. **Transform.** A plan can declare simple operations that run on each entry: fill a field with a value, or move a value from one path to another. A move never overwrites a value that's already there.
 3. **Resolve.** For entries no rule can fix, a person supplies the corrected content, validated against the new definition like any save.
 4. **Approve and apply.** The plan is approved against its own hash, so a plan that changed after approval needs approving again. A background worker then applies it entry by entry. If the worker is killed partway, the run resumes.
 
-Every step is an API call that the Studio, the CLI and scripts share. Agents can read migration plans through the MCP server, but planning, approving and applying stay with people ([why agents get no approval tools](/blog/ai-agents-without-the-publish-button/)).
+Every step is an API call that the Studio, the CLI and scripts share. Agents can read migration plans through the MCP server, but planning, approving and applying stay with people ([why agents get no approval tools](/blog/ai-agents-cms-permissions/)).
 
 ## Locales
 
@@ -86,6 +86,6 @@ Entries can have locale variants, grouped as one logical entry. Each variant has
 - **Geopoint fields**, offered by some CMSs, aren't planned for 0.1.
 - **Custom validation code.** The server runs no user code, so there are no validator functions; the rules above are all declared as data.
 
-## Where it stands
+## Where to read next
 
-Colophon is pre-release (0.1.0-alpha.1) and has no users. Everything above is built and tested in the [repository](https://github.com/akira-shirase-oss/colophon-cms), including load runs of the modeling and locale endpoints. To see how this compares with a schema-as-code CMS, read [Colophon vs Strapi](/blog/colophon-vs-strapi/) or [Colophon vs Payload](/blog/colophon-vs-payload/). The build log is at [404human.dev/colophon](https://404human.dev/colophon/).
+To see how this compares with a schema-as-code CMS, read [Colophon vs Strapi](/blog/colophon-vs-strapi/) or [Colophon vs Payload](/blog/colophon-vs-payload/). Why a rollback refuses old content that no longer fits the model is in [rolling back a release as a reviewed change](/blog/roll-back-a-bad-publish/).

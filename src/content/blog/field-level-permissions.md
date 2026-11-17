@@ -40,8 +40,8 @@ Any member can read what a role means before it's given to them.
 The rules apply to every read and every write, from the Studio, the CLI, the API and AI agents alike, because they all go through the same Rust services.
 
 - **Reading.** Fields the role can't read are left out of the answer. Fields it can read but not change are marked locked. An entry it can't read at all answers `404`, the same as one that doesn't exist, so a guess can't be confirmed. Revisions and history follow the same rules.
-- **Lists and search.** If a role may read only its own entries, a list holds only those. A title search looks only where the role can read titles. A search that would reveal which hidden titles match is refused instead (`403 titles_not_readable`). That gap was found while rewriting the docs, and fixed with a test that failed first.
-- **Saving.** Fields the saver can't read are put back exactly as stored. A save that sends a different value for one, or changes a field the role can't change, is refused with `422 field_not_permitted`, pointing at the field.
+- **Lists and search.** If a role may read only its own entries, a list holds only those. A title search looks only where the role can read titles. A search that would reveal which hidden titles match is refused instead.
+- **Saving.** Fields the saver can't read are put back exactly as stored. A save that sends a different value for one, or changes a field the role can't change, is refused, and the refusal points at the field.
 - **Publishing.** A publish request may include an entry only if the role may change it.
 
 The Studio's editor leaves hidden fields out entirely, shows locked ones disabled, and says which. But the Studio is a convenience on top: the server makes the decision.
@@ -66,7 +66,7 @@ The field-level checks above live in one policy function in Colophon's Rust code
 
 ## Tokens for scripts and agents
 
-Project API tokens use the same permission model as roles: read-only, full access, or a custom list narrowed by fields and own entries. A token is an identity of its own, so what it writes names the token. Revoking it is exact: no new request starts under it once the revocation commits. How this applies to AI agents, including the rule that a token can't approve what a token submitted, is in [give AI agents CMS access, not the publish button](/blog/ai-agents-without-the-publish-button/).
+Project API tokens use the same permission model as roles: read-only, full access, or a custom list narrowed by fields and own entries. A token is an identity of its own, so what it writes names the token. Revoking it is exact: no new request starts under it once the revocation commits. How this applies to AI agents, including the rule that a token can't approve what a token submitted, is in [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
 
 ## What this doesn't cover yet
 
@@ -74,6 +74,6 @@ Project API tokens use the same permission model as roles: read-only, full acces
 - **No per-locale permissions yet.** Roles can't be limited to one language.
 - **Sign-in extras.** There is no password reset and no emailed staff invitation yet; invitations are single-use links an owner shares.
 
-## Where it stands
+## How other CMSs compare
 
-Colophon is pre-release (0.1.0-alpha.1) and has no users. The roles, field lists, own-entry conditions, tokens, audit log and the database rules above are built and covered by tests against a real database. How this compares with other CMSs is in [Colophon vs Strapi](/blog/colophon-vs-strapi/) and [Colophon vs Directus](/blog/colophon-vs-directus/). The build log is at [404human.dev/colophon](https://404human.dev/colophon/).
+How this compares with other CMSs is in [Colophon vs Strapi](/blog/colophon-vs-strapi/) and [Colophon vs Directus](/blog/colophon-vs-directus/). Changing a role's power over a scheduled publish is covered in [scheduled publishing that survives downtime](/blog/scheduled-publishing-pitfalls/).

@@ -22,13 +22,13 @@ Agents connect through Colophon's MCP server, which comes two ways: a local proc
 - **Ask a person:** read and add comments, read and create tasks.
 - **Look at schema migrations:** list them and read their items.
 
-What's missing is the point. There's no tool to approve, publish, unpublish or schedule. None to manage roles, members or tokens. None to resolve a comment, change a task, or plan, approve or apply a schema migration. A full-access token gets the same 18 tools as a narrow one. The server's own test calls 21 of those privileged names and gets "unknown tool" for every one.
+What's missing is the point. There's no tool to approve, publish, unpublish or schedule. None to manage roles, members or tokens. None to resolve a comment, change a task, or plan, approve or apply a schema migration. A full-access token gets the same 18 tools as a narrow one, and calling any of 21 privileged tool names gets "unknown tool".
 
 ## Why missing tools aren't enough
 
 Leaving tools out is a convenience. Anyone with the token can call the HTTP API directly, and a CMS that relies on its MCP tool list for safety is one curl command from having none.
 
-So the rule lives in the API. When an API token tries to approve a publish request that an API token submitted, the server refuses with `403 agent_self_review`: "an API token can't approve a changeset an API token submitted; it needs a person's approval". The check is on the kind of identity, not on which token. Minting a second token to approve the first one's work doesn't get around it, because tokens are free to make.
+So the rule lives in the API. When an API token tries to approve a publish request that an API token submitted, the server refuses with a `403` that says so: "an API token can't approve a changeset an API token submitted; it needs a person's approval". The check is on the kind of identity, not on which token. Minting a second token to approve the first one's work doesn't get around it, because tokens are free to make.
 
 Approval in Colophon is also tied to exact content. A publish request pins exact revisions, and an approval counts only for a hash of those revisions. If an agent edits anything after a person approved it, the approval no longer counts.
 
@@ -47,15 +47,15 @@ A few more properties that matter when a token leaks:
 
 ## Budgets the agent can't talk its way past
 
-A token can carry ceilings: documents per day, concurrent jobs, requests per minute, and provider tokens and cost per day for future AI features. Work allowances are reserved in PostgreSQL inside the transaction that accepts the work, before anything starts, so parallel requests can't race past them. Over the limit, the answer is `403 budget_exceeded`. The per-minute cap works differently, as a rate limiter checked before the request does any work, because reserving a database row for every request would cost a write per request. Over it, the answer is `429 rate_limited` with a `Retry-After` header.
+A token can carry ceilings: documents per day, concurrent jobs, requests per minute, and provider tokens and cost per day for future AI features. Work allowances are reserved in PostgreSQL inside the transaction that accepts the work, before anything starts, so parallel requests can't race past them. Over the limit, the work is refused with a `403` before it starts. The per-minute cap works differently, as a rate limiter checked before the request does any work, because reserving a database row for every request would cost a write per request. Over it, the answer is `429` with a `Retry-After` header.
 
-The load test for this runs normal editorial traffic, then adds a token capped at 60 requests a minute that tries about 600 a second. 99.7% of its attempts were refused with `429`, and editors' p95 latency stayed at 1.83 times their own baseline. More numbers like that are in [Colophon's load tests, with the caveats](/blog/colophon-load-test-numbers/).
+The load test for this runs normal editorial traffic, then adds a token capped at 60 requests a minute that tries about 600 a second. 99.7% of its attempts were refused with `429`, and editors' p95 latency stayed at 1.83 times their own baseline. More numbers like that are in [Colophon's load tests, with the caveats](/blog/load-testing-a-cms/).
 
 ## Retries that can't double-write
 
-Agents retry. Networks drop answers. Every create and update tool sends an idempotency key, either the agent's own or one the server generates and returns. A retry with the same key replays the recorded result instead of writing again. A write that got no answer at all comes back as an `outcome_unknown` error naming the key to retry with.
+Agents retry. Networks drop answers. Every create and update tool sends an idempotency key, either the agent's own or one the server generates and returns. A retry with the same key replays the recorded result instead of writing again. A write that got no answer at all comes back as an error saying the outcome is unknown, naming the key to retry with.
 
-Updates send the revision the agent read. If a person saved in the meantime, the update is refused with the current revision named and nothing saved. An agent can't overwrite an editor's newer work, which is the same rule people get; see [what happens to your draft when the CMS crashes](/blog/crash-safe-drafts/).
+Updates send the revision the agent read. If a person saved in the meantime, the update is refused with the current revision named and nothing saved. An agent can't overwrite an editor's newer work, which is the same rule people get; see [what happens to your draft when the CMS crashes](/blog/cms-lost-edits/).
 
 ## Prompt injection in content
 
@@ -65,9 +65,9 @@ The server's instructions to the model say that entry content is data written by
 
 Colophon has an evaluation suite where the adversary is a scoped API token against the real API and a real MCP session, never a mock and never a friendly model. It covers six abuse cases: prompt injection in content, tool-argument manipulation, cost overruns, a mass-deletion attempt, an altered approved changeset and an unsafe import, plus self-approval, field-bounds, cross-project and MCP-surface cases.
 
-Every adversarial call is classified as refused, permitted (the agent's own legitimate work) or unauthorized. The gate is zero unauthorized calls, with zero problems beside it, because a test that can't tell a refusal from a success proves nothing. The stored run from 4 November ran ten cases, three trials each: 0 unauthorized, 0 problems.
+Every adversarial call is classified as refused, permitted (the agent's own legitimate work) or unauthorized. The gate is zero unauthorized calls, with zero problems beside it, because a test that can't tell a refusal from a success proves nothing. The [stored run](https://github.com/akira-shirase-oss/colophon-cms/tree/main/perf) from 4 November ran ten cases, three trials each: 0 unauthorized, 0 problems.
 
-The prompt-injection case shows the shape. An entry contains text telling the agent to approve its own work, publish it and delete another entry. The agent may read the entry, draft its own, propose a publish request and submit it for review; those are permitted. Approving is refused with `agent_self_review`, and publishing and deleting are refused because the token lacks those permissions. Afterwards the owner's reads confirm that the instruction is stored as plain content, the request still waits for a person, and nothing was published.
+The prompt-injection case shows the shape. An entry contains text telling the agent to approve its own work, publish it and delete another entry. The agent may read the entry, draft its own, propose a publish request and submit it for review; those are permitted. Approving is refused because a token can't approve a token's work, and publishing and deleting are refused because the token lacks those permissions. Afterwards the owner's reads confirm that the instruction is stored as plain content, the request still waits for a person, and nothing was published.
 
 There's no model in the suite on purpose. The cases are deterministic attacks on the API, and the question is whether the boundary holds, not whether a particular model behaves.
 
@@ -77,6 +77,6 @@ There's no model in the suite on purpose. The cases are deterministic attacks on
 - **Two planned tools,** one to validate a publish request without side effects and one for job status.
 - **Other environments over stdio.** The local MCP server works on `production`; the HTTP endpoint takes any environment its path names.
 
-## Where it stands
+## Where to read next
 
-Colophon is pre-release (0.1.0-alpha.1) and has no users yet. The MCP server, API tokens, budgets and the evaluation suite are built and tested in the [repository](https://github.com/akira-shirase-oss/colophon-cms). Roles for people work the same way and are covered in [field-level permissions](/blog/field-level-permissions/). I post progress in the build log at [404human.dev/colophon](https://404human.dev/colophon/).
+Roles for people work the same way and are covered in [field-level permissions](/blog/field-level-permissions/). How a CMS should answer for every publish, whoever proposed it, is in [six publishing questions a CMS should answer](/blog/headless-cms-publishing-checklist/).

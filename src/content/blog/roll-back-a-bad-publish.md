@@ -1,6 +1,6 @@
 ---
 title: "Rollback is a change too: reverting a release"
-description: "In Colophon, rolling back published content opens a normal publish request. It gets reviewed, lands as a new numbered release, and history only moves forward."
+description: "Rolling back published content in Colophon opens a normal publish request: it is reviewed, lands as a new numbered release, and history only moves forward."
 pubDate: 2026-11-16
 updatedDate: 2026-11-17
 tags: ["rollback", "review", "releases"]
@@ -33,7 +33,7 @@ Rewriting history has a second cost. If the record of releases can be rewound, y
 
 ## What happens when you roll back in Colophon
 
-In the Studio, every release has a receipt page. On an older release, people who can edit content see a button: **Roll back to this release**. There is also a release slider for stepping through releases one by one; reading what a past release held is covered in [what was live on your site last Tuesday?](/blog/what-was-live-last-tuesday/)
+In the Studio, every release has a receipt page. On an older release, people who can edit content see a button: **Roll back to this release**. There is also a release slider for stepping through releases one by one; reading what a past release held is covered in [how to see what your website said on a past date](/blog/website-history-past-date/).
 
 Pressing the button doesn't publish anything. It builds a publish request titled "Rollback to release N" and takes you to it. The request says which release it restores, with a link back.
 
@@ -49,7 +49,7 @@ No. A rollback request needs the same approval as any other publish request.
 
 An approval in Colophon is tied to the exact contents of a request, identified by a hash of every pinned entry and revision. If the request changes after approval, the approval no longer counts. Approvals also expire after seven days. Reviewing a rollback means reviewing precisely what will be restored, not a description of it.
 
-Who may approve is a role question. By default, publishers and owners can review and publish; editors can create and edit content and ask for review. An agent can never approve its own proposal. So a script or AI assistant connected to Colophon can propose a rollback, but a person has to approve it.
+Who may approve is a role question. By default, publishers and owners can review and publish; editors can create and edit content and ask for review. An agent can never approve its own proposal. So a script or AI assistant connected to Colophon can propose a rollback, but a person has to approve it; why is in [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
 
 ## What a reviewed rollback costs
 
@@ -59,7 +59,7 @@ What keeps it workable: self-review is allowed by default. If you are the only p
 
 So a solo maintainer pays a couple of extra clicks. A team that has chosen two-person review pays for that choice during an incident too. I think that's consistent. If a change needs a second reviewer on a normal day, it needs one on a bad day.
 
-What you get back is a record. The rollback is a release with a number, a title, who published it and when, and a link to the request it came from, which links to the release it restores. Its delivery receipt works the same as any release's, so you can see whether the website actually picked it up ([how receipts work](/blog/published-means-readers-can-see-it/)). One honest note: Colophon's separate audit log today covers access changes such as roles, members and tokens, not publishes. The record of a rollback lives in the release history and its publish request.
+What you get back is a record. The rollback is a release with a number, a title, who published it and when, and a link to the request it came from, which links to the release it restores. Its delivery receipt works the same as any release's, so you can see whether the website actually picked it up ([how receipts work](/blog/website-not-updating-after-publish/)). One honest note: Colophon's separate audit log today covers access changes such as roles, members and tokens, not publishes. The record of a rollback lives in the release history and its publish request.
 
 ## What a rollback won't bring back
 
@@ -75,6 +75,3 @@ Images have one known gap. Every uploaded version of an image is kept and can be
 
 Other CMSs document their own approaches. Contentstack, for example, can [roll back a deployed release](https://www.contentstack.com/docs/headless-cms/roll-back-a-release). Its docs describe restoring each item to its previous published state, or unpublishing it if no prior version existed, and note that a rollback changes publish state rather than deleting or restoring content versions. A rollback release there must be deployed manually and can't be scheduled. Strapi's Releases, on its paid plans, take a different line again: its docs say a published release "cannot be edited or published again", and restoring an older version goes through per-entry [Content History](https://docs.strapi.io/cms/features/content-history), which replaces the current draft ([Strapi Releases docs](https://docs.strapi.io/cms/features/releases), checked 16 November 2026; more in [Colophon vs Strapi](/blog/colophon-vs-strapi/)). Different design goals lead to different answers. Colophon's is to treat the rollback as one more reviewed change.
 
-## Where it stands
-
-Colophon is pre-release (0.1.0-alpha.1) and has no users yet. I build it in public, alone. Rollback through a reviewed publish request is built and covered by tests against a real database, and the Studio has the rollback button and the release slider. Version 0.1 still has gates I owe, including a long soak run and checks that need other people. Exact image versions on rollback come later. Agents can propose a rollback but never approve one; why is in [give AI agents CMS access, not the publish button](/blog/ai-agents-without-the-publish-button/). I post progress in the build log at [404human.dev/colophon](https://404human.dev/colophon/).
