@@ -45,8 +45,7 @@ const items: Item[] = [
   {
     title: 'Sites without custom CSS',
     body: 'Build pages, menus and themes from a fixed set of sections and design tokens, then publish them like any article.',
-    caption:
-      "Colophon Studio's site builder: the Home page's Look tab shows the page rendered from its sections and the site theme, beside the panel that sends it for review.",
+    caption: "Colophon Studio's site builder: the Home page's Look tab shows the page rendered from its sections and the site theme.",
     screen: SiteBuilder,
     href: `${docs}/15-web-blog.md`,
     topic: 'the website builder in the module notes on GitHub',
@@ -66,34 +65,34 @@ const items: Item[] = [
   {
     title: "Media that can't break a page",
     body: 'Every upload is checked before it can be published, so a release never goes out pointing at a broken image.',
-    caption: "Colophon Studio's media library: five uploads with their sizes, four marked Usable after their checks and one still being checked.",
+    caption: "Colophon Studio's media library: uploads with their sizes, each marked Usable once it passed its checks, and one still being checked.",
     screen: MediaLibrary,
     href: `${docs}/07-media.md`,
     topic: 'how uploads are checked in the module notes on GitHub',
     receipt: {
       label: 'Upload',
-      status: 'Verified',
+      status: 'Usable',
       tone: 'green',
       title: 'lavender-farmhouse.webp',
       rows: [
+        ['Checked', 'Before it can be used'],
         ['Type', 'WebP, read from the file'],
         ['Metadata', 'Stripped'],
-        ['Renditions', 'w320, w1280'],
       ],
-      says: 'Example upload lavender-farmhouse.webp, verified: its type read from the file as WebP, metadata stripped, renditions w320 and w1280 made.',
+      says: 'Example upload lavender-farmhouse.webp, usable: checked before it can be used, its type read from the file as WebP and its metadata stripped.',
     },
   },
   {
     title: 'Rollbacks that get reviewed',
     body: 'Returning to an older version opens a normal change for review instead of skipping the process.',
     caption:
-      "Colophon Studio's publish request for a rollback to release 144, waiting for review: the entries it restores, its review stages and the review panel.",
+      "Colophon Studio's publish request for a rollback to release 144, waiting for review: the review panel, the entries it restores and its review stages.",
     screen: RollbackReview,
     href: '/blog/roll-back-a-bad-publish/',
     topic: 'reviewed rollbacks on the blog',
     receipt: {
       label: 'Publish request',
-      status: 'In review',
+      status: 'Waiting for review',
       tone: 'blue',
       title: 'Rollback to release 144',
       rows: [
@@ -101,7 +100,7 @@ const items: Item[] = [
         ['Once approved', 'Release 146'],
         ['Review', 'Same as any publish'],
       ],
-      says: 'Example publish request "Rollback to release 144", in review. Release 145 is live now; once approved, the rollback goes live as release 146, reviewed like any publish.',
+      says: 'Example publish request "Rollback to release 144", waiting for review. Release 145 is live now; once approved, the rollback goes live as release 146, reviewed like any publish.',
     },
   },
   {
@@ -135,7 +134,7 @@ const items: Item[] = [
     <ul class={styles.list}>
       {
         items.map((it, i) => (
-          <li class={`${styles.card} ${i % 2 === 1 ? styles.flip : ''}`}>
+          <li class={`${styles.card} ${i % 2 === 1 ? styles.flip : ''} ${i === 0 ? styles.clear : ''}`}>
             <div class={styles.text}>
               <h3 class={styles.title}>{it.title}</h3>
               <p class={styles.body}>{it.body}</p>

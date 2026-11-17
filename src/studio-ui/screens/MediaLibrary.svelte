@@ -2,16 +2,16 @@
   The media library. Markup copied from Colophon (MIT): apps/studio/src/routes/projects/[project]/media/+page.svelte
   https://github.com/akira-shirase-oss/colophon-cms/blob/main/apps/studio/src/routes/projects/%5Bproject%5D/media/%2Bpage.svelte
 
-  The grid's `sm:`/`lg:`/`xl:` columns are resolved to the desktop four. The uploads are this
-  landing page's own paintings, with their real sizes; the Studio's state words are its own
-  ("Usable" once an upload passed its checks, "Checking…" while it is being checked).
+  The grid's `sm:`/`lg:`/`xl:` columns answer to the window's width (see shell/Panel.svelte). The
+  uploads are this landing page's own paintings, with their real sizes; the state words are the
+  Studio's own ("Usable" once an upload passed its checks, "Checking…" while it is being checked).
 -->
 <script lang="ts">
   import ImageIcon from '@lucide/svelte/icons/image'
   import TrashIcon from '@lucide/svelte/icons/trash'
   import UploadIcon from '@lucide/svelte/icons/upload'
   import PageHeader from '../shell/PageHeader.svelte'
-  import Shell from '../shell/Shell.svelte'
+  import Panel from '../shell/Panel.svelte'
   import Badge from '../ui/Badge.svelte'
   import Button from '../ui/Button.svelte'
 
@@ -31,7 +31,7 @@
   }
 </script>
 
-<Shell active="media" crumbs={['Media']}>
+<Panel>
   <PageHeader title="Media">
     {#snippet description()}
       Every upload in this project: what it settled in, how big it is, and where it came from. Uploads are checked before they can be used; a rejected file never reaches
@@ -42,7 +42,7 @@
     {/snippet}
   </PageHeader>
 
-  <ul class="grid grid-cols-4 gap-3">
+  <ul class="grid gap-3 @xl:grid-cols-2 @2xl:grid-cols-3 @4xl:grid-cols-4">
     {#each assets as asset (asset.name)}
       <li class="flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xs">
         <div class="flex h-40 items-center justify-center overflow-hidden border-b border-border bg-secondary/40">
@@ -67,4 +67,4 @@
       </li>
     {/each}
   </ul>
-</Shell>
+</Panel>

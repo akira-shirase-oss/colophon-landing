@@ -5,9 +5,10 @@
   and of apps/studio/src/lib/permissions.ts.
   https://github.com/akira-shirase-oss/colophon-cms/blob/main/apps/studio/src/routes/projects/%5Bproject%5D/settings/tokens/%2Bpage.svelte
 
-  The `lg:` frame is resolved to its desktop columns, its group labels are paragraphs with their
-  classes (the illustration is not part of the landing page's outline), and the sample tokens
-  and people are made up.
+  The frame's `lg:` variants answer to the window's width (see shell/Panel.svelte), so in a
+  narrow window the settings pages are a row of links above the page, as on a small screen. Its
+  group labels are paragraphs with their classes (the illustration is not part of the landing
+  page's outline), and the sample tokens and people are made up.
 -->
 <script lang="ts">
   import type { Component } from 'svelte'
@@ -19,7 +20,7 @@
   import ShieldCheckIcon from '@lucide/svelte/icons/shield-check'
   import SlidersHorizontalIcon from '@lucide/svelte/icons/sliders-horizontal'
   import PageHeader from '../shell/PageHeader.svelte'
-  import Shell from '../shell/Shell.svelte'
+  import Panel from '../shell/Panel.svelte'
   import Badge from '../ui/Badge.svelte'
   import Button from '../ui/Button.svelte'
 
@@ -74,14 +75,14 @@
   ]
 </script>
 
-<Shell active="settings" crumbs={['Settings', 'API tokens']}>
-  <div class="grid grid-cols-[13rem_minmax(0,1fr)] gap-8">
+<Panel>
+  <div class="grid gap-6 @4xl:grid-cols-[13rem_minmax(0,1fr)] @4xl:gap-8">
     <div class="min-w-0">
-      <div class="grid gap-5">
+      <div class="grid gap-2 @4xl:gap-5">
         {#each groups as group (group.label)}
           <div>
-            <p class="eyebrow mb-1.5 px-2.5">{group.label}</p>
-            <ul class="grid gap-0.5">
+            <p class="eyebrow mb-1.5 hidden px-2.5 @4xl:block">{group.label}</p>
+            <ul class="flex flex-wrap gap-1 @4xl:grid @4xl:gap-0.5">
               {#each group.items as item (item.label)}
                 <li>
                   <span
@@ -129,4 +130,4 @@
       </section>
     </div>
   </div>
-</Shell>
+</Panel>

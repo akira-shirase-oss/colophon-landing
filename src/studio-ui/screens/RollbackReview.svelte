@@ -4,15 +4,14 @@
   with its words from apps/studio/src/lib/words.ts.
   https://github.com/akira-shirase-oss/colophon-cms/blob/main/apps/studio/src/routes/projects/%5Bproject%5D/changesets/%5Bchangeset%5D/%2Bpage.svelte
 
-  The `lg:` grid is resolved to its desktop columns, the entries are shown folded, the section
-  headings are paragraphs with their classes (the illustration is not part of the landing page's
-  outline), and the sample entries, stages and people are made up.
+  The `lg:` variants answer to the window's width (see shell/Panel.svelte), the entries are shown
+  folded, the section headings are paragraphs with their classes (the illustration is not part of
+  the landing page's outline), and the sample entries, stages and people are made up.
 -->
 <script lang="ts">
   import ChevronDownIcon from '@lucide/svelte/icons/chevron-down'
-  import Badges from '../shell/Badges.svelte'
   import PageHeader from '../shell/PageHeader.svelte'
-  import Shell from '../shell/Shell.svelte'
+  import Panel from '../shell/Panel.svelte'
   import Badge from '../ui/Badge.svelte'
   import Button from '../ui/Button.svelte'
 
@@ -32,11 +31,12 @@
   ] as const
 </script>
 
-<Shell active="requests" crumbs={['Publish requests', 'Rollback to release 144']}>
+<Panel>
   <PageHeader title="Rollback to release 144">
     {#snippet meta()}
       <span class="inline-flex flex-wrap items-center gap-2">
-        <Badges pill={{ kind: 'request', state: 'awaiting_review' }} />
+        <!-- ChangesetBadge (apps/studio/src/lib/shell/ChangesetBadge.svelte): awaiting_review -->
+        <Badge variant="pending">Waiting for review</Badge>
         <span>restores <span class="underline underline-offset-2">release 144</span></span>
       </span>
     {/snippet}
@@ -51,7 +51,7 @@
     {/each}
   </ol>
 
-  <div class="grid grid-cols-[minmax(0,1fr)_20rem] gap-10">
+  <div class="grid gap-10 @2xl:grid-cols-[minmax(0,1fr)_20rem]">
     <section>
       <p class="mb-3 text-base font-semibold">Entries <span class="font-normal text-muted-foreground tabular">{items.length}</span></p>
       <ul class="space-y-3">
@@ -74,7 +74,7 @@
       </ul>
     </section>
 
-    <div class="space-y-8">
+    <div class="contents @2xl:block @2xl:space-y-8">
       <section>
         <p class="mb-3 text-base font-semibold">Review stages</p>
         <ol class="space-y-2.5">
@@ -88,9 +88,11 @@
           {/each}
         </ol>
       </section>
-      <section class="rounded-xl border border-border bg-card p-4 shadow-xs">
+      <section class="-order-1 rounded-xl border border-border bg-card p-4 shadow-xs @2xl:order-none">
         <p class="text-base font-semibold">Review</p>
-        <p class="mt-1 text-sm text-muted-foreground">You approve exactly the versions on this page. If they change, your approval no longer counts.</p>
+        <p class="mt-1 text-sm text-muted-foreground">
+          You approve exactly the versions on this page<span class="@2xl:hidden">: the changes are below</span>. If they change, your approval no longer counts.
+        </p>
         <div class="mt-4 grid gap-1.5">
           <span class="text-sm font-medium">Deciding</span>
           <span class="flex h-9 w-full items-center rounded-md border border-input bg-card px-3 text-sm shadow-xs">Legal — waiting</span>
@@ -102,4 +104,4 @@
       </section>
     </div>
   </div>
-</Shell>
+</Panel>

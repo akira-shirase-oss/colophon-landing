@@ -23,10 +23,11 @@ npm run build    # static production build into dist/
 - The FAQ also emits `FAQPage` structured data (JSON-LD).
 - `src/studio-ui/` — the Studio windows in "What's built". They are Colophon's own UI, copied from the
   [Colophon repository](https://github.com/akira-shirase-oss/colophon-cms) (MIT; each file names its source):
-  the Studio's shell, buttons and badges as Svelte components, four screens with sample data, its site renderer
-  and its design tokens (`studio.css`, Tailwind CSS v4 limited to these files). Astro renders them at build
-  time and never hydrates them, so they add no JavaScript; the windows are `inert` and hidden from screen
-  readers, with a figure caption saying what each shows.
+  the Studio's main panel, page header, buttons and badges as Svelte components, four screens with sample data,
+  its site renderer and its design tokens (`studio.css`, Tailwind CSS v4 limited to these files). Astro renders
+  them at build time and never hydrates them, so they add no JavaScript. Each window crops to the Studio's main
+  panel at a zoom of at least 0.8 (0.65 on phones), so its text stays readable; the windows are `inert` and
+  hidden from screen readers, with a figure caption saying what each shows.
 
 ## Security headers and checks
 
