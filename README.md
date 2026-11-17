@@ -43,6 +43,10 @@ The leak scan also looks for the build user's name and home directory, and for a
 `LEAK_SCAN_NAMES` (comma-separated; keep that list out of the repo). `check:browser` needs Playwright, which
 is not a dependency here; see the top of `scripts/check-csp-browser.mjs`.
 
+`.github/workflows/ci.yml` runs on every push, every pull request and daily: workflow hygiene
+(`scripts/check-workflows.mjs`), `npm ci`, `npm audit --omit=dev --audit-level=moderate`, lint, `npm test`, the
+build and `npm run check`. Dependabot proposes one grouped npm PR and one grouped Actions PR a week.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
