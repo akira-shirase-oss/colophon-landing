@@ -1,6 +1,6 @@
 // Loads every built page in headless Chromium with the headers from dist/_headers and fails on any
 // Content-Security-Policy violation, page error, failed request or broken image. It also clicks
-// the FAQ, the feature tabs, the Phase/Proof switch and the phone menu, which proves the hashed
+// the FAQ, the Phase/Proof switch, the How it works tabs and the phone menu, which proves the hashed
 // inline scripts actually ran.
 //
 //   npm run build && npm run check:browser
@@ -132,8 +132,6 @@ for (const path of pages) {
   await visit(path, desktop, path === '/' ? async (page, report) => {
     await page.locator('[data-faq] button').first().click()
     await expectAttr(page, report, '[data-faq] > div', 'data-open', 'true')
-    await page.locator('[data-features] [role="tab"]').nth(1).click()
-    await expectAttr(page, report, '[data-features] [role="tab"] >> nth=1', 'aria-selected', 'true')
     await page.locator('[data-status] [data-view="proof"]').click()
     await expectAttr(page, report, '[data-status] [data-view="proof"]', 'aria-checked', 'true')
     await page.locator('[data-how] [role="tab"]').nth(1).click()
