@@ -53,11 +53,7 @@ One case surprised me, and a test found it rather than a person. A save commits 
 
 Two crash tests prove two moments. They can't prove the thousands of orderings in between, where one editor's request is slow, another's answer is lost and a worker restarts. For that, Colophon has a deterministic simulator.
 
-It runs the editing and publishing rules in one thread, with a virtual clock and a fake network that drops, delays, duplicates and reorders messages. Every run is chosen by a seed number. CI runs 2,000 seeds of the editing scenario and 1,000 of the publishing scenario on every push. If a seed fails, the run prints it, and replaying that seed reproduces the same failure step for step:
-
-```sh
-cargo run -p colophon-sim -- --seed 1234 --trace
-```
+It runs the editing and publishing rules in one thread, with a virtual clock and a fake network that drops, delays, duplicates and reorders messages. Every run is chosen by a seed number. CI runs 2,000 seeds of the editing scenario and 1,000 of the publishing scenario on every push. If a seed fails, the run prints it, and replaying that seed reproduces the same failure step for step, so a once-in-a-thousand interleaving becomes a bug you can debug at your desk.
 
 The simulator is checked two ways. A deliberately broken rule has to be caught, so it can't pass by testing nothing. And runs of the editing scenario are replayed save by save against real PostgreSQL, which must give the same answers, so the model is checked against the database it stands in for. The publishing scenario has no such replay yet. The double-save case above is one the simulator found.
 

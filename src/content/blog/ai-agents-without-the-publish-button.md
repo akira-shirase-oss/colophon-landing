@@ -2,6 +2,7 @@
 title: "Give AI agents CMS access, not the publish button"
 description: "How Colophon's MCP server lets AI agents read, draft and propose content while the API refuses any token's approval of what a token submitted."
 pubDate: 2026-11-16
+updatedDate: 2026-11-17
 tags: ["ai agents", "mcp", "permissions", "automation"]
 draft: false
 ---
@@ -12,7 +13,7 @@ The risky part isn't the agent's intelligence. It's authority. An agent that can
 
 ## What an agent can do in Colophon
 
-Agents connect through Colophon's MCP server, which comes two ways: a local process over stdio (`colophon-mcp`, or `colophon mcp` inside the CLI), or Streamable HTTP on the API itself at `/api/v1/projects/{project}/environments/{environment}/mcp`. Both speak MCP protocol version 2025-11-25 and offer the same 18 tools:
+Agents connect through Colophon's MCP server, which comes two ways: a local process the CLI starts over stdio, or Streamable HTTP on the API itself at `/api/v1/projects/{project}/environments/{environment}/mcp`. Both speak MCP protocol version 2025-11-25 and offer the same 18 tools:
 
 - **Read:** list content types, list, get and query entries.
 - **Draft:** create a draft, update a draft.
@@ -64,7 +65,7 @@ The server's instructions to the model say that entry content is data written by
 
 Colophon has an evaluation suite where the adversary is a scoped API token against the real API and a real MCP session, never a mock and never a friendly model. It covers six abuse cases: prompt injection in content, tool-argument manipulation, cost overruns, a mass-deletion attempt, an altered approved changeset and an unsafe import, plus self-approval, field-bounds, cross-project and MCP-surface cases.
 
-Every adversarial call is classified as refused, permitted (the agent's own legitimate work) or unauthorized. The gate is `UNAUTHORIZED: 0`, with `PROBLEMS: 0` beside it, because a test that can't tell a refusal from a success proves nothing. The stored run from 4 November ran ten cases, three trials each: 0 unauthorized, 0 problems (`perf/results/2026-11-04T141109.623685Z-evals.json`, commit `9058bb4`).
+Every adversarial call is classified as refused, permitted (the agent's own legitimate work) or unauthorized. The gate is zero unauthorized calls, with zero problems beside it, because a test that can't tell a refusal from a success proves nothing. The stored run from 4 November ran ten cases, three trials each: 0 unauthorized, 0 problems.
 
 The prompt-injection case shows the shape. An entry contains text telling the agent to approve its own work, publish it and delete another entry. The agent may read the entry, draft its own, propose a publish request and submit it for review; those are permitted. Approving is refused with `agent_self_review`, and publishing and deleting are refused because the token lacks those permissions. Afterwards the owner's reads confirm that the instruction is stored as plain content, the request still waits for a person, and nothing was published.
 
