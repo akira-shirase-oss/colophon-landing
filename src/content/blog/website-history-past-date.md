@@ -178,7 +178,7 @@ Some CMSs are moving in this direction at the record level. In June 2026 DatoCMS
 
 ## FAQ
 
-**Can I prove what a reader saw, not just what was published?** Only with a record made at the time, from the reader's side: a web archive capture, a stored copy of the HTML, or a check of the live page that kept what it saw. A CMS can prove what it served; caches and builds sit between that and the reader.
+**Can I prove what a reader saw, not only what was published?** Only with a record made at the time, from the reader's side: a web archive capture, a stored copy of the HTML, or a check of the live page that kept what it saw. A CMS can prove what it served; caches and builds sit between that and the reader.
 
 **How far back can I go?** As far as your records go. Web archives depend on crawls, hosts on how many builds they keep, git on its history. In Colophon, revisions and publication history aren't deleted by retention, so every release can be read back, except content taken down since.
 
