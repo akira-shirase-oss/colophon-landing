@@ -14,13 +14,16 @@ type Stage = {
   featured?: boolean
 }
 
-// Colophon has no pricing yet; these cards report build status instead.
+// Colophon has no pricing yet; these cards report build status instead, in the words of the
+// milestone table in Colophon's README (P3: the public demo is owed; P6: the 24-hour soak, the
+// usability sessions and an independent install are owed). Values and units stay one line each:
+// the cards have a fixed height.
 const stages: Stage[] = [
   {
     name: 'Core',
     value: { phase: 'P0–P3', proof: '1 seed' },
-    unit: { phase: 'Done', proof: 'replays any failure exactly' },
-    description: 'The base layer that every later phase builds on, finished and covered by tests.',
+    unit: { phase: 'Built; public demo owed', proof: 'replays any failure exactly' },
+    description: 'The base layer that every later phase builds on, built and covered by tests.',
     features: [
       { label: 'Numbered releases', done: true },
       { label: 'Pinned-release reads', done: true },
@@ -54,7 +57,7 @@ const stages: Stage[] = [
   {
     name: 'Operations',
     value: { phase: 'P6–P7', proof: '400s' },
-    unit: { phase: 'Proven, one soak test to go', proof: 'from backup capture to serving' },
+    unit: { phase: 'Built; three gates still owed', proof: 'from backup capture to serving' },
     description: 'Backups, load tests and member accounts, each exercised against real failures.',
     features: [
       { label: 'Encrypted backups', done: true },

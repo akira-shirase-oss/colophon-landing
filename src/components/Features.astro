@@ -6,21 +6,24 @@ const items = [
   {
     title: 'Sites without custom CSS',
     body: 'Build pages, menus and themes from a fixed set of sections and design tokens, then publish them like any article.',
+    alt: 'Illustration of the site builder: a home page made of sections, with a section library and design tokens beside it',
   },
   {
     title: "Media that can't break a page",
     body: 'Every upload is checked before it can be published, so a release never goes out pointing at a broken image.',
+    alt: 'Illustration of the media library: a grid of uploaded images, each marked as checked',
   },
   {
     title: 'Rollbacks that get reviewed',
     body: 'Returning to an older version opens a normal change for review instead of skipping the process.',
+    alt: 'Illustration of a rollback waiting for review: the entries it will restore and the review stages it must pass',
   },
   {
-    title: "APIs that can't drift",
-    body: 'API docs and the TypeScript SDK are generated from the server itself, and the CLI and MCP tools match the API.',
+    title: 'Generated API docs and SDK',
+    body: "The API document is generated from the server's own route table, the TypeScript SDK's types from that document, and the CLI and MCP tools go through the same API.",
+    alt: 'Illustration of the developer settings: REST, GraphQL, SDK, CLI and MCP tabs above a list of scoped API tokens',
   },
 ]
-const altFor = (title: string) => `${title} in the Colophon Studio`
 ---
 
 <section class="section" id="features">
@@ -32,8 +35,8 @@ const altFor = (title: string) => `${title} in the Colophon Studio`
         <span class="soft">The rest is in arcs</span>
       </SectionHeading>
       <p class={`t-body-lg ${styles.intro}`}>
-        Writing, editing, publishing and delivery checks are finished. Newer work arrives in arcs, and each one is
-        tested against failure before it counts.
+        Writing, editing, publishing and delivery checks are built and tested. Newer work arrives in arcs, and each
+        one is tested against failure before it counts.
       </p>
     </div>
 
@@ -72,8 +75,8 @@ const altFor = (title: string) => `${title} in the Colophon Studio`
           items.map((it, i) => (
             <img
               src={`/images/feature-${i + 1}.webp`}
-              alt={i === 0 ? altFor(it.title) : ''}
-              data-alt={altFor(it.title)}
+              alt={i === 0 ? it.alt : ''}
+              data-alt={it.alt}
               data-active={String(i === 0)}
               loading={i === 0 ? 'eager' : 'lazy'}
             />
