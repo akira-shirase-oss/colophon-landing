@@ -1,15 +1,32 @@
 ---
 import ArrowButton from './ui/ArrowButton.astro'
 import styles from './Hero.module.css'
-
 ---
 
 <section class={styles.hero}>
   <div class={styles.card}>
-    <div class={styles.bg} aria-hidden="true"></div>
-    <div class={styles.overlay} aria-hidden="true"></div>
+    <!-- The sky: CSS gradients (Hero.module.css), two low hills and a fine grain, all drawn in the page.
+         Its colours were sampled from the painting it replaced; tokens.css has a dusk for dark mode. -->
+    <div class={styles.sky} aria-hidden="true"></div>
+    <svg class={styles.hills} viewBox="0 0 1240 160" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <path
+        class={styles.hillFar}
+        d="M0 96C46 90 88 80 140 76C196 72 236 66 300 64C352 62 392 70 444 78C498 86 540 96 600 98C652 100 700 92 752 82C806 72 850 62 908 58C954 55 996 58 1040 64C1092 71 1140 74 1188 78C1210 80 1226 82 1240 84V160H0Z"
+      ></path>
+      <path
+        class={styles.hillNear}
+        d="M0 126C40 122 76 116 124 112C176 108 218 104 270 103C320 102 360 106 410 110C458 114 500 120 552 126C604 132 652 136 708 134C760 132 804 126 852 118C902 110 948 104 1000 104C1052 104 1096 108 1146 112C1186 115 1216 114 1240 112V160H0Z"
+      ></path>
+    </svg>
+    <svg class={styles.grain} aria-hidden="true">
+      <filter id="hero-grain" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"></feTurbulence>
+        <feColorMatrix type="saturate" values="0"></feColorMatrix>
+      </filter>
+      <rect width="100%" height="100%" filter="url(#hero-grain)"></rect>
+    </svg>
     <div class={styles.title}>
-      <h1 class="t-hero">
+      <h1 class={`t-hero ${styles.headline}`}>
         A CMS where every publish leaves a&nbsp;receipt
       </h1>
       <p class={`t-body ${styles.sub}`}>

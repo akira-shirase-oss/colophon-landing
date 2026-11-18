@@ -78,8 +78,8 @@ const version = browser.version()
 const problems = []
 let interactions = 0
 
-async function visit(path, viewport, act) {
-  const context = await browser.newContext({ viewport })
+async function visit(path, viewport, act, colorScheme = 'light') {
+  const context = await browser.newContext({ viewport, colorScheme })
   await context.addInitScript(() => {
     window.__csp = []
     document.addEventListener('securitypolicyviolation', (e) =>
@@ -87,7 +87,7 @@ async function visit(path, viewport, act) {
     )
   })
   const page = await context.newPage()
-  const report = (what) => problems.push(`${path} [${viewport.width}px]: ${what}`)
+  const report = (what) => problems.push(`${path} [${viewport.width}px ${colorScheme}]: ${what}`)
   page.on('pageerror', (e) => report(`page error: ${e.message}`))
   page.on('console', (m) => m.type() === 'error' && report(`console error: ${m.text()}`))
   page.on('requestfailed', (r) => report(`request failed: ${r.url()} (${r.failure()?.errorText})`))
@@ -114,7 +114,8 @@ async function visit(path, viewport, act) {
     // A code token must be drawn in its theme colour, the one `npm run check` measured against the surface.
     codeOff: [...document.querySelectorAll('pre.astro-code span[style*="--shiki-light"]')]
       .filter((span) => {
-        const want = getComputedStyle(span).getPropertyValue('--shiki-light').trim()
+        const dark = getComputedStyle(document.documentElement).colorScheme === 'dark'
+        const want = getComputedStyle(span).getPropertyValue(dark ? '--shiki-dark' : '--shiki-light').trim()
         const probe = document.createElement('i')
         probe.style.color = want
         document.body.append(probe)
@@ -148,6 +149,39 @@ for (const path of pages) {
     await expectAttr(page, report, '[data-faq] > div', 'data-open', 'true')
   } : undefined)
 }
+// Every page again with the system in dark mode: the same CSP, no errors, and the dark tokens in force.
+for (const path of pages) {
+  await visit(path, desktop, async (page, report) => {
+    interactions++
+    const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor)
+    if (bg === 'rgb(255, 255, 255)') report(`the system asks for dark, but the page background is ${bg}`)
+  }, 'dark')
+}
+
+// The theme switch: choosing Dark sticks across a reload and is applied before first paint (the inline
+// head script), choosing System clears it; and storage that throws leaves the page working on the system theme.
+await visit('/', desktop, async (page, report) => {
+  interactions++
+  await page.locator('[data-theme-switch] [data-value="dark"]').click()
+  await expectAttr(page, report, '[data-theme-switch] [data-value="dark"]', 'aria-checked', 'true')
+  if ((await page.evaluate(() => document.documentElement.dataset.theme)) !== 'dark') report('Dark did not set data-theme')
+  await page.reload({ waitUntil: 'domcontentloaded' })
+  const early = await page.evaluate(() => ({ theme: document.documentElement.dataset.theme, bg: getComputedStyle(document.documentElement).getPropertyValue('--c-bg').trim() }))
+  if (early.theme !== 'dark' || early.bg !== '#121211') report(`a stored Dark is not applied before first paint: ${JSON.stringify(early)}`)
+  await page.waitForLoadState('networkidle')
+  await page.locator('[data-theme-switch] [data-value="dark"]').focus()
+  await page.keyboard.press('ArrowRight')
+  await expectAttr(page, report, '[data-theme-switch] [data-value="system"]', 'aria-checked', 'true')
+  if ((await page.evaluate(() => [document.documentElement.dataset.theme, localStorage.getItem('theme')])).some((v) => v != null)) report('System did not clear the stored choice')
+})
+await visit('/', desktop, async (page, report) => {
+  interactions++
+  // storage blocked: the switch still changes the page for this visit
+  await page.evaluate(() => { Object.defineProperty(window, 'localStorage', { get() { throw new Error('blocked') } }) })
+  await page.locator('[data-theme-switch] [data-value="light"]').click()
+  if ((await page.evaluate(() => document.documentElement.dataset.theme)) !== 'light') report('with storage blocked, Light did not apply')
+}, 'dark')
+
 await visit('/blog/', phone, async (page, report) => {
   await page.locator('[data-nav-toggle]').click()
   await expectAttr(page, report, '[data-nav-toggle]', 'aria-expanded', 'true')
@@ -163,5 +197,5 @@ if (problems.length) {
   if (problems.length > 40) console.error(`  … and ${problems.length - 40} more`)
   process.exit(1)
 }
-console.log(`check-csp-browser${label}: ${pages.length} pages + 1 phone view in Chromium ${version}, ` +
+console.log(`check-csp-browser${label}: ${pages.length} pages in light and dark + 1 phone view in Chromium ${version}, ` +
   `no CSP violations, errors or broken assets; ${interactions} scripted interactions worked`)

@@ -52,19 +52,41 @@
   --c-draft-bg: #fff4d6;
   --c-draft-ink: #6b4e00;
 
-  /* Paintings (hero, CTA): text on them, the overall shade and the scrim under the headline */
+  /* The CTA painting: text on it, and the shade over it (deeper toward the top) */
   --c-on-image: #ffffff;
   --c-on-image-soft: rgba(255, 255, 255, 0.72);
-  --c-image-shade-top: rgba(0, 0, 0, 0.15);
-  --c-image-shade: rgba(0, 0, 0, 0.15);
+  --c-image-shade-top: rgba(0, 0, 0, 0.25);
   --c-image-shade-strong: rgba(0, 0, 0, 0.25);
-  --c-scrim: rgba(0, 0, 0, 0.3);
-  --c-scrim-edge: rgba(0, 0, 0, 0);
+  --c-image-scrim: rgba(24, 14, 30, 0.55);
+  --c-image-scrim-edge: rgba(24, 14, 30, 0);
   --img-filter: none;
+
+  /* The hero's sky, sampled from the painting it replaced: dusty rose overhead, peach and apricot, then
+     rose and lavender to the horizon, with a cream sun low on the left. Text on it is a deep plum ink. */
+  --c-sky-top: #d9a3a3;
+  --c-sky-high: #eaa892;
+  --c-sky-glow: #f2ad80;
+  --c-sky-low: #dca095;
+  --c-sky-horizon: #ae93ab;
+  --c-sky-clear: rgba(242, 173, 128, 0);
+  --c-sun: #fff6d2;
+  --c-sun-halo: rgba(255, 222, 168, 0.55);
+  --c-sun-wash: rgba(255, 205, 150, 0.4);
+  --c-cloud: rgba(255, 232, 214, 0.5);
+  --c-cloud-low: rgba(250, 210, 196, 0.45);
+  --c-ember: rgba(232, 150, 120, 0);
+  --c-hill-far: #a48cab;
+  --c-hill-near: #8a7299;
+  --c-on-sky: #24161f;
+  --c-on-sky-soft: #3b2733;
+  --grain-opacity: 0.22;
 
   /* The footer's oversized wordmark: a faint tone on the footer panel */
   --c-wordmark-top: #e9e9e9;
   --c-wordmark-bottom: #e2e2e2;
+  --c-wordmark-type: #d2d2d2;
+  --c-wordmark-shade: rgba(0, 0, 0, 0.16);
+  --c-wordmark-catch: rgba(255, 255, 255, 0.9);
 
   /* Diagrams in posts */
   --c-figure-fill: #f2f2f2;
@@ -128,14 +150,34 @@
     --c-on-image: #ffffff;
     --c-on-image-soft: rgba(255, 255, 255, 0.78);
     --c-image-shade-top: rgba(16, 14, 46, 0.62);
-    --c-image-shade: rgba(14, 12, 28, 0.36);
     --c-image-shade-strong: rgba(14, 12, 28, 0.5);
-    --c-scrim: rgba(8, 6, 18, 0.45);
-    --c-scrim-edge: rgba(8, 6, 18, 0);
+    --c-image-scrim: rgba(10, 8, 22, 0.35);
+    --c-image-scrim-edge: rgba(10, 8, 22, 0);
     --img-filter: saturate(0.85);
 
-    --c-wordmark-top: #242422;
-    --c-wordmark-bottom: #21211f;
+    --c-sky-top: #121228;
+    --c-sky-high: #1d1a3c;
+    --c-sky-glow: #2e2450;
+    --c-sky-low: #4a2f55;
+    --c-sky-horizon: #6a3a52;
+    --c-sky-clear: rgba(46, 36, 80, 0);
+    --c-sun: rgba(255, 176, 120, 0.07);
+    --c-sun-halo: rgba(220, 120, 110, 0.04);
+    --c-sun-wash: rgba(150, 80, 110, 0.14);
+    --c-cloud: rgba(120, 100, 170, 0.22);
+    --c-cloud-low: rgba(170, 96, 120, 0.22);
+    --c-ember: rgba(214, 112, 76, 0.55);
+    --c-hill-far: #2c2240;
+    --c-hill-near: #1c1730;
+    --c-on-sky: #ffffff;
+    --c-on-sky-soft: rgba(255, 255, 255, 0.84);
+    --grain-opacity: 0.16;
+
+    --c-wordmark-top: #222220;
+    --c-wordmark-bottom: #1f1f1d;
+    --c-wordmark-type: #31312d;
+    --c-wordmark-shade: rgba(0, 0, 0, 0.7);
+    --c-wordmark-catch: rgba(255, 255, 255, 0.06);
 
     --c-figure-fill: #1d1d1b;
     --c-figure-ink: #f2f1ec;
@@ -196,14 +238,34 @@
   --c-on-image: #ffffff;
   --c-on-image-soft: rgba(255, 255, 255, 0.78);
   --c-image-shade-top: rgba(16, 14, 46, 0.62);
-  --c-image-shade: rgba(14, 12, 28, 0.36);
   --c-image-shade-strong: rgba(14, 12, 28, 0.5);
-  --c-scrim: rgba(8, 6, 18, 0.45);
-  --c-scrim-edge: rgba(8, 6, 18, 0);
+  --c-image-scrim: rgba(10, 8, 22, 0.35);
+  --c-image-scrim-edge: rgba(10, 8, 22, 0);
   --img-filter: saturate(0.85);
 
-  --c-wordmark-top: #242422;
-  --c-wordmark-bottom: #21211f;
+  --c-sky-top: #121228;
+  --c-sky-high: #1d1a3c;
+  --c-sky-glow: #2e2450;
+  --c-sky-low: #4a2f55;
+  --c-sky-horizon: #6a3a52;
+  --c-sky-clear: rgba(46, 36, 80, 0);
+  --c-sun: rgba(255, 176, 120, 0.07);
+  --c-sun-halo: rgba(220, 120, 110, 0.04);
+  --c-sun-wash: rgba(150, 80, 110, 0.14);
+  --c-cloud: rgba(120, 100, 170, 0.22);
+  --c-cloud-low: rgba(170, 96, 120, 0.22);
+  --c-ember: rgba(214, 112, 76, 0.55);
+  --c-hill-far: #2c2240;
+  --c-hill-near: #1c1730;
+  --c-on-sky: #ffffff;
+  --c-on-sky-soft: rgba(255, 255, 255, 0.84);
+  --grain-opacity: 0.16;
+
+  --c-wordmark-top: #222220;
+  --c-wordmark-bottom: #1f1f1d;
+  --c-wordmark-type: #31312d;
+  --c-wordmark-shade: rgba(0, 0, 0, 0.7);
+  --c-wordmark-catch: rgba(255, 255, 255, 0.06);
 
   --c-figure-fill: #1d1d1b;
   --c-figure-ink: #f2f1ec;

@@ -1,11 +1,11 @@
+/* The footer is a panel, not a band: the hero card's inset and radius, on the page background, so the
+   two cards frame the page. Its bottom margin matches the hero's top margin. */
 .footer {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 20px 0;
-  background: var(--c-surface);
-  overflow: clip;
+  padding: 0 20px 20px;
 }
 .inner {
   width: 100%;
@@ -13,6 +13,10 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  padding: 40px 32px 0;
+  border-radius: 24px;
+  background: var(--c-surface);
+  overflow: hidden;
 }
 .top {
   position: relative;
@@ -118,8 +122,19 @@
   align-items: center;
   flex-wrap: wrap;
 }
+/* links inside the legal and imprint lines: ink and an underline, as in running text elsewhere,
+   so they never rely on colour alone */
 .legal a {
   color: var(--c-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--c-underline);
+  text-underline-offset: 3px;
+}
+.legal a:hover {
+  text-decoration-color: currentColor;
+}
+.imprint {
+  color: var(--c-text);
 }
 
 @media (max-width: 1199px) {
@@ -136,7 +151,10 @@
 }
 @media (max-width: 809px) {
   .footer {
-    padding: 40px 16px 0;
+    padding: 0 16px 16px;
+  }
+  .inner {
+    padding: 32px 20px 0;
   }
   .top {
     align-items: flex-start;
