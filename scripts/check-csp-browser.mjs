@@ -233,6 +233,30 @@ await visit('/', desktop, async (page, report) => {
   if ((await page.evaluate(() => document.documentElement.dataset.theme)) !== 'light') report('with storage blocked, the toggle did not switch to Light')
 }, 'dark')
 
+// The hero title prints at load but is real text from the first moment: in the accessibility tree at once,
+// fully revealed by 1.5 s, and still when motion is reduced.
+{
+  const context = await browser.newContext({ viewport: phone })
+  const page = await context.newPage()
+  await page.goto(origin + '/', { waitUntil: 'commit' })
+  await page.waitForSelector('h1')
+  const tree = await page.locator('h1').ariaSnapshot()
+  const early = await page.evaluate(() => { const h = document.querySelector('h1'); return { print: h.dataset.print, lines: getComputedStyle(h).getPropertyValue('--print-lines') } })
+  interactions++
+  if (!/Know exactly what went live/.test(tree)) problems.push(`/ [hero title]: not in the accessibility tree at load (${tree})`)
+  if (early.print !== 'go') problems.push(`/ [hero title]: the print was not armed (${JSON.stringify(early)})`)
+  await page.waitForTimeout(1500)
+  const later = await page.evaluate(() => getComputedStyle(document.querySelector('h1')).clipPath)
+  if (later !== 'none' && !/inset\(0px\)/.test(later)) problems.push(`/ [hero title]: not fully shown after 1.5 s (clip-path ${later})`)
+  await context.close()
+  const still = await browser.newContext({ viewport: phone, reducedMotion: 'reduce' })
+  const quiet = await still.newPage()
+  await quiet.goto(origin + '/', { waitUntil: 'domcontentloaded' })
+  const s = await quiet.evaluate(() => { const h = document.querySelector('h1'); return { print: h.dataset.print ?? null, anim: getComputedStyle(h).animationName } })
+  if (s.print !== null || s.anim !== 'none') problems.push(`/ [hero title, reduced motion]: it still prints (${JSON.stringify(s)})`)
+  await still.close()
+}
+
 // The footer wordmark prints once when it scrolls into view, and the hero's icons lean away from the pointer.
 // Both are still under reduced motion.
 await visit('/', desktop, async (page, report) => {
@@ -257,6 +281,40 @@ await visit('/', desktop, async (page, report) => {
   const still = await page.evaluate(() => ({ print: document.querySelector('[data-wordmark]').dataset.print ?? null, drift: getComputedStyle(document.querySelector('[data-hero-field] > span > span')).animationName }))
   if (still.print !== null || still.drift !== 'none') problems.push(`/ [reduced motion]: the wordmark or the icons still move: ${JSON.stringify(still)}`)
   await context.close()
+}
+
+// The fonts actually drawn (Chromium's own record of the platform font per node): titles in Geist Pixel,
+// text in Inter, both as the downloaded web fonts, never their local fallbacks.
+for (const path of ['/', '/blog/', pages.find((p) => p.startsWith('/blog/') && p !== '/blog/')]) {
+  await visit(path, desktop, async (page, report) => {
+    interactions++
+    const cdp = await page.context().newCDPSession(page)
+    await cdp.send('DOM.enable')
+    await cdp.send('CSS.enable')
+    const { root } = await cdp.send('DOM.getDocument', { depth: -1 })
+    const want = [
+      ['main h1', 'Geist Pixel'],
+      ['main p', 'Inter'],
+      ['nav a', 'Inter'],
+      ['footer p', 'Inter'],
+      ['footer a', 'Inter'],
+    ]
+    for (const [selector, family] of want) {
+      // the first match that holds text of its own (Chromium reports only a node's direct text)
+      const found = await page.evaluate((selector) => {
+        const el = [...document.querySelectorAll(selector)].find((e) => [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()))
+        if (el) el.setAttribute('data-font-probe', '')
+        return !!el
+      }, selector)
+      if (!found) continue
+      const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector: `${selector}[data-font-probe]` })
+      if (!nodeId) continue
+      const { fonts } = await cdp.send('CSS.getPlatformFontsForNode', { nodeId })
+      const main = [...fonts].sort((a, b) => b.glyphCount - a.glyphCount)[0]
+      await page.evaluate(() => document.querySelectorAll('[data-font-probe]').forEach((e) => e.removeAttribute('data-font-probe')))
+      if (!main || main.familyName !== family || !main.isCustomFont) report(`${selector} is drawn in ${main ? `${main.familyName}${main.isCustomFont ? '' : ' (local)'}` : 'nothing'}, not the ${family} web font`)
+    }
+  })
 }
 
 await visit('/blog/', phone, async (page, report) => {

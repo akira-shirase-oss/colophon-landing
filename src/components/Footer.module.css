@@ -71,8 +71,18 @@
   justify-content: space-between;
   align-items: flex-start;
 }
+/* Every line in the footer is 16px; the hierarchy comes from weight and colour (Product and Build at 500
+   in ink, links in ink, the rest in the text grey). */
+.footer :global(:is(.t-tiny, .t-small, .t-label)) {
+  font-size: 16px;
+  line-height: 1.45;
+}
 .tagline {
-  max-width: 239px;
+  max-width: 36ch;
+}
+/* a phrase that wraps as one piece */
+.keep {
+  white-space: nowrap;
 }
 .menu {
   display: flex;
@@ -164,9 +174,6 @@
   .links {
     flex-direction: column;
     gap: 40px;
-  }
-  .tagline {
-    max-width: 240px;
   }
   .menu {
     width: 100%;

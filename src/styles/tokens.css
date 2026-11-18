@@ -51,28 +51,25 @@
   /* The draft stamp on unpublished posts */
   --c-draft-bg: #fff4d6;
   --c-draft-ink: #6b4e00;
+  /* Pixel-art illustrations in the closing statement: one small palette with a 1-cell outline */
+  --c-px-outline: #14161c;
+  --c-px-blue: #0061ff;
+  --c-px-orange: #ff8a3d;
+  --c-px-green: #3fbf6b;
+  --c-px-pink: #ff7eb6;
+  --c-px-cream: #fff1d0;
+  /* The brand block (the hero and the CTA): white at the top to #0061ff at the bottom, the same in both
+     themes, with navy type, a navy button and quiet navy icons; a hairline edge where the page is white. */
+  --c-brand-top: #ffffff;
+  --c-brand-bottom: #0061ff;
+  --c-on-brand: #08142b;
+  --c-brand-button: #08142b;
+  --c-brand-button-text: #ffffff;
+  --c-brand-edge: rgba(8, 20, 43, 0.12);
+  --c-brand-icon: rgba(8, 40, 120, 0.5);
 
-  /* The CTA painting: text on it, and the shade over it (deeper toward the top) */
-  --c-on-image: #ffffff;
-  --c-on-image-soft: rgba(255, 255, 255, 0.72);
-  --c-image-shade-top: rgba(0, 0, 0, 0.25);
-  --c-image-shade-strong: rgba(0, 0, 0, 0.25);
-  --c-image-scrim: rgba(24, 14, 30, 0.55);
-  --c-image-scrim-edge: rgba(24, 14, 30, 0);
-  --img-filter: none;
 
-  /* The hero: a saturated blue block, cobalt at the top through the brand blue to a touch brighter at the
-     bottom edge. White keeps 5:1 or more wherever text sits. The button on it is a cream pill. */
-  --c-sky-top: #2350e6;
-  --c-sky-high: #2a5aee;
-  --c-sky-glow: #2f62f2;
-  --c-sky-horizon: #3a6cf5;
-  --c-on-sky: #ffffff;
-  --c-on-sky-soft: #ffffff;
-  --c-on-brand-pill: #f2f0ea;
-  --c-on-brand-ink: #000000;
-  --c-on-brand-mark: #ffffff;
-  --c-hero-icon: rgba(255, 255, 255, 0.26);
+
 
   /* The footer's oversized wordmark: a faint tone on the footer panel */
   --c-wordmark: #e3e3e3;
@@ -136,25 +133,24 @@
 
     --c-draft-bg: #3a2f12;
     --c-draft-ink: #f0d58c;
+    --c-px-outline: #e9e7e1;
+    --c-px-blue: #4d8dff;
+    --c-px-orange: #ff9a55;
+    --c-px-green: #55cf7f;
+    --c-px-pink: #ff8fc0;
+    --c-px-cream: #2b2924;
+    /* The brand block (the hero and the CTA): white at the top to #0061ff at the bottom, the same in both
+       themes, with navy type, a navy button and quiet navy icons; a hairline edge where the page is white. */
+    --c-brand-top: #ffffff;
+    --c-brand-bottom: #0061ff;
+    --c-on-brand: #08142b;
+    --c-brand-button: #08142b;
+    --c-brand-button-text: #ffffff;
+    --c-brand-edge: rgba(255, 255, 255, 0.1);
+    --c-brand-icon: rgba(8, 40, 120, 0.5);
 
-    --c-on-image: #ffffff;
-    --c-on-image-soft: rgba(255, 255, 255, 0.78);
-    --c-image-shade-top: rgba(16, 14, 46, 0.62);
-    --c-image-shade-strong: rgba(14, 12, 28, 0.5);
-    --c-image-scrim: rgba(10, 8, 22, 0.35);
-    --c-image-scrim-edge: rgba(10, 8, 22, 0);
-    --img-filter: saturate(0.85);
 
-    --c-sky-top: #1c40c4;
-    --c-sky-high: #2249cf;
-    --c-sky-glow: #2550d8;
-    --c-sky-horizon: #2b58dc;
-    --c-on-sky: #ffffff;
-    --c-on-sky-soft: #ffffff;
-    --c-on-brand-pill: #f2f0ea;
-    --c-on-brand-ink: #000000;
-    --c-on-brand-mark: #ffffff;
-    --c-hero-icon: rgba(255, 255, 255, 0.22);
+
 
     --c-wordmark: #262624;
     --c-mask-show: #ffffff;
@@ -213,25 +209,24 @@
 
   --c-draft-bg: #3a2f12;
   --c-draft-ink: #f0d58c;
+  --c-px-outline: #e9e7e1;
+  --c-px-blue: #4d8dff;
+  --c-px-orange: #ff9a55;
+  --c-px-green: #55cf7f;
+  --c-px-pink: #ff8fc0;
+  --c-px-cream: #2b2924;
+  /* The brand block (the hero and the CTA): white at the top to #0061ff at the bottom, the same in both
+     themes, with navy type, a navy button and quiet navy icons; a hairline edge where the page is white. */
+  --c-brand-top: #ffffff;
+  --c-brand-bottom: #0061ff;
+  --c-on-brand: #08142b;
+  --c-brand-button: #08142b;
+  --c-brand-button-text: #ffffff;
+  --c-brand-edge: rgba(255, 255, 255, 0.1);
+  --c-brand-icon: rgba(8, 40, 120, 0.5);
 
-  --c-on-image: #ffffff;
-  --c-on-image-soft: rgba(255, 255, 255, 0.78);
-  --c-image-shade-top: rgba(16, 14, 46, 0.62);
-  --c-image-shade-strong: rgba(14, 12, 28, 0.5);
-  --c-image-scrim: rgba(10, 8, 22, 0.35);
-  --c-image-scrim-edge: rgba(10, 8, 22, 0);
-  --img-filter: saturate(0.85);
 
-  --c-sky-top: #1c40c4;
-  --c-sky-high: #2249cf;
-  --c-sky-glow: #2550d8;
-  --c-sky-horizon: #2b58dc;
-  --c-on-sky: #ffffff;
-  --c-on-sky-soft: #ffffff;
-  --c-on-brand-pill: #f2f0ea;
-  --c-on-brand-ink: #000000;
-  --c-on-brand-mark: #ffffff;
-  --c-hero-icon: rgba(255, 255, 255, 0.22);
+
 
   --c-wordmark: #262624;
   --c-mask-show: #ffffff;

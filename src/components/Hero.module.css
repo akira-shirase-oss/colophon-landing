@@ -18,22 +18,8 @@
   isolation: isolate;
 }
 
-/* A saturated blue block: cobalt at the top, through the brand blue, a touch brighter only at the bottom
-   edge, where no text sits. Dark mode takes the same blue a step deeper (tokens.css). No image. */
-.sky {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    var(--c-sky-top) 0%,
-    var(--c-sky-high) 40%,
-    var(--c-sky-glow) 74%,
-    var(--c-sky-horizon) 100%
-  );
-}
-
 /* The icon field: quiet marks around the edges, a lighter tone of the blue (white at low opacity), never in
-   the clear zone around the words. Each one drifts a few pixels on a slow loop and leans away from the
+   the clear zone around the words. Navy at low opacity, so they read on the white top and the blue bottom alike. Each one drifts a few pixels on a slow loop and leans away from the
    pointer (the --lean-* values the script sets); hovering one turns and brightens it. Transform and opacity
    only, and all of it stops under reduced motion. */
 .field {
@@ -49,7 +35,7 @@
   width: var(--s);
   height: var(--s);
   margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
-  color: var(--c-hero-icon);
+  color: var(--c-brand-icon);
   opacity: 0.5;
   transform: translate(calc(var(--lean-x, 0px) * var(--k)), calc(var(--lean-y, 0px) * var(--k))) rotate(var(--r));
   transition:
@@ -106,14 +92,14 @@
   max-width: 100%;
 }
 .headline {
-  color: var(--c-on-sky);
+  color: var(--c-on-brand);
 }
 /* 17.5px on a phone, growing to 20px from about 1024px wide */
 .sub {
   max-width: 60ch;
   font-size: clamp(17px, 15.9px + 0.4vw, 20px);
   line-height: 1.5;
-  color: var(--c-on-sky-soft);
+  color: var(--c-on-brand);
 }
 
 @media (max-width: 1199px) {

@@ -43,6 +43,7 @@ await page.evaluate(() => {
   const logo = document.querySelector('header a[aria-label="Colophon home"]').cloneNode(true)
   card.querySelector('a[href*="github.com"]')?.remove()
   card.querySelector('[data-hero-field]')?.remove()
+  card.querySelector('[data-print-title]')?.removeAttribute('data-print') // the share image shows it printed
   Object.assign(logo.style, { position: 'absolute', top: '44px', left: '56px', zIndex: '3', transform: 'scale(1.5)', transformOrigin: 'left top' })
   card.append(logo)
   Object.assign(card.style, { width: '1200px', maxWidth: 'none', height: '630px', borderRadius: '0', padding: '0' })

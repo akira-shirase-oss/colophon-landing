@@ -44,15 +44,7 @@ const { class: className } = Astro.props
       clip-path: inset(0 0 100% 0);
     }
     :global([data-wordmark][data-print='go']) {
-      animation: print 0.6s steps(var(--rows), end) both;
-    }
-  }
-  @keyframes print {
-    from {
-      clip-path: inset(0 0 100% 0);
-    }
-    to {
-      clip-path: inset(0 0 0 0);
+      animation: print var(--print-line) steps(var(--rows), end) both;
     }
   }
 </style>

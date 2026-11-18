@@ -1,89 +1,47 @@
+/* The closing statement: no card, the page's own surface, the content column. */
 .section {
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 80px 20px;
+  padding: 96px var(--pad-x);
 }
-.card {
-  position: relative;
+.inner {
   width: 100%;
-  max-width: 1240px;
-  height: 500px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 24px;
-  overflow: clip;
-}
-/* stretched painting anchored left and overflowing right, like the source */
-.image {
-  position: absolute;
-  top: -1px;
-  bottom: 1px;
-  left: -1px;
-  width: 1729px;
-  z-index: 0;
-  background: url('/images/cta.webp') left center / 100% 100% no-repeat;
-  filter: var(--img-filter);
-}
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, var(--c-image-shade-top) 0%, var(--c-image-shade-strong) 60%);
-}
-/* A soft scrim under the words, so white text holds AA on the brightest part of the painting. */
-.card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: radial-gradient(ellipse 42% 46% at 50% 52%, var(--c-image-scrim) 0%, var(--c-image-scrim) 45%, var(--c-image-scrim-edge) 100%);
-  pointer-events: none;
-}
-.title {
-  position: relative;
-  z-index: 2;
-  width: 700px;
+  max-width: 1176px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  text-align: center;
+  gap: 32px;
 }
-.heading {
-  text-wrap: wrap;
-  width: 660px;
-  color: var(--c-on-image);
+/* about 56px at 1440 and 30px at 390 */
+.statement {
+  font-family: var(--font-text);
+  font-size: clamp(30px, 20.3px + 2.5vw, 56px);
+  line-height: 1.18;
+  font-weight: 550;
+  letter-spacing: -0.02em;
+  color: var(--c-ink);
+  text-wrap: pretty;
 }
-.soft {
-  color: var(--c-on-image-soft);
+/* the word before an illustration, the illustration and its punctuation never part across a line */
+.keep {
+  white-space: nowrap;
 }
-.sub {
-  max-width: 500px;
-  color: var(--c-on-image);
+.more {
+  align-self: flex-start;
+  font-family: var(--font-text);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--c-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--c-underline);
+  text-underline-offset: 4px;
+}
+.more:hover {
+  text-decoration-color: currentColor;
 }
 
 @media (max-width: 1199px) {
   .section {
-    padding: 40px 20px;
-  }
-  .heading {
-    font-size: 44px;
-    width: 100%;
-  }
-  .title {
-    max-width: 660px;
-  }
-}
-@media (max-width: 809px) {
-  /* the words wrap across most of a phone's card, so the scrim does too */
-  .card::before {
-    background: radial-gradient(ellipse 90% 52% at 50% 52%, var(--c-image-scrim) 0%, var(--c-image-scrim) 55%, var(--c-image-scrim-edge) 100%);
-  }
-  .heading {
-    font-size: 32px;
-  }
-  .title {
-    padding: 0 16px;
+    padding: 64px var(--pad-x);
   }
 }

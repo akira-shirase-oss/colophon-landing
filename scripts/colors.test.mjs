@@ -30,7 +30,7 @@ const NAMED = 'white|black|red|green|blue|gray|grey|silver|yellow|orange|pink|pu
 const LITERAL = [
   /#[0-9a-f]{3,8}\b/gi,
   /\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/gi,
-  new RegExp(`(?:color|background(?:-color)?|fill|stroke|border(?:-[a-z]+)?|outline|box-shadow|text-shadow|stop-color)\\s*[:=]\\s*["']?[^;"'>]*\\b(?:${NAMED})\\b`, 'gi'),
+  new RegExp(`(?:color|background(?:-color)?|fill|stroke|border(?:-[a-z]+)?|outline|box-shadow|text-shadow|stop-color)\\s*[:=]\\s*["']?[^;"'>]*(?<![-\\w])(?:${NAMED})\\b`, 'gi'),
 ]
 
 test('no hard-coded colour outside the token file', () => {
@@ -77,7 +77,7 @@ test('every light token has a dark twin, in both dark blocks, and nothing else i
 test('the scanner itself catches each kind of literal', () => {
   const probe = ['color: #fff;', 'background: rgba(0, 0, 0, 0.3)', 'fill="#000"', 'stop-color="white"', 'border: 1px solid black']
   for (const line of probe) assert.ok(LITERAL.some((re) => { re.lastIndex = 0; return re.test(line) }), line)
-  for (const line of ['href="/blog/#faq"', 'color: var(--c-ink)', 'fill="currentColor"', 'background: transparent']) {
+  for (const line of ['href="/blog/#faq"', 'color: var(--c-ink)', 'fill="currentColor"', 'background: transparent', 'fill: var(--c-px-blue)']) {
     const hit = LITERAL.some((re) => { re.lastIndex = 0; const m = re.exec(line); return m && !(re === LITERAL[0] && /href/.test(line)) })
     assert.ok(!hit, `false positive: ${line}`)
   }

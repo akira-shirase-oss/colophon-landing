@@ -37,11 +37,17 @@ pinned theme never flashes the other one. It is hash-allowed in `public/_headers
   and on a token missing from either dark block.
 - **Dark is designed, not inverted:** a warm near-black page, surfaces that step up in lightness, an off-white
   ink, chips re-tinted for the dark surface, code drawn with `github-dark-default` (every token at least
-  4.8:1, checked by `npm run check`), and the CTA painting shaded toward dusk.
-- **The hero is a blue block, drawn in CSS:** a cobalt-to-brand-blue gradient with white type (5:1 or more
-  under every word), a cream button, and eight quiet line icons around the edges that drift and lean away
-  from the pointer (static under reduced motion or without JavaScript). The headline and description live in
-  `src/data/hero.ts`, which also feeds the page title and the share image's alt text.
+  4.8:1, checked by `npm run check`).
+- **The hero is a brand block** (`.brand-block` in `global.css`): a CSS gradient from white at
+  the top to #0061ff at the bottom, the same in both themes, with navy type and a navy button (AA or better on
+  the worst pixel under every word), a hairline edge so the card reads on a white page, and no image at all. The
+  hero adds eight quiet navy line icons around the edges that drift and lean away from the pointer (static under
+  reduced motion or without JavaScript). The headline and description live in `src/data/hero.ts`, which also
+  feeds the page title and the share image's alt text.
+- **The closing statement** (`CTA.astro`) is one sentence in display-size Inter on the page itself, with five
+  original pixel-art illustrations between the words (`ui/PixelArt.astro`: grids of colour letters turned into
+  `<rect>` runs at build time, colours from tokens with dark twins). The words live in `src/data/statement.ts`;
+  each illustration stays on the line with the word before it.
 - **The share image** (`public/og.jpg`) is rendered from the built hero: `npm run build && node scripts/make-og.mjs`
   (needs Playwright, as below). Re-run it after changing the hero, and commit the JPEG.
 - **The footer wordmark** is "Colophon" in Geist Pixel's own cells, like a receipt printer's dots, generated
@@ -99,7 +105,8 @@ npm run check            # dist/: headers and CSP fit every page; no leaks, draf
 npm run check:browser    # every page in headless Chromium with those headers, in light and in dark: no
                          # CSP violations, every code token drawn in its theme colour, the theme switch
                          # works by mouse and keyboard, a stored choice applies before first paint, and
-                         # blocked storage still leaves a working page
+                         # blocked storage still leaves a working page; titles are drawn in the Geist
+                         # Pixel web font and text in the Inter web font, never a local fallback
 ```
 
 When a component's `<script>` changes, its hash changes and `npm run check` fails with the new value: read
