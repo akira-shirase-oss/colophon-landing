@@ -10,7 +10,8 @@
     "lint": "oxlint",
     "test": "node --test scripts/*.test.mjs",
     "check": "node scripts/check-dist.mjs",
-    "check:browser": "node scripts/check-csp-browser.mjs"
+    "check:browser": "node scripts/check-csp-browser.mjs",
+    "check:app": "PUBLIC_APP_URL=https://app.example.test sh -c 'astro build --outDir dist-app && node scripts/check-dist.mjs dist-app && node scripts/check-csp-browser.mjs --dist dist-app'"
   },
   "dependencies": {
     "astro": "7.4.12"

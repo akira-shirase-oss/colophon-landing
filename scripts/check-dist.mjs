@@ -21,6 +21,8 @@
 // code     every highlighted code block is coloured through the theme variables (--shiki-light and
 //          --shiki-dark), never a fixed colour; every token reaches WCAG AA (4.5:1) on the light code
 //          surface (--c-surface) and 4.8:1 on the dark one.
+// app      the account buttons ship only in a build made with PUBLIC_APP_URL: without it, no page links to the
+//          app's sign-in, sign-up or dashboard (the app isn't live), and the header keeps "See the source"
 // fonts    the site uses exactly two webfonts: every @font-face is Geist Pixel or Inter (or their local,
 //          metric-matched fallbacks), every font file built is one of their two woff2 files, and nothing
 //          links to or preloads any other font.
@@ -673,6 +675,22 @@ function checkFonts() {
 }
 
 // ---------------------------------------------------------------------------------------------
+// app: no links to an app that isn't live
+
+function checkApp() {
+  const appUrl = process.env.PUBLIC_APP_URL?.trim()
+  let pages = 0
+  for (const page of html) {
+    if (!/<header/.test(page.text)) continue
+    pages++
+    const linksApp = /href="[^"]*\/studio\/(?:signin|signup)?"/.test(page.text) || /data-auth/.test(page.text)
+    if (!appUrl && linksApp) fail('app', `${page.file} links to the app's account pages, but this build has no PUBLIC_APP_URL`)
+    if (appUrl && !page.text.includes(`${appUrl.replace(/\/+$/, '')}/studio/signin`)) fail('app', `${page.file} has no Sign in link to ${appUrl}`)
+  }
+  return { pages, appUrl }
+}
+
+// ---------------------------------------------------------------------------------------------
 
 checkHeaders()
 const namesScanned = checkLeaks()
@@ -684,6 +702,7 @@ const jsonLdBlocks = checkJsonLd()
 const redirectRules = checkRedirects()
 const codeTokens = checkCode()
 const fontFaces = checkFonts()
+const appCheck = checkApp()
 
 if (failures.length) {
   console.error(`check-dist: ${failures.length} failure(s) in ${dist}\n`)
@@ -698,5 +717,6 @@ console.log(`  links    ok: every target="_blank" link has noopener or noreferre
 console.log(`  seo      ok: titles, descriptions, one h1, canonicals, share cards, alt; ${seo.indexable} pages in the sitemap, ${seo.posts} posts in the feed`)
 console.log(`  jsonld   ok: ${jsonLdBlocks} JSON-LD blocks, all valid JSON with no "<"`)
 console.log(`  code     ok: ${codeTokens} code tokens coloured by the theme, all at AA on the light and dark code surfaces`)
+console.log(appCheck.appUrl ? `  app      ok: ${appCheck.pages} pages link Sign in, Sign up and Dashboard to ${appCheck.appUrl}` : `  app      ok: no PUBLIC_APP_URL, so none of ${appCheck.pages} pages links to the app`)
 console.log(`  fonts    ok: ${fontFaces} @font-face rules, all Geist Pixel or Inter; no other font file or preload`)
 console.log(`  redirects ok: ${redirectRules} permanent redirects to built pages; nothing links to a retired address`)

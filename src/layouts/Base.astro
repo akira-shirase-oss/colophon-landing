@@ -43,9 +43,10 @@ const ld = structured ? (Array.isArray(structured) ? structured : [structured]) 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
-    <!-- A stored Light or Dark choice, applied before first paint so the page never flashes the other theme.
-         Without it (or without storage) the device's setting decides, through tokens.css. Hash-allowed in _headers. -->
-    <script is:inline>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+    <!-- Before the first paint: a stored Light or Dark choice (else the device's setting decides, through
+         tokens.css), and whether the app's hint cookie says someone is signed in (colophon_signed_in, exactly
+         "1"; D-200), which swaps Sign in and Sign up for Dashboard. Nothing is fetched. Hash-allowed in _headers. -->
+    <script is:inline>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}try{if(document.cookie.split('; ').indexOf('colophon_signed_in=1')>=0)document.documentElement.dataset.session='in'}catch(e){}</script>
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
