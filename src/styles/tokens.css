@@ -73,8 +73,6 @@
 
   /* The footer's oversized wordmark: a faint tone on the footer panel */
   --c-wordmark: #e3e3e3;
-  /* mask luminance: white shows what it covers (the wordmark's cells) */
-  --c-mask-show: #ffffff;
 
   /* Diagrams in posts */
   --c-figure-fill: #f2f2f2;
@@ -153,7 +151,6 @@
 
 
     --c-wordmark: #262624;
-    --c-mask-show: #ffffff;
 
     --c-figure-fill: #1d1d1b;
     --c-figure-ink: #f2f1ec;
@@ -229,7 +226,6 @@
 
 
   --c-wordmark: #262624;
-  --c-mask-show: #ffffff;
 
   --c-figure-fill: #1d1d1b;
   --c-figure-ink: #f2f1ec;

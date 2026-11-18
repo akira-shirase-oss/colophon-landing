@@ -1,8 +1,7 @@
 ---
 /** The oversized "Colophon" at the foot of every page, set in Geist Pixel's own cells (wordmark-cells.ts,
  * generated from the shipped font), like a receipt printer's dots: every publish leaves a receipt. One path
- * of square cells with a hairline between them (the mask; phones drop it, where the cells are only a few
- * pixels). Decorative: the name is already in the footer. The first time the footer comes into view it
+ * of separate squares with the hairline between them drawn in, so there is no mask to paint. Decorative: the name is already in the footer. The first time the footer comes into view it
  * prints from the top down, row by row (Footer.astro's script arms it; still without JavaScript or when
  * motion is reduced). */
 import { wordmark } from './wordmark-cells'
@@ -20,22 +19,14 @@ const { class: className } = Astro.props
   data-wordmark
   style={`--rows: ${wordmark.capRows + 1}`}
 >
-  <defs>
-    <pattern id="wordmark-cell" width="1" height="1" patternUnits="userSpaceOnUse">
-      <rect x="0.06" y="0.06" width="0.88" height="0.88" style="fill: var(--c-mask-show)"></rect>
-    </pattern>
-    <mask id="wordmark-gaps" maskUnits="userSpaceOnUse" x="0" y="0" width={wordmark.width} height={wordmark.height}>
-      <rect width={wordmark.width} height={wordmark.height} fill="url(#wordmark-cell)"></rect>
-    </mask>
-  </defs>
-  <path class="cells" d={wordmark.path} mask="url(#wordmark-gaps)" style="fill: var(--c-wordmark)"></path>
+  <path class="cells" d={wordmark.path} style="fill: var(--c-wordmark)"></path>
 </svg>
 
 <style>
-  /* Phones: the cells are a few pixels wide, so they print solid. */
+  /* Phones: the cells are a few pixels wide and the gap a fraction of one, so let it blend rather than snap. */
   @media (max-width: 809px) {
-    .cells {
-      mask: none;
+    svg {
+      shape-rendering: geometricPrecision;
     }
   }
   /* Printing: the rows appear from the top, in steps, once. */

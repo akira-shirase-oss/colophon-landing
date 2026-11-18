@@ -21,6 +21,10 @@
 // code     every highlighted code block is coloured through the theme variables (--shiki-light and
 //          --shiki-dark), never a fixed colour; every token reaches WCAG AA (4.5:1) on the light code
 //          surface (--c-surface) and 4.8:1 on the dark one.
+// light    the page stays still unless someone acts: no backdrop-filter (a blurred sticky layer re-blurs on
+//          every frame), no animation that repeats forever, and no script listening to pointer or mouse moves,
+//          scroll, wheel or touch moves. One-time effects (the title and wordmark print, the theme toggle's view
+//          transition on click) are fine.
 // app      the account buttons ship only in a build made with PUBLIC_APP_URL: without it, no page links to the
 //          app's sign-in, sign-up or dashboard (the app isn't live), and the header keeps "See the source"
 // fonts    the site uses exactly two webfonts: every @font-face is Geist Pixel or Inter (or their local,
@@ -691,6 +695,33 @@ function checkApp() {
 }
 
 // ---------------------------------------------------------------------------------------------
+// light: nothing that keeps painting while the visitor does nothing, or runs on every pointer or scroll move
+
+function checkLight() {
+  const sources = [
+    ...css.map((sheet) => ({ file: sheet.file, text: sheet.text, kind: 'css' })),
+    ...html.flatMap((page) => [
+      ...[...page.text.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => ({ file: page.file, text: m[1], kind: 'css' })),
+      ...[...page.text.matchAll(/\sstyle="([^"]*)"/g)].map((m) => ({ file: page.file, text: m[1], kind: 'css' })),
+      ...[...page.text.matchAll(/<script(?![^>]*application\/ld\+json)[^>]*>([\s\S]*?)<\/script>/g)].map((m) => ({ file: page.file, text: m[1], kind: 'js' })),
+    ]),
+    ...files.filter((f) => extname(f) === '.js').map((f) => ({ file: rel(f), text: readFileSync(f, 'utf8'), kind: 'js' })),
+  ]
+  let checked = 0
+  for (const { file, text, kind } of sources) {
+    checked++
+    if (kind === 'css') {
+      if (/backdrop-filter\s*:/i.test(text)) fail('light', `${file}: backdrop-filter, which repaints the page under it on every frame`)
+      for (const m of text.matchAll(/animation(?:-iteration-count)?\s*:[^;}]*\binfinite\b/gi)) fail('light', `${file}: an animation that never stops (${m[0].slice(0, 80)})`)
+    } else {
+      for (const m of text.matchAll(/(?:addEventListener\(\s*["'`](pointermove|mousemove|scroll|wheel|touchmove)["'`]|\bon(pointermove|mousemove|scroll|wheel|touchmove)\s*=)/g))
+        fail('light', `${file}: a script listens to ${m[1] ?? m[2]}, which runs on every move`)
+    }
+  }
+  return checked
+}
+
+// ---------------------------------------------------------------------------------------------
 
 checkHeaders()
 const namesScanned = checkLeaks()
@@ -703,6 +734,7 @@ const redirectRules = checkRedirects()
 const codeTokens = checkCode()
 const fontFaces = checkFonts()
 const appCheck = checkApp()
+const lightChecked = checkLight()
 
 if (failures.length) {
   console.error(`check-dist: ${failures.length} failure(s) in ${dist}\n`)
@@ -717,6 +749,7 @@ console.log(`  links    ok: every target="_blank" link has noopener or noreferre
 console.log(`  seo      ok: titles, descriptions, one h1, canonicals, share cards, alt; ${seo.indexable} pages in the sitemap, ${seo.posts} posts in the feed`)
 console.log(`  jsonld   ok: ${jsonLdBlocks} JSON-LD blocks, all valid JSON with no "<"`)
 console.log(`  code     ok: ${codeTokens} code tokens coloured by the theme, all at AA on the light and dark code surfaces`)
+console.log(`  light    ok: ${lightChecked} stylesheets and scripts: no backdrop-filter, no endless animation, no move or scroll listeners`)
 console.log(appCheck.appUrl ? `  app      ok: ${appCheck.pages} pages link Sign in, Sign up and Dashboard to ${appCheck.appUrl}` : `  app      ok: no PUBLIC_APP_URL, so none of ${appCheck.pages} pages links to the app`)
 console.log(`  fonts    ok: ${fontFaces} @font-face rules, all Geist Pixel or Inter; no other font file or preload`)
 console.log(`  redirects ok: ${redirectRules} permanent redirects to built pages; nothing links to a retired address`)
