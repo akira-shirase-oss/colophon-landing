@@ -3,6 +3,13 @@ import ArrowButton from './ui/ArrowButton.astro'
 import BrandLogo from './ui/BrandLogo.astro'
 import styles from './Nav.module.css'
 
+type Props = {
+  /** The home page: the header sits on the hero's painting in white, with the links in a glass
+   *  pill, and turns into a solid bar once the painting has scrolled away. */
+  overHero?: boolean
+}
+const { overHero = false } = Astro.props
+
 const links = [
   { label: 'Features', href: '/#benefits' },
   { label: 'Blog', href: '/blog/' },
@@ -10,18 +17,18 @@ const links = [
 ]
 ---
 
-<header class={styles.wrap}>
+<header class={`${styles.wrap} ${overHero ? styles.over : ''}`}>
   <nav class={styles.nav} aria-label="Primary" data-nav>
     <div class={styles.container}>
       <a href="/" class={styles.logo} aria-label="Colophon home">
         <BrandLogo />
       </a>
       <div class={styles.menu}>
-        <div class={styles.links}>
+        <div class={`${styles.links} ${overHero ? styles.pill : ''}`}>
           {
             links.map((l, i) => (
               <>
-                {i > 0 && <span class={styles.dot} aria-hidden="true" />}
+                {i > 0 && <span class={overHero ? styles.divider : styles.dot} aria-hidden="true" />}
                 <a href={l.href} class={`t-label ${styles.link}`}>
                   {l.label}
                 </a>
@@ -29,7 +36,7 @@ const links = [
             ))
           }
         </div>
-        <ArrowButton href="https://github.com/akira-shirase-oss/colophon-cms">See the source</ArrowButton>
+        <ArrowButton href="https://github.com/akira-shirase-oss/colophon-cms" variant={overHero ? 'secondary' : 'primary'}>See the source</ArrowButton>
       </div>
       <button type="button" class={styles.burger} aria-label="Open menu" aria-expanded="false" data-nav-toggle>
         <span></span>
