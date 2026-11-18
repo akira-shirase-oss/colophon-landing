@@ -1,61 +1,22 @@
 ---
 import ArrowButton from './ui/ArrowButton.astro'
-import { heroPhone, heroWide } from '../lib/hero-image'
 import styles from './Hero.module.css'
 
-// The painting fills the first screen edge to edge. It is the page's largest paint, so it loads
-// first: a <picture> at high priority (index.astro preloads the same files), never lazy.
-
-// Three states a release can be in, as the Studio words them (apps/studio/src/lib/receipts.ts and
-// words.ts in the Colophon repo). Sample data, so the chips are decoration for screen readers.
-const chips = [
-  { label: 'Published', value: 'Release 145', tone: 'live' },
-  { label: 'Receipt', value: 'Verified at 1 location', tone: 'live' },
-  { label: 'Rollback', value: 'Waiting for review', tone: 'pending' },
-] as const
 ---
 
 <section class={styles.hero}>
-  <div class={styles.stage}>
-    <picture>
-      <source media={heroPhone.media} srcset={heroPhone.src} width={heroPhone.width} height={heroPhone.height} />
-      <img
-        class={styles.image}
-        src="/images/hero.webp"
-        srcset={heroWide.srcset}
-        sizes={heroWide.sizes}
-        width="2326"
-        height="1200"
-        alt=""
-        fetchpriority="high"
-      />
-    </picture>
-    <div class={styles.scrim} aria-hidden="true"></div>
-
-    <div class={styles.inner}>
-      <div class={styles.copy}>
-        <h1 class={styles.title}>A CMS where every publish leaves a&nbsp;receipt</h1>
-        <p class={styles.sub}>
-          Write, review and ship your site's articles, then see exactly what went live, when it went live, and where
-          readers saw it.
-        </p>
-        <div class={styles.actions}>
-          <ArrowButton href="https://github.com/akira-shirase-oss/colophon-cms" variant="secondary">See the source</ArrowButton>
-          <a class={styles.glass} href="#benefits">Why Colophon</a>
-        </div>
-      </div>
-
-      <ul class={styles.chips} aria-hidden="true">
-        {
-          chips.map((c, i) => (
-            <li class={styles.chip} style={`--i: ${i}`}>
-              <span class={`${styles.dot} ${styles[c.tone]}`} />
-              <span class={styles.label}>{c.label}</span>
-              <span class={styles.value}>{c.value}</span>
-            </li>
-          ))
-        }
-      </ul>
+  <div class={styles.card}>
+    <div class={styles.bg} aria-hidden="true"></div>
+    <div class={styles.overlay} aria-hidden="true"></div>
+    <div class={styles.title}>
+      <h1 class="t-hero">
+        A CMS where every publish leaves a&nbsp;receipt
+      </h1>
+      <p class={`t-body ${styles.sub}`}>
+        Write, review and ship your site's articles, then see exactly what went live, when it went live, and where
+        readers saw it.
+      </p>
+      <ArrowButton href="https://github.com/akira-shirase-oss/colophon-cms">See the source</ArrowButton>
     </div>
   </div>
 </section>
