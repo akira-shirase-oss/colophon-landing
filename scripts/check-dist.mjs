@@ -21,6 +21,9 @@
 // code     every highlighted code block is coloured through the theme variables (--shiki-light and
 //          --shiki-dark), never a fixed colour; every token reaches WCAG AA (4.5:1) on the light code
 //          surface (--c-surface) and 4.8:1 on the dark one.
+// fonts    the site uses exactly two webfonts: every @font-face is Geist Pixel or Inter (or their local,
+//          metric-matched fallbacks), every font file built is one of their two woff2 files, and nothing
+//          links to or preloads any other font.
 // redirects dist/_redirects matches public/_redirects; every rule is a permanent redirect from a plain
 //          path that is no longer built to a built page, never to another rule's source; a retired post
 //          address has a rule for both spellings (with and without the trailing slash); and no page, the
@@ -640,6 +643,36 @@ function checkCode() {
 }
 
 // ---------------------------------------------------------------------------------------------
+// fonts: two families, nothing else downloaded
+
+const FONT_FAMILIES = new Set(['Geist Pixel', 'Inter', 'Geist Pixel Fallback', 'Inter Fallback'])
+const FONT_FILES = new Set(['fonts/geist-pixel-latin.woff2', 'fonts/inter-latin-var.woff2'])
+
+function checkFonts() {
+  let faces = 0
+  for (const sheet of css) {
+    for (const face of sheet.text.match(/@font-face\s*{[^}]*}/g) ?? []) {
+      faces++
+      const family = face.match(/font-family:\s*["']?([^;"'}]+)["']?/)?.[1]?.trim()
+      if (!FONT_FAMILIES.has(family)) fail('fonts', `${sheet.file}: @font-face for "${family}"; the site uses Geist Pixel and Inter only`)
+      for (const m of face.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/g)) {
+        const file = m[1].replace(/^\//, '')
+        if (!FONT_FILES.has(file)) fail('fonts', `${sheet.file}: @font-face loads ${m[1]}, which is not one of the two font files`)
+      }
+    }
+  }
+  for (const file of files.map(rel)) {
+    if (/\.(woff2?|ttf|otf|eot)$/i.test(file) && !FONT_FILES.has(file.split(sep).join('/'))) fail('fonts', `${file} is a font file the site should not ship`)
+  }
+  for (const page of html) {
+    for (const m of page.text.matchAll(/<link[^>]+href="([^"]+\.(?:woff2?|ttf|otf))"/g)) {
+      if (!FONT_FILES.has(m[1].replace(/^\//, ''))) fail('fonts', `${page.file} preloads ${m[1]}`)
+    }
+  }
+  return faces
+}
+
+// ---------------------------------------------------------------------------------------------
 
 checkHeaders()
 const namesScanned = checkLeaks()
@@ -650,6 +683,7 @@ const seo = checkSeo()
 const jsonLdBlocks = checkJsonLd()
 const redirectRules = checkRedirects()
 const codeTokens = checkCode()
+const fontFaces = checkFonts()
 
 if (failures.length) {
   console.error(`check-dist: ${failures.length} failure(s) in ${dist}\n`)
@@ -664,4 +698,5 @@ console.log(`  links    ok: every target="_blank" link has noopener or noreferre
 console.log(`  seo      ok: titles, descriptions, one h1, canonicals, share cards, alt; ${seo.indexable} pages in the sitemap, ${seo.posts} posts in the feed`)
 console.log(`  jsonld   ok: ${jsonLdBlocks} JSON-LD blocks, all valid JSON with no "<"`)
 console.log(`  code     ok: ${codeTokens} code tokens coloured by the theme, all at AA on the light and dark code surfaces`)
+console.log(`  fonts    ok: ${fontFaces} @font-face rules, all Geist Pixel or Inter; no other font file or preload`)
 console.log(`  redirects ok: ${redirectRules} permanent redirects to built pages; nothing links to a retired address`)

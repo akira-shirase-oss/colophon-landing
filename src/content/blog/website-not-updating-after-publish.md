@@ -19,7 +19,7 @@ This post is for that moment. It explains where the old copy is hiding, gives yo
 ## Where old copies hide
 
 <figure>
-<svg viewBox="0 0 640 520" role="img" aria-labelledby="layers-title layers-desc" xmlns="http://www.w3.org/2000/svg" font-family="Geist, sans-serif">
+<svg viewBox="0 0 640 520" role="img" aria-labelledby="layers-title layers-desc" xmlns="http://www.w3.org/2000/svg" font-family="Inter, sans-serif">
 <title id="layers-title">Where an old copy can hide between publish and reader</title>
 <desc id="layers-desc">Five layers in order. The CMS database changes when you publish. The content API and its cache can still answer with an old copy until the cache expires or is cleared. The site build is old until a rebuild runs and goes live. The CDN edge is old until its copy expires or is purged at that edge. The browser is old until its own copy is no longer fresh.</desc>
 <g stroke-width="1.5" style="fill: var(--c-figure-fill); stroke: var(--c-figure-ink)">

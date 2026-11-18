@@ -158,29 +158,106 @@ for (const path of pages) {
   }, 'dark')
 }
 
-// The theme switch: choosing Dark sticks across a reload and is applied before first paint (the inline
-// head script), choosing System clears it; and storage that throws leaves the page working on the system theme.
+// The theme toggle (the Studio's): one button, aria-pressed when dark. On a light system, pressing stores
+// Dark, which a reload applies before first paint (the inline head script); pressing again lands on the
+// system's own scheme and clears the choice. On a dark system the same goes the other way. With motion
+// allowed the switch runs as a view transition, and with reduced motion it doesn't. Blocked storage still
+// switches the page.
+const countTransitions = () => {
+  window.__vt = 0
+  const start = document.startViewTransition?.bind(document)
+  if (start) document.startViewTransition = (cb) => { window.__vt++; return start(cb) }
+}
+const state = (page) =>
+  page.evaluate(() => ({
+    theme: document.documentElement.dataset.theme ?? null,
+    stored: localStorage.getItem('theme'),
+    pressed: document.querySelector('[data-theme-toggle]').getAttribute('aria-pressed'),
+    vt: window.__vt,
+  }))
 await visit('/', desktop, async (page, report) => {
   interactions++
-  await page.locator('[data-theme-switch] [data-value="dark"]').click()
-  await expectAttr(page, report, '[data-theme-switch] [data-value="dark"]', 'aria-checked', 'true')
-  if ((await page.evaluate(() => document.documentElement.dataset.theme)) !== 'dark') report('Dark did not set data-theme')
+  await page.addInitScript(countTransitions)
+  await page.reload({ waitUntil: 'networkidle' })
+  const toggle = page.locator('[data-theme-toggle]')
+  if ((await toggle.getAttribute('aria-pressed')) !== 'false') report('on a light system the toggle starts pressed')
+  await toggle.click()
+  await page.waitForTimeout(600)
+  let s = await state(page)
+  if (s.theme !== 'dark' || s.stored !== 'dark' || s.pressed !== 'true') report(`pressing on a light system did not store Dark: ${JSON.stringify(s)}`)
+  if (!(s.vt >= 1)) report('with motion allowed, the switch did not run as a view transition')
   await page.reload({ waitUntil: 'domcontentloaded' })
   const early = await page.evaluate(() => ({ theme: document.documentElement.dataset.theme, bg: getComputedStyle(document.documentElement).getPropertyValue('--c-bg').trim() }))
   if (early.theme !== 'dark' || early.bg !== '#121211') report(`a stored Dark is not applied before first paint: ${JSON.stringify(early)}`)
   await page.waitForLoadState('networkidle')
-  await page.locator('[data-theme-switch] [data-value="dark"]').focus()
-  await page.keyboard.press('ArrowRight')
-  await expectAttr(page, report, '[data-theme-switch] [data-value="system"]', 'aria-checked', 'true')
-  if ((await page.evaluate(() => [document.documentElement.dataset.theme, localStorage.getItem('theme')])).some((v) => v != null)) report('System did not clear the stored choice')
+  await page.locator('[data-theme-toggle]').focus()
+  await page.keyboard.press('Enter')
+  await page.waitForTimeout(600)
+  s = await state(page)
+  if (s.theme !== null || s.stored !== null || s.pressed !== 'false') report(`pressing back onto the light system did not clear the choice: ${JSON.stringify(s)}`)
+  await page.keyboard.press('Space')
+  await page.waitForTimeout(600)
+  if ((await state(page)).pressed !== 'true') report('Space did not press the toggle')
 })
 await visit('/', desktop, async (page, report) => {
   interactions++
-  // storage blocked: the switch still changes the page for this visit
-  await page.evaluate(() => { Object.defineProperty(window, 'localStorage', { get() { throw new Error('blocked') } }) })
-  await page.locator('[data-theme-switch] [data-value="light"]').click()
-  if ((await page.evaluate(() => document.documentElement.dataset.theme)) !== 'light') report('with storage blocked, Light did not apply')
+  const toggle = page.locator('[data-theme-toggle]')
+  if ((await toggle.getAttribute('aria-pressed')) !== 'true') report('on a dark system the toggle does not start pressed')
+  await toggle.click()
+  await page.waitForTimeout(600)
+  let s = await state(page)
+  if (s.theme !== 'light' || s.stored !== 'light') report(`pressing on a dark system did not store Light: ${JSON.stringify(s)}`)
+  await toggle.click()
+  await page.waitForTimeout(600)
+  s = await state(page)
+  if (s.theme !== null || s.stored !== null) report(`pressing back onto the dark system did not clear the choice: ${JSON.stringify(s)}`)
 }, 'dark')
+{
+  // reduced motion: no view transition
+  const context = await browser.newContext({ viewport: desktop, reducedMotion: 'reduce' })
+  await context.addInitScript(countTransitions)
+  const page = await context.newPage()
+  await page.goto(origin + '/', { waitUntil: 'networkidle' })
+  await page.locator('[data-theme-toggle]').click()
+  interactions++
+  const s = await state(page)
+  if (s.vt !== 0 || s.theme !== 'dark') problems.push(`/ [reduced motion]: the switch ran a view transition (${s.vt}) or did not switch (${s.theme})`)
+  await context.close()
+}
+await visit('/', desktop, async (page, report) => {
+  interactions++
+  // storage blocked: the toggle still changes the page for this visit
+  await page.evaluate(() => { Object.defineProperty(window, 'localStorage', { get() { throw new Error('blocked') } }) })
+  await page.locator('[data-theme-toggle]').click()
+  await page.waitForTimeout(600)
+  if ((await page.evaluate(() => document.documentElement.dataset.theme)) !== 'light') report('with storage blocked, the toggle did not switch to Light')
+}, 'dark')
+
+// The footer wordmark prints once when it scrolls into view, and the hero's icons lean away from the pointer.
+// Both are still under reduced motion.
+await visit('/', desktop, async (page, report) => {
+  interactions++
+  const before = await page.evaluate(() => document.querySelector('[data-wordmark]').dataset.print)
+  if (before !== 'go' && before !== 'armed') report(`the wordmark was not armed below the fold (data-print=${before})`)
+  await page.evaluate(() => document.querySelector('footer').scrollIntoView({ block: 'end' }))
+  await page.waitForTimeout(1500)
+  const after = await page.evaluate(() => { const w = document.querySelector('[data-wordmark]'); return { print: w.dataset.print, clip: getComputedStyle(w).clipPath } })
+  if (after.print !== 'go' || /100%/.test(after.clip)) report(`the wordmark never printed: ${JSON.stringify(after)}`)
+  await page.evaluate(() => scrollTo(0, 0))
+  await page.mouse.move(40, 200)
+  await page.waitForTimeout(300)
+  const lean = await page.evaluate(() => getComputedStyle(document.querySelector('[data-hero-field]')).getPropertyValue('--lean-x').trim())
+  if (!lean || Math.abs(parseFloat(lean)) > 8 || parseFloat(lean) === 0) report(`the hero icons did not lean within 8px (--lean-x=${lean})`)
+})
+{
+  const context = await browser.newContext({ viewport: desktop, reducedMotion: 'reduce' })
+  const page = await context.newPage()
+  await page.goto(origin + '/', { waitUntil: 'networkidle' })
+  interactions++
+  const still = await page.evaluate(() => ({ print: document.querySelector('[data-wordmark]').dataset.print ?? null, drift: getComputedStyle(document.querySelector('[data-hero-field] > span > span')).animationName }))
+  if (still.print !== null || still.drift !== 'none') problems.push(`/ [reduced motion]: the wordmark or the icons still move: ${JSON.stringify(still)}`)
+  await context.close()
+}
 
 await visit('/blog/', phone, async (page, report) => {
   await page.locator('[data-nav-toggle]').click()

@@ -8,7 +8,7 @@
 .card {
   position: relative;
   width: 100%;
-  max-width: 1240px;
+  max-width: 1380px;
   height: 619px;
   display: flex;
   align-items: center;
@@ -18,59 +18,84 @@
   isolation: isolate;
 }
 
-/* A sunset sky in layers, top layer first: the sun's glow low on the left, three long cloud bands lit
-   from below, and the sky itself from dusty rose overhead through apricot to lavender at the horizon.
-   Dark mode swaps every colour for a dusk (tokens.css): the glow is nearly gone, an ember line holds
-   the horizon. No image is downloaded. */
+/* A saturated blue block: cobalt at the top, through the brand blue, a touch brighter only at the bottom
+   edge, where no text sits. Dark mode takes the same blue a step deeper (tokens.css). No image. */
 .sky {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(18% 24% at 19% 42%, var(--c-sun) 0%, var(--c-sun-halo) 38%, var(--c-sky-clear) 100%),
-    radial-gradient(48% 40% at 19% 46%, var(--c-sun-wash) 0%, var(--c-sky-clear) 100%),
-    radial-gradient(42% 3.2% at 30% 30%, var(--c-cloud) 0%, var(--c-sky-clear) 100%),
-    radial-gradient(36% 2.6% at 70% 22%, var(--c-cloud) 0%, var(--c-sky-clear) 100%),
-    radial-gradient(52% 3.6% at 56% 44%, var(--c-cloud-low) 0%, var(--c-sky-clear) 100%),
-    radial-gradient(70% 10% at 40% 76%, var(--c-ember) 0%, var(--c-sky-clear) 100%),
-    linear-gradient(
-      180deg,
-      var(--c-sky-top) 0%,
-      var(--c-sky-high) 30%,
-      var(--c-sky-glow) 55%,
-      var(--c-sky-low) 72%,
-      var(--c-sky-horizon) 88%
-    );
+  background: linear-gradient(
+    180deg,
+    var(--c-sky-top) 0%,
+    var(--c-sky-high) 40%,
+    var(--c-sky-glow) 74%,
+    var(--c-sky-horizon) 100%
+  );
 }
-/* Two low hills along the bottom edge, so it reads as a landscape rather than a gradient. */
-.hills {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 22%;
-}
-.hillFar {
-  fill: var(--c-hill-far);
-}
-.hillNear {
-  fill: var(--c-hill-near);
-}
-/* Fine grain, so the sky feels painted and its long gradients never band. */
-.grain {
+
+/* The icon field: quiet marks around the edges, a lighter tone of the blue (white at low opacity), never in
+   the clear zone around the words. Each one drifts a few pixels on a slow loop and leans away from the
+   pointer (the --lean-* values the script sets); hovering one turns and brightens it. Transform and opacity
+   only, and all of it stops under reduced motion. */
+.field {
   position: absolute;
   inset: 0;
+  z-index: 1;
+  overflow: hidden;
+}
+.mark {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  height: var(--s);
+  margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
+  color: var(--c-hero-icon);
+  opacity: 0.5;
+  transform: translate(calc(var(--lean-x, 0px) * var(--k)), calc(var(--lean-y, 0px) * var(--k))) rotate(var(--r));
+  transition:
+    transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.3s var(--ease);
+}
+.drift {
+  display: block;
   width: 100%;
   height: 100%;
-  opacity: var(--grain-opacity);
-  mix-blend-mode: overlay;
-  pointer-events: none;
+  animation: drift var(--d) ease-in-out infinite alternate;
+}
+.mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@media (hover: hover) {
+  .mark:hover {
+    opacity: 1;
+  }
+  .mark:hover svg {
+    transform: rotate(10deg) scale(1.06);
+  }
+}
+@keyframes drift {
+  to {
+    transform: translate(var(--dx), var(--dy));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .drift {
+    animation: none;
+  }
+  .mark,
+  .mark svg {
+    transition: none;
+  }
 }
 
 .title {
   position: relative;
   z-index: 2;
-  width: 700px;
+  width: 1100px;
+  max-width: calc(100% - 64px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -78,13 +103,16 @@
   text-align: center;
 }
 .title h1 {
-  width: 660px;
+  max-width: 100%;
 }
 .headline {
   color: var(--c-on-sky);
 }
+/* 17.5px on a phone, growing to 20px from about 1024px wide */
 .sub {
-  max-width: 420px;
+  max-width: 60ch;
+  font-size: clamp(17px, 15.9px + 0.4vw, 20px);
+  line-height: 1.5;
   color: var(--c-on-sky-soft);
 }
 
@@ -94,7 +122,7 @@
   }
   .title {
     width: 100%;
-    max-width: 700px;
+    max-width: 760px;
   }
 }
 @media (max-width: 809px) {
@@ -103,10 +131,7 @@
   }
   .card {
     height: auto;
-    padding: 120px 20px 140px;
-  }
-  .hills {
-    height: 96px;
+    padding: 120px 20px;
   }
   .title h1 {
     width: 100%;
@@ -115,13 +140,26 @@
 
 @media (max-width: 1199px) {
   .title h1 {
-    width: 700px;
-    max-width: 100%;
-    font-size: 54px;
+    font-size: 52.63px;
   }
 }
 @media (max-width: 809px) {
   .title h1 {
-    font-size: 44px;
+    font-size: 39.47px;
+  }
+  .title {
+    max-width: 100%;
+  }
+  /* four marks on a phone, in the corners, clear of the words */
+  .mark {
+    display: none;
+  }
+  .mark.onPhone {
+    display: block;
+    left: var(--px-x);
+    top: var(--px-y);
+    width: min(var(--s), 40px);
+    height: min(var(--s), 40px);
+    margin: calc(min(var(--s), 40px) / -2) 0 0 calc(min(var(--s), 40px) / -2);
   }
 }
