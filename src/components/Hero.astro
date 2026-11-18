@@ -4,17 +4,17 @@ import { hero } from '../data/hero'
 import styles from './Hero.module.css'
 
 // Eight Colophon ideas as quiet line icons around the edges (lucide, stroke 1.5), placed outside the clear zone
-// around the words. x/y are the icon's centre in the card, s its size, r its resting turn, k how far it follows
-// the pointer (0 to 1), d/dx/dy its slow drift. `phone` marks the four that stay, in the corners, on a phone.
+// around the words. x/y are the icon's centre in the card, s its size, r its resting turn; `phone` marks the four
+// that stay, in the corners, on a phone.
 const ICONS = [
-  { name: 'receipt-text', x: 7, y: 17, s: 68, r: -8, k: 0.9, d: 17, dx: 4, dy: -3, phone: { x: 9, y: 6 }, paths: '<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M14 8H8"/><path d="M16 12H8"/><path d="M13 16H8"/>' },
-  { name: 'globe', x: 29, y: 9, s: 34, r: 12, k: 0.4, d: 19, dx: -3, dy: 2, paths: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>' },
-  { name: 'circle-check', x: 89, y: 15, s: 56, r: 8, k: 0.8, d: 14, dx: -4, dy: 3, phone: { x: 88, y: 6 }, paths: '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>' },
-  { name: 'pen-line', x: 5, y: 56, s: 36, r: 6, k: 0.5, d: 16, dx: 3, dy: 4, paths: '<path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/>' },
-  { name: 'clock', x: 95, y: 52, s: 40, r: -10, k: 0.6, d: 18, dx: -3, dy: -4, paths: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>' },
-  { name: 'file-text', x: 14, y: 84, s: 46, r: 10, k: 0.7, d: 15, dx: 4, dy: 2, phone: { x: 10, y: 94 }, paths: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>' },
-  { name: 'shield-check', x: 70, y: 91, s: 38, r: 4, k: 0.45, d: 20, dx: -2, dy: -3, paths: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>' },
-  { name: 'undo-2', x: 86, y: 82, s: 52, r: -6, k: 0.75, d: 13, dx: 3, dy: -2, phone: { x: 88, y: 94 }, paths: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/>' },
+  { name: 'receipt-text', x: 7, y: 17, s: 68, r: -8, phone: { x: 9, y: 6 }, paths: '<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M14 8H8"/><path d="M16 12H8"/><path d="M13 16H8"/>' },
+  { name: 'globe', x: 29, y: 9, s: 34, r: 12, paths: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>' },
+  { name: 'circle-check', x: 89, y: 15, s: 56, r: 8, phone: { x: 88, y: 6 }, paths: '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>' },
+  { name: 'pen-line', x: 5, y: 56, s: 36, r: 6, paths: '<path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/>' },
+  { name: 'clock', x: 95, y: 52, s: 40, r: -10, paths: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>' },
+  { name: 'file-text', x: 14, y: 84, s: 46, r: 10, phone: { x: 10, y: 94 }, paths: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>' },
+  { name: 'shield-check', x: 70, y: 91, s: 38, r: 4, paths: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>' },
+  { name: 'undo-2', x: 86, y: 82, s: 52, r: -6, phone: { x: 88, y: 94 }, paths: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/>' },
 ]
 // Prints the title once at load, a pixel row at a time and line after line: it counts the title's lines
 // (before the first paint, so nothing flashes), then arms the shared `print` animation (global.css). The text
@@ -22,7 +22,7 @@ const ICONS = [
 const PRINT_TITLE =
   "var h=document.querySelector('[data-print-title]');if(h&&!matchMedia('(prefers-reduced-motion: reduce)').matches){var s=getComputedStyle(h),n=Math.max(1,Math.round(h.offsetHeight/parseFloat(s.lineHeight)));h.style.setProperty('--print-lines',n);h.style.setProperty('--print-steps',n*parseInt(s.getPropertyValue('--print-rows')||'29'));h.dataset.print='go'}"
 const place = (i: (typeof ICONS)[number]) =>
-  `--x: ${i.x}%; --y: ${i.y}%; --s: ${i.s}px; --r: ${i.r}deg; --k: ${i.k}; --d: ${i.d}s; --dx: ${i.dx}px; --dy: ${i.dy}px;` +
+  `--x: ${i.x}%; --y: ${i.y}%; --s: ${i.s}px; --r: ${i.r}deg;` +
   (i.phone ? ` --px-x: ${i.phone.x}%; --px-y: ${i.phone.y}%;` : '')
 ---
 
@@ -32,7 +32,6 @@ const place = (i: (typeof ICONS)[number]) =>
       {
         ICONS.map((i) => (
           <span class={`${styles.mark} ${i.phone ? styles.onPhone : ''}`} style={place(i)}>
-            <span class={styles.drift}>
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -43,7 +42,6 @@ const place = (i: (typeof ICONS)[number]) =>
                 focusable="false"
                 set:html={i.paths}
               />
-            </span>
           </span>
         ))
       }
@@ -57,29 +55,3 @@ const place = (i: (typeof ICONS)[number]) =>
   </div>
 </section>
 
-<script>
-  // The icons lean a few pixels away from the pointer (at most 8), on desktop pointers only, while the hero is
-  // on screen, at most once a frame. Reduced motion, touch, or no JavaScript: they simply stay put.
-  const field = document.querySelector<HTMLElement>('[data-hero-field]')
-  if (field && matchMedia('(hover: hover) and (pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    let visible = false
-    let frame = 0
-    let x = 0
-    let y = 0
-    new IntersectionObserver(([entry]) => (visible = entry.isIntersecting)).observe(field)
-    addEventListener(
-      'pointermove',
-      (e) => {
-        if (!visible) return
-        x = e.clientX / innerWidth - 0.5
-        y = e.clientY / innerHeight - 0.5
-        frame ||= requestAnimationFrame(() => {
-          frame = 0
-          field.style.setProperty('--lean-x', `${(-x * 16).toFixed(1)}px`)
-          field.style.setProperty('--lean-y', `${(-y * 16).toFixed(1)}px`)
-        })
-      },
-      { passive: true },
-    )
-  }
-</script>

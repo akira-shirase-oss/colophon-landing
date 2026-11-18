@@ -41,8 +41,7 @@ pinned theme never flashes the other one. It is hash-allowed in `public/_headers
 - **The hero is a brand block** (`.brand-block` in `global.css`): a CSS gradient from white at
   the top to #0061ff at the bottom, the same in both themes, with navy type and a navy button (AA or better on
   the worst pixel under every word), a hairline edge so the card reads on a white page, and no image at all. The
-  hero adds eight quiet navy line icons around the edges that drift and lean away from the pointer (static under
-  reduced motion or without JavaScript). The headline and description live in `src/data/hero.ts`, which also
+  hero adds eight quiet navy line icons around the edges; they stand still, and hovering one tilts it (CSS only). The headline and description live in `src/data/hero.ts`, which also
   feeds the page title and the share image's alt text.
 - **The closing statement** (`CTA.astro`) is one sentence in display-size Inter on the page itself, with five
   original pixel-art illustrations between the words (`ui/PixelArt.astro`: grids of colour letters turned into
@@ -71,6 +70,14 @@ does not build it), so a variable in the Pages dashboard would not reach the bui
 deploy that `dist/` as usual. `npm run check` then expects the Sign in link on every page; without the variable it fails if
 any page links to the app. `npm run check:app` builds and checks an app-enabled copy (into `dist-app/`) so both
 states stay tested before launch.
+
+## Kept light
+
+The page stays still unless someone acts. Effects run once (the hero title and footer wordmark print, the
+theme toggle's view transition on click) or on hover in CSS; nothing loops, follows the pointer, listens to
+scroll or blurs what's behind it, and no large element is masked. `npm run check` fails on `backdrop-filter`,
+an endless animation or a move/scroll listener; `npm run check:browser` fails on a mask over anything larger
+than 48px and on an icon that moves with the pointer.
 
 ## Typography
 

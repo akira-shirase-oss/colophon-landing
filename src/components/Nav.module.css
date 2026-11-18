@@ -10,9 +10,8 @@
   flex-direction: column;
   align-items: center;
   padding: 20px var(--content-pad) 0;
+  /* a solid ground, no backdrop blur: a blurred sticky header re-blurs the page under it on every frame */
   background: var(--c-bg);
-  -webkit-backdrop-filter: blur(60px);
-  backdrop-filter: blur(60px);
 }
 .container {
   width: 100%;

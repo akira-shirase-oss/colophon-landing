@@ -11,12 +11,12 @@
 // install chromium), or point PLAYWRIGHT_MODULE at an existing node_modules/playwright directory.
 import { createServer } from 'node:http'
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
-import { extname, join, normalize, relative, sep } from 'node:path'
+import { extname, join, normalize, relative, resolve, sep } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
 const distArg = process.argv.indexOf('--dist')
-const dist = join(root, distArg > 0 ? process.argv[distArg + 1] : 'dist')
+const dist = resolve(root, distArg > 0 ? process.argv[distArg + 1] : 'dist')
 const mutate = process.argv.includes('--mutate')
 
 let playwright
@@ -258,6 +258,27 @@ await visit('/', desktop, async (page, report) => {
   await still.close()
 }
 
+// Masks are cheap on an icon and expensive over a large area: no element bigger than 48px may be masked or
+// clipped by an SVG mask (the wordmark draws its gaps in its path instead).
+for (const viewport of [desktop, phone]) {
+  await visit('/', viewport, async (page, report) => {
+    interactions++
+    const masked = await page.evaluate(() =>
+      [...document.querySelectorAll('*')]
+        .filter((e) => {
+          const s = getComputedStyle(e)
+          const css = (s.maskImage && s.maskImage !== 'none') || (s.webkitMaskImage && s.webkitMaskImage !== 'none')
+          const svg = e.getAttribute('mask') || (s.mask && s.mask !== 'none' && /url\(/.test(s.mask))
+          if (!css && !svg) return false
+          const r = e.getBoundingClientRect()
+          return r.width > 48 || r.height > 48
+        })
+        .map((e) => `${e.tagName.toLowerCase()}.${String(e.className?.baseVal ?? e.className).split(' ')[0]} ${Math.round(e.getBoundingClientRect().width)}x${Math.round(e.getBoundingClientRect().height)}`),
+    )
+    for (const m of masked) report(`a mask over a large element (${m})`)
+  })
+}
+
 // The header's buttons. A build without PUBLIC_APP_URL keeps "See the source" and has no account buttons; a build
 // with it follows the app's hint cookie (D-200): exactly colophon_signed_in=1 shows Dashboard alone; no cookie,
 // any other value, or no JavaScript shows Sign in and Sign up. The state is decided before the first paint, so
@@ -316,8 +337,8 @@ if (!appBuild) {
   await noJs.close()
 }
 
-// The footer wordmark prints once when it scrolls into view, and the hero's icons lean away from the pointer.
-// Both are still under reduced motion.
+// The footer wordmark prints once when it scrolls into view, and the hero's icons stay where they are when the
+// pointer moves (no tracking, no running animation). The wordmark is still under reduced motion.
 await visit('/', desktop, async (page, report) => {
   interactions++
   const before = await page.evaluate(() => document.querySelector('[data-wordmark]').dataset.print)
@@ -327,18 +348,22 @@ await visit('/', desktop, async (page, report) => {
   const after = await page.evaluate(() => { const w = document.querySelector('[data-wordmark]'); return { print: w.dataset.print, clip: getComputedStyle(w).clipPath } })
   if (after.print !== 'go' || /100%/.test(after.clip)) report(`the wordmark never printed: ${JSON.stringify(after)}`)
   await page.evaluate(() => scrollTo(0, 0))
+  const boxes = () => page.evaluate(() => [...document.querySelectorAll('[data-hero-field] > span')].map((e) => { const r = e.getBoundingClientRect(); return `${Math.round(r.left)},${Math.round(r.top)}` }).join(' '))
+  const at = await boxes()
   await page.mouse.move(40, 200)
+  await page.mouse.move(1300, 700, { steps: 10 })
   await page.waitForTimeout(300)
-  const lean = await page.evaluate(() => getComputedStyle(document.querySelector('[data-hero-field]')).getPropertyValue('--lean-x').trim())
-  if (!lean || Math.abs(parseFloat(lean)) > 8 || parseFloat(lean) === 0) report(`the hero icons did not lean within 8px (--lean-x=${lean})`)
+  if ((await boxes()) !== at) report('the hero icons moved with the pointer')
+  const running = await page.evaluate(() => document.getAnimations().filter((a) => a.effect?.getComputedTiming().iterations === Infinity).length)
+  if (running) report(`${running} animation(s) run forever`)
 })
 {
   const context = await browser.newContext({ viewport: desktop, reducedMotion: 'reduce' })
   const page = await context.newPage()
   await page.goto(origin + '/', { waitUntil: 'networkidle' })
   interactions++
-  const still = await page.evaluate(() => ({ print: document.querySelector('[data-wordmark]').dataset.print ?? null, drift: getComputedStyle(document.querySelector('[data-hero-field] > span > span')).animationName }))
-  if (still.print !== null || still.drift !== 'none') problems.push(`/ [reduced motion]: the wordmark or the icons still move: ${JSON.stringify(still)}`)
+  const still = await page.evaluate(() => ({ print: document.querySelector('[data-wordmark]').dataset.print ?? null, running: document.getAnimations().length }))
+  if (still.print !== null || still.running) problems.push(`/ [reduced motion]: something still moves: ${JSON.stringify(still)}`)
   await context.close()
 }
 
