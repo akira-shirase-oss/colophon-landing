@@ -18,7 +18,7 @@ npm run build    # static production build into dist/
 - `src/components/ui/` — `ArrowButton` (sliding-arrow button), `SectionHeading`, `MaskIcon`, `BrandLogo` (mark +
   name), `BrandWordmark`
 - `src/components/*.astro` — one component per section, each with a co-located CSS module. Interactive parts (menu,
-  benefit cards, Phase/Proof switch, FAQ, hero scroll zoom) are small vanilla
+  benefit cards, FAQ, hero scroll zoom) are small vanilla
   `<script>`s in the component; everything else is plain HTML with no JavaScript.
 - The FAQ also emits `FAQPage` structured data (JSON-LD).
 

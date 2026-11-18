@@ -113,7 +113,7 @@ There's no Payload importer. Colophon imports its own JSONL and JSON arrays, plu
 
 ## What to know before choosing Colophon
 
-- **It's pre-release.** Version 0.1.0-alpha.1, built in public by one person, with no users yet. The [status section](/#pricing) on the home page says what's done.
+- **It's pre-release.** Version 0.1.0-alpha.1, built in public by one person, with no users yet. The [public roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md) says what's done and what's planned.
 - **PostgreSQL only, self-hosted only.** There's no hosted version, and today you build it from source: no container image, published binaries or npm packages yet.
 - **Two delivery pieces are partial.** Webhook payloads aren't signed yet, and cache clears are tested against a stand-in CDN; the adapter for a real CDN is on the roadmap.
 - **[On the roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md):** draft preview for headless sites (the Studio already previews pages of its own website starter), choosing a locale in the public content API, and images inside rich text (the editor inserts a placeholder for now).
