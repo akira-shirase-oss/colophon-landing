@@ -111,7 +111,21 @@ async function visit(path, viewport, act) {
     broken: [...document.images].filter((i) => i.complete && i.naturalWidth === 0).map((i) => i.currentSrc || i.src),
     fonts: [...document.fonts].filter((f) => f.status === 'loaded').length,
     fontErrors: [...document.fonts].filter((f) => f.status === 'error').map((f) => f.family),
+    // A code token must be drawn in its theme colour, the one `npm run check` measured against the surface.
+    codeOff: [...document.querySelectorAll('pre.astro-code span[style*="--shiki-light"]')]
+      .filter((span) => {
+        const want = getComputedStyle(span).getPropertyValue('--shiki-light').trim()
+        const probe = document.createElement('i')
+        probe.style.color = want
+        document.body.append(probe)
+        const wanted = getComputedStyle(probe).color
+        probe.remove()
+        return getComputedStyle(span).color !== wanted
+      })
+      .slice(0, 3)
+      .map((span) => `${span.textContent.slice(0, 20)} is ${getComputedStyle(span).color}`),
   }))
+  for (const off of result.codeOff) report(`code token not in its theme colour: ${off}`)
   for (const v of result.csp) report(`CSP violation: ${v}`)
   for (const src of result.broken) report(`broken image: ${src}`)
   for (const family of result.fontErrors) report(`font failed: ${family}`)

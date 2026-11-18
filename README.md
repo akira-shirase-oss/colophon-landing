@@ -36,8 +36,10 @@ npm run check            # dist/: headers and CSP fit every page; no leaks, draf
                          # canonical (or noindex), share card and alt text; the sitemap and feed list exactly
                          # the published pages; every JSON-LD block is valid JSON with no "<"; every
                          # redirect in public/_redirects is a 301 to a built page, and nothing links to
-                         # an old address
-npm run check:browser    # every page in headless Chromium with those headers: no CSP violations
+                         # an old address; every highlighted code token is coloured through the theme
+                         # variables and reaches AA (4.5:1) on the code surface
+npm run check:browser    # every page in headless Chromium with those headers: no CSP violations, and
+                         # every code token drawn in the colour the check above measured
 ```
 
 When a component's `<script>` changes, its hash changes and `npm run check` fails with the new value: read
