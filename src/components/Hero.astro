@@ -22,9 +22,7 @@ const place = (i: (typeof ICONS)[number]) =>
 ---
 
 <section class={styles.hero}>
-  <div class={styles.card}>
-    <!-- A blue block: one vertical gradient (Hero.module.css, colours in tokens.css). -->
-    <div class={styles.sky} aria-hidden="true"></div>
+  <div class={`brand-block ${styles.card}`}>
     <div class={styles.field} aria-hidden="true" data-hero-field>
       {
         ICONS.map((i) => (

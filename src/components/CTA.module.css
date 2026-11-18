@@ -15,31 +15,6 @@
   border-radius: 24px;
   overflow: clip;
 }
-/* stretched painting anchored left and overflowing right, like the source */
-.image {
-  position: absolute;
-  top: -1px;
-  bottom: 1px;
-  left: -1px;
-  width: 1729px;
-  z-index: 0;
-  background: url('/images/cta.webp') left center / 100% 100% no-repeat;
-  filter: var(--img-filter);
-}
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, var(--c-image-shade-top) 0%, var(--c-image-shade-strong) 60%);
-}
-/* A soft scrim under the words, so white text holds AA on the brightest part of the painting. */
-.card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: radial-gradient(ellipse 42% 46% at 50% 52%, var(--c-image-scrim) 0%, var(--c-image-scrim) 45%, var(--c-image-scrim-edge) 100%);
-  pointer-events: none;
-}
 .title {
   position: relative;
   z-index: 2;
@@ -53,14 +28,14 @@
 .heading {
   text-wrap: wrap;
   width: 660px;
-  color: var(--c-on-image);
+  color: var(--c-on-brand);
 }
 .soft {
-  color: var(--c-on-image-soft);
+  color: var(--c-on-brand-soft);
 }
 .sub {
   max-width: 500px;
-  color: var(--c-on-image);
+  color: var(--c-on-brand);
 }
 
 @media (max-width: 1199px) {
@@ -76,10 +51,6 @@
   }
 }
 @media (max-width: 809px) {
-  /* the words wrap across most of a phone's card, so the scrim does too */
-  .card::before {
-    background: radial-gradient(ellipse 90% 52% at 50% 52%, var(--c-image-scrim) 0%, var(--c-image-scrim) 55%, var(--c-image-scrim-edge) 100%);
-  }
   .heading {
     font-size: 32px;
   }

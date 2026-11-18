@@ -4,10 +4,7 @@ import styles from './CTA.module.css'
 ---
 
 <section class={styles.section}>
-  <div class={styles.card}>
-    <div class={styles.image} aria-hidden="true">
-      <div class={styles.overlay}></div>
-    </div>
+  <div class={`brand-block ${styles.card}`}>
     <div class={styles.title}>
       <h2 class={`t-h2 ${styles.heading}`}>
         Follow the build.
@@ -18,7 +15,7 @@ import styles from './CTA.module.css'
         Colophon is being built in public, one write-up at a time. Read along as it comes together, or poke around the
         demo sites.
       </p>
-      <ArrowButton href="https://404human.dev/colophon/">Read the build log</ArrowButton>
+      <ArrowButton href="https://404human.dev/colophon/" variant="onBrand">Read the build log</ArrowButton>
     </div>
   </div>
 </section>

@@ -259,6 +259,40 @@ await visit('/', desktop, async (page, report) => {
   await context.close()
 }
 
+// The fonts actually drawn (Chromium's own record of the platform font per node): titles in Geist Pixel,
+// text in Inter, both as the downloaded web fonts, never their local fallbacks.
+for (const path of ['/', '/blog/', pages.find((p) => p.startsWith('/blog/') && p !== '/blog/')]) {
+  await visit(path, desktop, async (page, report) => {
+    interactions++
+    const cdp = await page.context().newCDPSession(page)
+    await cdp.send('DOM.enable')
+    await cdp.send('CSS.enable')
+    const { root } = await cdp.send('DOM.getDocument', { depth: -1 })
+    const want = [
+      ['main h1', 'Geist Pixel'],
+      ['main p', 'Inter'],
+      ['nav a', 'Inter'],
+      ['footer p', 'Inter'],
+      ['footer a', 'Inter'],
+    ]
+    for (const [selector, family] of want) {
+      // the first match that holds text of its own (Chromium reports only a node's direct text)
+      const found = await page.evaluate((selector) => {
+        const el = [...document.querySelectorAll(selector)].find((e) => [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()))
+        if (el) el.setAttribute('data-font-probe', '')
+        return !!el
+      }, selector)
+      if (!found) continue
+      const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector: `${selector}[data-font-probe]` })
+      if (!nodeId) continue
+      const { fonts } = await cdp.send('CSS.getPlatformFontsForNode', { nodeId })
+      const main = [...fonts].sort((a, b) => b.glyphCount - a.glyphCount)[0]
+      await page.evaluate(() => document.querySelectorAll('[data-font-probe]').forEach((e) => e.removeAttribute('data-font-probe')))
+      if (!main || main.familyName !== family || !main.isCustomFont) report(`${selector} is drawn in ${main ? `${main.familyName}${main.isCustomFont ? '' : ' (local)'}` : 'nothing'}, not the ${family} web font`)
+    }
+  })
+}
+
 await visit('/blog/', phone, async (page, report) => {
   await page.locator('[data-nav-toggle]').click()
   await expectAttr(page, report, '[data-nav-toggle]', 'aria-expanded', 'true')
