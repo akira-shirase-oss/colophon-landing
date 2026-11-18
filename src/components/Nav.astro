@@ -3,6 +3,14 @@ import ArrowButton from './ui/ArrowButton.astro'
 import BrandLogo from './ui/BrandLogo.astro'
 import styles from './Nav.module.css'
 
+// The theme switch: System follows the device, Light and Dark stick (localStorage, read before first paint
+// by the inline script in Base.astro). Icons are 16px strokes in the text colour.
+const themes = [
+  { value: 'system', label: 'System', icon: '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>' },
+  { value: 'light', label: 'Light', icon: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>' },
+  { value: 'dark', label: 'Dark', icon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>' },
+]
+
 const links = [
   { label: 'Features', href: '/#benefits' },
   { label: 'Blog', href: '/blog/' },
@@ -30,6 +38,24 @@ const links = [
           }
         </div>
         <ArrowButton href="https://github.com/akira-shirase-oss/colophon-cms">See the source</ArrowButton>
+      </div>
+      <div class={styles.theme} role="radiogroup" aria-label="Colour theme" data-theme-switch>
+        {
+          themes.map((t) => (
+            <button
+              type="button"
+              role="radio"
+              class={styles.themeOption}
+              aria-checked={t.value === 'system' ? 'true' : 'false'}
+              tabindex={t.value === 'system' ? 0 : -1}
+              title={t.label}
+              data-value={t.value}
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={t.icon} />
+              <span class="visually-hidden">{t.label}</span>
+            </button>
+          ))
+        }
       </div>
       <button type="button" class={styles.burger} aria-label="Open menu" aria-expanded="false" data-nav-toggle>
         <span></span>
@@ -71,4 +97,37 @@ const links = [
     }
   }
   toggle.addEventListener('click', () => setOpen(!menu))
+
+  // Theme: a radio group with arrow keys. System clears the stored choice, so the device decides again.
+  const group = nav.querySelector<HTMLElement>('[data-theme-switch]')!
+  const options = [...group.querySelectorAll<HTMLButtonElement>('[role=radio]')]
+  const show = (value: string) =>
+    options.forEach((o) => {
+      const on = o.dataset.value === value
+      o.setAttribute('aria-checked', String(on))
+      o.tabIndex = on ? 0 : -1
+    })
+  const choose = (value: string) => {
+    const root = document.documentElement
+    if (value === 'system') delete root.dataset.theme
+    else root.dataset.theme = value
+    try {
+      if (value === 'system') localStorage.removeItem('theme')
+      else localStorage.setItem('theme', value)
+    } catch {}
+    show(value)
+  }
+  show(document.documentElement.dataset.theme ?? 'system')
+  options.forEach((o, i) => {
+    o.addEventListener('click', () => choose(o.dataset.value!))
+    o.addEventListener('keydown', (e) => {
+      const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key]
+      if (!step) return
+      e.preventDefault()
+      const next = options[(i + step + options.length) % options.length]
+      next.focus()
+      choose(next.dataset.value!)
+    })
+  })
+  group.dataset.ready = ''
 </script>

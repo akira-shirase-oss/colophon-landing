@@ -27,13 +27,13 @@
   transform: translate(-50%, -50%) scale(1.5);
   /* cover keeps the painting's proportions in every box shape */
   background: url('/images/hero.webp') 55% center / cover no-repeat;
+  filter: var(--img-filter);
   will-change: transform;
 }
 .overlay {
   position: absolute;
   inset: 0;
-  background: var(--c-ink);
-  opacity: 0.15;
+  background: linear-gradient(180deg, var(--c-image-shade-top) 0%, var(--c-image-shade) 55%);
 }
 /* Soft scrim behind the headline so white text holds on bright paintings. */
 .card::before {
@@ -41,7 +41,7 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: radial-gradient(ellipse 36% 30% at 50% 52%, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 100%);
+  background: radial-gradient(ellipse 36% 30% at 50% 52%, var(--c-scrim) 0%, var(--c-scrim-edge) 100%);
   pointer-events: none;
 }
 .title {
@@ -59,7 +59,7 @@
 }
 .sub {
   max-width: 420px;
-  color: #fff;
+  color: var(--c-on-image);
 }
 
 @media (max-width: 1199px) {

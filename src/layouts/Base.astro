@@ -41,6 +41,10 @@ const ld = structured ? (Array.isArray(structured) ? structured : [structured]) 
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <!-- A stored Light or Dark choice, applied before first paint so the page never flashes the other theme.
+         Without it (or without storage) the device's setting decides, through tokens.css. Hash-allowed in _headers. -->
+    <script is:inline>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}

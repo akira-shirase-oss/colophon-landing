@@ -22,27 +22,27 @@ This post is for that moment. It explains where the old copy is hiding, gives yo
 <svg viewBox="0 0 640 520" role="img" aria-labelledby="layers-title layers-desc" xmlns="http://www.w3.org/2000/svg" font-family="Geist, sans-serif">
 <title id="layers-title">Where an old copy can hide between publish and reader</title>
 <desc id="layers-desc">Five layers in order. The CMS database changes when you publish. The content API and its cache can still answer with an old copy until the cache expires or is cleared. The site build is old until a rebuild runs and goes live. The CDN edge is old until its copy expires or is purged at that edge. The browser is old until its own copy is no longer fresh.</desc>
-<g fill="#f2f2f2" stroke="#000" stroke-width="1.5">
+<g stroke-width="1.5" style="fill: var(--c-figure-fill); stroke: var(--c-figure-ink)">
 <rect x="1" y="8" width="232" height="64" rx="12"/>
 <rect x="1" y="112" width="232" height="64" rx="12"/>
 <rect x="1" y="216" width="232" height="64" rx="12"/>
 <rect x="1" y="320" width="232" height="64" rx="12"/>
 <rect x="1" y="424" width="232" height="64" rx="12"/>
 </g>
-<g stroke="#000" stroke-width="1.5" fill="none">
+<g stroke-width="1.5" fill="none" style="stroke: var(--c-figure-ink)">
 <path d="M117 72v32m-6-8 6 8 6-8"/>
 <path d="M117 176v32m-6-8 6 8 6-8"/>
 <path d="M117 280v32m-6-8 6 8 6-8"/>
 <path d="M117 384v32m-6-8 6 8 6-8"/>
 </g>
-<g font-size="20" font-weight="600" fill="#000" text-anchor="middle">
+<g font-size="20" font-weight="600" text-anchor="middle" style="fill: var(--c-figure-ink)">
 <text x="117" y="47">CMS database</text>
 <text x="117" y="151">Content API + cache</text>
 <text x="117" y="255">Site build</text>
 <text x="117" y="359">CDN edge</text>
 <text x="117" y="463">Browser</text>
 </g>
-<g font-size="17" fill="#5e5e5e">
+<g font-size="17" style="fill: var(--c-figure-text)">
 <text x="256" y="36">Publishing changes this layer.</text>
 <text x="256" y="58">Nothing after it has moved yet.</text>
 <text x="256" y="140">Old until its cache expires</text>

@@ -24,12 +24,12 @@
   width: 1729px;
   z-index: 1;
   background: url('/images/cta.webp') left center / 100% 100% no-repeat;
+  filter: var(--img-filter);
 }
 .overlay {
   position: absolute;
   inset: 0;
-  background: var(--c-ink);
-  opacity: 0.25;
+  background: linear-gradient(180deg, var(--c-image-shade-top) 0%, var(--c-image-shade-strong) 60%);
 }
 .title {
   position: relative;
@@ -44,14 +44,14 @@
 .heading {
   text-wrap: wrap;
   width: 660px;
-  color: #fff;
+  color: var(--c-on-image);
 }
 .soft {
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--c-on-image-soft);
 }
 .sub {
   max-width: 500px;
-  color: #fff;
+  color: var(--c-on-image);
 }
 
 @media (max-width: 1199px) {

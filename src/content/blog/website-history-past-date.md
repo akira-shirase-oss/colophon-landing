@@ -59,29 +59,29 @@ Number every publish. A publish that changes five entries is release 41; the nex
 <svg viewBox="0 0 640 300" role="img" aria-labelledby="intervals-title intervals-desc" xmlns="http://www.w3.org/2000/svg" font-family="Geist, sans-serif">
 <title id="intervals-title">Publication intervals for three entries across releases 39 to 44</title>
 <desc id="intervals-desc">Pricing: version 1 live from release 39 until release 42, then version 2 from 42 onwards. About: version 1 live from 39 onwards. Promo: version 1 live from release 40 until 43, when it was taken down. A dashed line at release 41, Tuesday at 3 pm, crosses pricing version 1, about version 1 and promo version 1: that is what was live.</desc>
-<g font-size="17" fill="#000" font-weight="600">
+<g font-size="17" font-weight="600" style="fill: var(--c-figure-ink)">
 <text x="0" y="69">Pricing</text>
 <text x="0" y="129">About</text>
 <text x="0" y="189">Promo</text>
 </g>
-<g fill="#f2f2f2" stroke="#000" stroke-width="1.5">
+<g stroke-width="1.5" style="fill: var(--c-figure-fill); stroke: var(--c-figure-ink)">
 <rect x="160" y="48" width="270" height="30" rx="6"/>
 <rect x="430" y="48" width="200" height="30" rx="6"/>
 <rect x="160" y="108" width="470" height="30" rx="6"/>
 <rect x="250" y="168" width="270" height="30" rx="6"/>
 </g>
-<g font-size="15" fill="#000">
+<g font-size="15" style="fill: var(--c-figure-ink)">
 <text x="172" y="68">version 1</text>
 <text x="442" y="68">version 2 →</text>
 <text x="172" y="128">version 1 →</text>
 <text x="262" y="188">version 1</text>
-<text x="530" y="188" fill="#5e5e5e">taken down</text>
+<text x="530" y="188" style="fill: var(--c-figure-text)">taken down</text>
 </g>
-<path d="M520 160v46" stroke="#000" stroke-width="3"/>
-<path d="M340 30v200" stroke="#000" stroke-width="1.5" stroke-dasharray="5 5"/>
-<text x="348" y="24" font-size="15" fill="#000" font-weight="600">Tuesday 3 pm = release 41</text>
-<g stroke="#8c8c8c" stroke-width="1"><path d="M160 238h470"/><path d="M160 232v12M250 232v12M340 232v12M430 232v12M520 232v12M610 232v12"/></g>
-<g font-size="15" fill="#5e5e5e" text-anchor="middle">
+<path d="M520 160v46" stroke-width="3" style="stroke: var(--c-figure-ink)"/>
+<path d="M340 30v200" stroke-width="1.5" stroke-dasharray="5 5" style="stroke: var(--c-figure-ink)"/>
+<text x="348" y="24" font-size="15" font-weight="600" style="fill: var(--c-figure-ink)">Tuesday 3 pm = release 41</text>
+<g stroke-width="1" style="stroke: var(--c-figure-rule)"><path d="M160 238h470"/><path d="M160 232v12M250 232v12M340 232v12M430 232v12M520 232v12M610 232v12"/></g>
+<g font-size="15" text-anchor="middle" style="fill: var(--c-figure-text)">
 <text x="160" y="266">39</text><text x="250" y="266">40</text><text x="340" y="266">41</text><text x="430" y="266">42</text><text x="520" y="266">43</text><text x="610" y="266">44</text>
 <text x="395" y="292">release number</text>
 </g>
