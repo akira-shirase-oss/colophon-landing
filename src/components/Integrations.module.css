@@ -1,10 +1,3 @@
-/* a quiet strip of the five ways in, right under the hero. Equal space above and below: the hero section
-   ends with 20px of its own padding, and the next section opens with var(--section-y), so the strip takes
-   var(--section-y) - 20px on top and nothing below. */
-section.strip {
-  padding-top: calc(var(--section-y) - 20px);
-  padding-bottom: 0;
-}
 .inner {
   display: flex;
   flex-direction: column;
