@@ -1,12 +1,15 @@
-// Where the app lives (the Studio): sign in, sign up and the dashboard. Set PUBLIC_APP_URL at build time to
-// point the landing at another deployment; the default is the planned app domain (D-200).
-const base = (import.meta.env.PUBLIC_APP_URL ?? 'https://app.colophon.404human.dev').replace(/\/+$/, '')
+// Where the app lives (the Studio): sign in, sign up and the dashboard. The account buttons appear only when
+// PUBLIC_APP_URL is set at build time (D-200); unset, the header keeps "See the source", so the site never
+// links to an app that isn't live. Set it in the Pages build settings when the app launches (README).
+const base = import.meta.env.PUBLIC_APP_URL?.trim().replace(/\/+$/, '')
+
+export const app = base
+  ? {
+      signIn: `${base}/studio/signin`,
+      signUp: `${base}/studio/signup`,
+      dashboard: `${base}/studio/`,
+    }
+  : null
 
 // The documentation site (guides, the API and tokens).
 export const DOCS_URL = 'https://docs.colophon.404human.dev'
-
-export const app = {
-  signIn: `${base}/studio/signin`,
-  signUp: `${base}/studio/signup`,
-  dashboard: `${base}/studio/`,
-}

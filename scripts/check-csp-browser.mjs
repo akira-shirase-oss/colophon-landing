@@ -5,6 +5,7 @@
 //
 //   npm run build && npm run check:browser
 //   node scripts/check-csp-browser.mjs --mutate   # serves a CSP with the script hashes removed; must fail
+//   node scripts/check-csp-browser.mjs --dist dist-app   # another build (npm run check:app builds one with the app's buttons)
 //
 // Playwright is not a dependency of this repo. Install it (npm i -D playwright && npx playwright
 // install chromium), or point PLAYWRIGHT_MODULE at an existing node_modules/playwright directory.
@@ -14,7 +15,8 @@ import { extname, join, normalize, relative, sep } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
-const dist = join(root, 'dist')
+const distArg = process.argv.indexOf('--dist')
+const dist = join(root, distArg > 0 ? process.argv[distArg + 1] : 'dist')
 const mutate = process.argv.includes('--mutate')
 
 let playwright
@@ -256,17 +258,24 @@ await visit('/', desktop, async (page, report) => {
   await still.close()
 }
 
-// The account buttons follow the app's hint cookie (D-200): exactly colophon_signed_in=1 shows Dashboard alone;
-// no cookie, any other value, or no JavaScript shows Sign in and Sign up. Both sets share one space, so the
-// header's layout is identical either way.
-{
+// The header's buttons. A build without PUBLIC_APP_URL keeps "See the source" and has no account buttons; a build
+// with it follows the app's hint cookie (D-200): exactly colophon_signed_in=1 shows Dashboard alone; no cookie,
+// any other value, or no JavaScript shows Sign in and Sign up. The state is decided before the first paint, so
+// the page never shifts (CLS 0) in either state.
+const appBuild = readFileSync(join(dist, 'index.html'), 'utf8').includes('data-auth')
+if (!appBuild) {
+  await visit('/', desktop, async (page, report) => {
+    interactions++
+    const header = await page.evaluate(() => ({ auth: document.querySelectorAll('[data-auth]').length, source: [...document.querySelectorAll('header a')].some((a) => /See the source/.test(a.textContent)) }))
+    if (header.auth || !header.source) report(`without the app, the header should keep See the source and no account buttons: ${JSON.stringify(header)}`)
+  })
+} else {
   const shown = (page) =>
     page.evaluate(() =>
       [...document.querySelectorAll('header [data-auth] a')]
         .filter((a) => a.checkVisibility({ visibilityProperty: true }))
         .map((a) => { const c = a.cloneNode(true); c.querySelectorAll('[aria-hidden]').forEach((n) => n.remove()); return c.textContent.trim() }),
     )
-  const box = (page) => page.evaluate(() => JSON.stringify(document.querySelector('header [data-auth]').getBoundingClientRect()))
   const cases = [
     ['no cookie', null, 'Sign in,Sign up'],
     ['signed in', 'colophon_signed_in=1', 'Dashboard'],
@@ -274,23 +283,26 @@ await visit('/', desktop, async (page, report) => {
     ['a longer value', 'colophon_signed_in=10', 'Sign in,Sign up'],
     ['a look-alike name', 'xcolophon_signed_in=1', 'Sign in,Sign up'],
   ]
-  let firstBox
   for (const [name, cookie, want] of cases) {
     const context = await browser.newContext({ viewport: desktop })
     if (cookie) {
       const [k, v] = cookie.split('=')
       await context.addCookies([{ name: k, value: v, url: origin }])
     }
-    await context.addInitScript(() => { window.__csp = []; document.addEventListener('securitypolicyviolation', (e) => window.__csp.push(e.effectiveDirective)) })
+    await context.addInitScript(() => {
+      window.__csp = []
+      window.__cls = 0
+      document.addEventListener('securitypolicyviolation', (e) => window.__csp.push(e.effectiveDirective))
+      new PerformanceObserver((l) => { for (const e of l.getEntries()) if (!e.hadRecentInput) window.__cls += e.value }).observe({ type: 'layout-shift', buffered: true })
+    })
     const page = await context.newPage()
     await page.goto(origin + '/', { waitUntil: 'networkidle' })
+    await page.waitForTimeout(300)
     interactions++
     const got = (await shown(page)).join(',')
     if (got !== want) problems.push(`/ [account buttons, ${name}]: shows ${got || 'nothing'} (want ${want})`)
-    const b = await box(page)
-    firstBox ??= b
-    if (b !== firstBox) problems.push(`/ [account buttons, ${name}]: the header's button area moved (${b} vs ${firstBox})`)
-    const csp = await page.evaluate(() => window.__csp.length)
+    const { csp, cls } = await page.evaluate(() => ({ csp: window.__csp.length, cls: window.__cls }))
+    if (cls > 0) problems.push(`/ [account buttons, ${name}]: the page shifted (CLS ${cls.toFixed(4)})`)
     if (csp) problems.push(`/ [account buttons, ${name}]: ${csp} CSP violation(s)`)
     await context.close()
   }
@@ -299,7 +311,7 @@ await visit('/', desktop, async (page, report) => {
   const page = await noJs.newPage()
   await page.goto(origin + '/', { waitUntil: 'load' })
   interactions++
-  const got = (await page.locator('header [data-auth] a').evaluateAll((as) => as.filter((a) => getComputedStyle(a).visibility !== 'hidden' && getComputedStyle(a.parentElement).visibility !== 'hidden').map((a) => { const c = a.cloneNode(true); c.querySelectorAll('[aria-hidden]').forEach((n) => n.remove()); return c.textContent.trim() }))).join(',')
+  const got = (await page.locator('header [data-auth] a').evaluateAll((as) => as.filter((a) => a.offsetParent !== null).map((a) => { const c = a.cloneNode(true); c.querySelectorAll('[aria-hidden]').forEach((n) => n.remove()); return c.textContent.trim() }))).join(',')
   if (got !== 'Sign in,Sign up') problems.push(`/ [account buttons, no JavaScript]: shows ${got || 'nothing'} (want Sign in,Sign up)`)
   await noJs.close()
 }

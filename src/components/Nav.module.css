@@ -106,27 +106,25 @@
 :global(:root[data-theme='dark']) .moon {
   transform: rotate(0deg) scale(1);
 }
-/* The account buttons: both sets sit in one grid cell, the inactive one hidden, so the space is always the
-   wider of the two and the swap shifts nothing. */
+/* The header's buttons. With the app live, one of two sets shows: the head script decides before the first
+   paint (html[data-session]), so each lays out on its own and nothing ever swaps on screen. */
 .auth {
-  display: grid;
+  display: flex;
 }
 .signedOut,
 .signedIn {
-  grid-area: 1 / 1;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   gap: 8px;
 }
 .signedIn {
-  visibility: hidden;
+  display: none;
 }
 :global(html[data-session='in']) .signedOut {
-  visibility: hidden;
+  display: none;
 }
 :global(html[data-session='in']) .signedIn {
-  visibility: visible;
+  display: flex;
 }
 /* Sign in: the quiet one, a hairline-framed text button the height of the arrow button */
 .signIn {

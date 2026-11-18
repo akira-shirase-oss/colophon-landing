@@ -57,6 +57,21 @@ pinned theme never flashes the other one. It is hash-allowed in `public/_headers
 - `docs/screens/theme/` holds the four main pages at 1440 × 900 and 390 × 844 in both themes, as a record of
   the look.
 
+## Account buttons (when the app launches)
+
+The header shows **See the source** until the app is live. A build with `PUBLIC_APP_URL` set (for example
+`https://app.colophon.404human.dev`) shows **Sign in** and **Sign up** instead (`/studio/signin`,
+`/studio/signup`), or **Dashboard** (`/studio/`) for someone signed in. The landing reads only the app's
+non-secret hint cookie `colophon_signed_in` (exactly `1`; D-200) in the head script, before the first paint,
+and never calls the app.
+
+At the app's launch: the landing is built here and uploaded (`wrangler pages deploy dist`; Cloudflare Pages
+does not build it), so a variable in the Pages dashboard would not reach the build. Set it where the build runs:
+`PUBLIC_APP_URL=https://app.colophon.404human.dev npm run build`, run the checks with the same variable, then
+deploy that `dist/` as usual. `npm run check` then expects the Sign in link on every page; without the variable it fails if
+any page links to the app. `npm run check:app` builds and checks an app-enabled copy (into `dist-app/`) so both
+states stay tested before launch.
+
 ## Typography
 
 Two families, both self-hosted from `public/fonts/` (no font CDN; the CSP allows `font-src 'self'` only):
@@ -102,6 +117,7 @@ npm run check            # dist/: headers and CSP fit every page; no leaks, draf
                          # an old address; every highlighted code token is coloured through the theme
                          # variables and reaches AA (4.5:1) on the code surface; no font but Geist Pixel
                          # and Inter is declared, shipped or preloaded
+npm run check:app        # an app-enabled build (dist-app/): account buttons by the hint cookie, no shift
 npm run check:browser    # every page in headless Chromium with those headers, in light and in dark: no
                          # CSP violations, every code token drawn in its theme colour, the theme switch
                          # works by mouse and keyboard, a stored choice applies before first paint, and
