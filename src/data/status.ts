@@ -6,6 +6,6 @@ export const status = {
   /** The one shared line. Plain words: what Colophon is today, honestly. */
   line: 'Colophon is pre-release (0.1.0-alpha.1) and has no users yet. I build it in public, on my own.',
   /** Where a reader goes for what's done and what broke. */
-  done: { href: '/#pricing', text: 'what’s built' },
+  done: { href: 'https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md', text: 'what’s built' },
   log: { href: 'https://404human.dev/colophon/', text: 'the build log' },
 } as const

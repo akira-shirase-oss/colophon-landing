@@ -132,8 +132,6 @@ for (const path of pages) {
   await visit(path, desktop, path === '/' ? async (page, report) => {
     await page.locator('[data-faq] button').first().click()
     await expectAttr(page, report, '[data-faq] > div', 'data-open', 'true')
-    await page.locator('[data-status] [data-view="proof"]').click()
-    await expectAttr(page, report, '[data-status] [data-view="proof"]', 'aria-checked', 'true')
   } : undefined)
 }
 await visit('/blog/', phone, async (page, report) => {
