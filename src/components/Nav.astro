@@ -2,6 +2,7 @@
 import ArrowButton from './ui/ArrowButton.astro'
 import BrandLogo from './ui/BrandLogo.astro'
 import styles from './Nav.module.css'
+import { app, DOCS_URL } from '../data/app'
 
 // The theme toggle is the Studio's (D-182): one button between light and dark that follows the system until
 // pressed; pressing onto the system's own scheme goes back to following it. A stored choice is applied before
@@ -11,6 +12,7 @@ const MOON = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>'
 
 const links = [
   { label: 'Features', href: '/#benefits' },
+  { label: 'Docs', href: DOCS_URL },
   { label: 'Blog', href: '/blog/' },
   { label: 'Build log', href: 'https://404human.dev/colophon/' },
 ]
@@ -47,8 +49,17 @@ const links = [
         <svg class={`${styles.icon} ${styles.sun}`} viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={SUN} />
         <svg class={`${styles.icon} ${styles.moon}`} viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={MOON} />
       </button>
-      <span class={styles.cta}>
-        <ArrowButton href="https://github.com/akira-shirase-oss/colophon-cms">See the source</ArrowButton>
+      <!-- Sign in and Sign up, or Dashboard for someone signed in to the app. Both are in the page and share one
+           space, so the swap moves nothing; the head script in Base.astro picks one before the first paint from
+           the app's hint cookie. Without JavaScript or the cookie: Sign in and Sign up. -->
+      <span class={styles.auth} data-auth>
+        <span class={styles.signedOut}>
+          <a class={styles.signIn} href={app.signIn}>Sign in</a>
+          <ArrowButton href={app.signUp}>Sign up</ArrowButton>
+        </span>
+        <span class={styles.signedIn}>
+          <ArrowButton href={app.dashboard}>Dashboard</ArrowButton>
+        </span>
       </span>
       <button type="button" class={styles.burger} aria-label="Open menu" aria-expanded="false" data-nav-toggle>
         <span></span>
@@ -65,7 +76,15 @@ const links = [
             </a>
           ))
         }
-        <ArrowButton href="https://github.com/akira-shirase-oss/colophon-cms">See the source</ArrowButton>
+        <span class={`${styles.auth} ${styles.authMenu}`} data-auth>
+          <span class={styles.signedOut}>
+            <a class={styles.signIn} href={app.signIn}>Sign in</a>
+            <ArrowButton href={app.signUp}>Sign up</ArrowButton>
+          </span>
+          <span class={styles.signedIn}>
+            <ArrowButton href={app.dashboard}>Dashboard</ArrowButton>
+          </span>
+        </span>
       </div>
     </template>
   </nav>

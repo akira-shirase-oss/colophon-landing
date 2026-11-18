@@ -106,8 +106,53 @@
 :global(:root[data-theme='dark']) .moon {
   transform: rotate(0deg) scale(1);
 }
-.cta {
+/* The account buttons: both sets sit in one grid cell, the inactive one hidden, so the space is always the
+   wider of the two and the swap shifts nothing. */
+.auth {
+  display: grid;
+}
+.signedOut,
+.signedIn {
+  grid-area: 1 / 1;
   display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.signedIn {
+  visibility: hidden;
+}
+:global(html[data-session='in']) .signedOut {
+  visibility: hidden;
+}
+:global(html[data-session='in']) .signedIn {
+  visibility: visible;
+}
+/* Sign in: the quiet one, a hairline-framed text button the height of the arrow button */
+.signIn {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  font-family: var(--font-text);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--c-ink);
+  transition: background-color 0.2s var(--ease);
+}
+.signIn:hover {
+  background: var(--c-surface);
+}
+.signIn:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 3px;
+}
+/* in the phone menu the buttons start at the left, under the links */
+.authMenu .signedOut,
+.authMenu .signedIn {
+  justify-content: flex-start;
 }
 
 .burger,
@@ -133,7 +178,7 @@
   .menu {
     display: none;
   }
-  .cta {
+  .container > .auth {
     display: none;
   }
   .toggle {

@@ -238,8 +238,7 @@ await visit('/', desktop, async (page, report) => {
 {
   const context = await browser.newContext({ viewport: phone })
   const page = await context.newPage()
-  await page.goto(origin + '/', { waitUntil: 'commit' })
-  await page.waitForSelector('h1')
+  await page.goto(origin + '/', { waitUntil: 'domcontentloaded' })
   const tree = await page.locator('h1').ariaSnapshot()
   const early = await page.evaluate(() => { const h = document.querySelector('h1'); return { print: h.dataset.print, lines: getComputedStyle(h).getPropertyValue('--print-lines') } })
   interactions++
@@ -255,6 +254,54 @@ await visit('/', desktop, async (page, report) => {
   const s = await quiet.evaluate(() => { const h = document.querySelector('h1'); return { print: h.dataset.print ?? null, anim: getComputedStyle(h).animationName } })
   if (s.print !== null || s.anim !== 'none') problems.push(`/ [hero title, reduced motion]: it still prints (${JSON.stringify(s)})`)
   await still.close()
+}
+
+// The account buttons follow the app's hint cookie (D-200): exactly colophon_signed_in=1 shows Dashboard alone;
+// no cookie, any other value, or no JavaScript shows Sign in and Sign up. Both sets share one space, so the
+// header's layout is identical either way.
+{
+  const shown = (page) =>
+    page.evaluate(() =>
+      [...document.querySelectorAll('header [data-auth] a')]
+        .filter((a) => a.checkVisibility({ visibilityProperty: true }))
+        .map((a) => { const c = a.cloneNode(true); c.querySelectorAll('[aria-hidden]').forEach((n) => n.remove()); return c.textContent.trim() }),
+    )
+  const box = (page) => page.evaluate(() => JSON.stringify(document.querySelector('header [data-auth]').getBoundingClientRect()))
+  const cases = [
+    ['no cookie', null, 'Sign in,Sign up'],
+    ['signed in', 'colophon_signed_in=1', 'Dashboard'],
+    ['another value', 'colophon_signed_in=yes', 'Sign in,Sign up'],
+    ['a longer value', 'colophon_signed_in=10', 'Sign in,Sign up'],
+    ['a look-alike name', 'xcolophon_signed_in=1', 'Sign in,Sign up'],
+  ]
+  let firstBox
+  for (const [name, cookie, want] of cases) {
+    const context = await browser.newContext({ viewport: desktop })
+    if (cookie) {
+      const [k, v] = cookie.split('=')
+      await context.addCookies([{ name: k, value: v, url: origin }])
+    }
+    await context.addInitScript(() => { window.__csp = []; document.addEventListener('securitypolicyviolation', (e) => window.__csp.push(e.effectiveDirective)) })
+    const page = await context.newPage()
+    await page.goto(origin + '/', { waitUntil: 'networkidle' })
+    interactions++
+    const got = (await shown(page)).join(',')
+    if (got !== want) problems.push(`/ [account buttons, ${name}]: shows ${got || 'nothing'} (want ${want})`)
+    const b = await box(page)
+    firstBox ??= b
+    if (b !== firstBox) problems.push(`/ [account buttons, ${name}]: the header's button area moved (${b} vs ${firstBox})`)
+    const csp = await page.evaluate(() => window.__csp.length)
+    if (csp) problems.push(`/ [account buttons, ${name}]: ${csp} CSP violation(s)`)
+    await context.close()
+  }
+  const noJs = await browser.newContext({ viewport: desktop, javaScriptEnabled: false })
+  await noJs.addCookies([{ name: 'colophon_signed_in', value: '1', url: origin }])
+  const page = await noJs.newPage()
+  await page.goto(origin + '/', { waitUntil: 'load' })
+  interactions++
+  const got = (await page.locator('header [data-auth] a').evaluateAll((as) => as.filter((a) => getComputedStyle(a).visibility !== 'hidden' && getComputedStyle(a.parentElement).visibility !== 'hidden').map((a) => { const c = a.cloneNode(true); c.querySelectorAll('[aria-hidden]').forEach((n) => n.remove()); return c.textContent.trim() }))).join(',')
+  if (got !== 'Sign in,Sign up') problems.push(`/ [account buttons, no JavaScript]: shows ${got || 'nothing'} (want Sign in,Sign up)`)
+  await noJs.close()
 }
 
 // The footer wordmark prints once when it scrolls into view, and the hero's icons lean away from the pointer.
