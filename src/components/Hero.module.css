@@ -1,106 +1,259 @@
+/* The hero: the painting fills the first screen edge to edge, with the header (Nav, `overHero`) on top
+   of it. The copy sits upper left over a soft purple scrim that keeps white text above WCAG AA on the
+   bright sky (measured, see the branch notes); three dark-glass chips float over the field on the
+   right. The section keeps 20px of white below the painting, which the tile strip's spacing counts on. */
+
+/* The hero's and the header's own names for the site's fonts: the same files, with font-display:
+   optional. The fonts are preloaded, so they are normally ready for the first paint; on a slow first
+   visit the first screen keeps the fallback instead of swapping fonts and reflowing, so nothing in it
+   moves while the page loads (CLS 0). .hero and Nav's .over point --font-display and --font-body here. */
+@font-face {
+  font-family: 'DM Sans Steady';
+  src: url('/fonts/dm-sans-600.woff2') format('woff2');
+  font-weight: 600;
+  font-display: optional;
+}
+@font-face {
+  font-family: 'Geist Steady';
+  src: url('/fonts/geist-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: optional;
+}
+@font-face {
+  font-family: 'Geist Steady';
+  src: url('/fonts/geist-500.woff2') format('woff2');
+  font-weight: 500;
+  font-display: optional;
+}
+@font-face {
+  font-family: 'Geist Steady';
+  src: url('/fonts/geist-600.woff2') format('woff2');
+  font-weight: 600;
+  font-display: optional;
+}
+
+/* The header reads this timeline to turn solid once the painting has scrolled away (Nav.module.css). */
+:global(body) {
+  timeline-scope: --hero;
+}
+
 .hero {
+  --font-display: 'DM Sans Steady', sans-serif;
+  --font-body: 'Geist Steady', sans-serif;
   width: 100%;
-  display: flex;
-  justify-content: center;
-  padding: 20px;
+  /* main opens with a 1px margin; the painting starts at the very top of the page */
+  margin-top: -1px;
+  padding-bottom: 20px;
   background: var(--c-bg);
 }
-.card {
+.stage {
   position: relative;
   width: 100%;
-  max-width: 1240px;
-  height: 619px;
+  min-height: clamp(600px, 100svh, 920px);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 24px;
   overflow: clip;
+  /* the painting's dusk, shown for the moment before it arrives */
+  background: #7a6a8c;
+  view-timeline: --hero block;
 }
-/* The painting is stretched to a fixed box and shown at 1.5x. It stays still while the page scrolls. */
-.bg {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  /* sized from the card like the source: desktop card − 409px */
-  width: max(calc(100% - 409px), calc(100% / 1.49));
-  height: 526px;
-  transform: translate(-50%, -50%) scale(1.5);
-  /* cover keeps the painting's proportions in every box shape */
-  background: url('/images/hero.webp') 55% center / cover no-repeat;
-  will-change: transform;
-}
-.overlay {
+.image {
   position: absolute;
   inset: 0;
-  background: var(--c-ink);
-  opacity: 0.15;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 30% 45%;
 }
-/* Soft scrim behind the headline so white text holds on bright paintings. */
-.card::before {
-  content: '';
+/* A purple-black scrim: darker under the header and behind the copy, clear over the farmhouse. It
+   holds its strength to the copy's right edge (the 640px column inside the 1240px container), wherever
+   that falls, then fades out over 280px. */
+.scrim {
+  --copy-end: calc(max(20px, 50% - 620px) + 660px);
   position: absolute;
   inset: 0;
-  z-index: 1;
-  background: radial-gradient(ellipse 36% 30% at 50% 52%, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 100%);
-  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(24, 14, 36, 0.42) 0, rgba(24, 14, 36, 0) 180px),
+    linear-gradient(
+      90deg,
+      rgba(24, 14, 36, 0.7) 0,
+      rgba(24, 14, 36, 0.58) var(--copy-end),
+      rgba(24, 14, 36, 0) calc(var(--copy-end) + 280px)
+    );
 }
-.title {
+
+.inner {
   position: relative;
-  z-index: 2;
-  width: 700px;
+  z-index: 1;
+  flex: 1;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 176px 20px 96px;
+}
+.copy {
+  max-width: 640px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 20px;
-  text-align: center;
 }
-.title h1 {
-  width: 660px;
-}
-.sub {
-  max-width: 420px;
+.title {
+  font-family: var(--font-display);
+  font-size: 56px;
+  line-height: 1.06;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   color: #fff;
 }
+.sub {
+  max-width: 500px;
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.5;
+  color: #fff;
+  text-wrap: pretty;
+}
+.actions {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.glass {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  background: rgba(24, 14, 36, 0.28);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  backdrop-filter: blur(12px) saturate(140%);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 500;
+  color: #fff;
+  transition: background-color 0.2s var(--ease);
+}
+.glass:hover {
+  background: rgba(24, 14, 36, 0.42);
+}
+.actions a:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
 
-@media (max-width: 1199px) {
-  .card {
-    max-width: none;
+/* Floating status chips, tilted a little as if they hang in front of the painting */
+.chips {
+  position: absolute;
+  right: 20px;
+  bottom: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  list-style: none;
+  transform: perspective(1100px) rotateY(-16deg) rotateX(5deg);
+  transform-origin: right center;
+}
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 300px;
+  padding: 13px 16px;
+  margin-right: calc((2 - var(--i)) * 28px);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(22, 14, 32, 0.56);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+  box-shadow: 0 14px 34px -14px rgba(12, 6, 22, 0.6);
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--tone);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+.live {
+  --tone: #4cc760;
+  --ring: rgba(76, 199, 96, 0.25);
+}
+.pending {
+  --tone: #f0b429;
+  --ring: rgba(240, 180, 41, 0.25);
+}
+.label {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.74);
+}
+.value {
+  margin-left: auto;
+  padding-left: 16px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.2;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+/* a slow drift, only for people who haven't asked for less motion */
+@media (prefers-reduced-motion: no-preference) {
+  .chips {
+    animation: drift 7s ease-in-out infinite;
   }
-  .bg {
-    width: calc((100% - 254px) * 1.2);
-    height: 700px;
+}
+@keyframes drift {
+  50% {
+    translate: 0 -6px;
+  }
+}
+
+/* ---------- Tablet ---------- */
+@media (max-width: 1199px) {
+  .inner {
+    padding: 152px 20px 80px;
   }
   .title {
-    width: 100%;
-    max-width: 700px;
+    font-size: 48px;
   }
-}
-@media (max-width: 809px) {
-  .hero {
-    padding: 100px 16px 20px;
+  .chips {
+    bottom: 72px;
   }
-  .card {
-    height: auto;
-    padding: 120px 20px;
-  }
-  .bg {
-    width: calc((100% - 118px) * 1.2);
-    height: 700px;
-  }
-  .title h1 {
-    width: 100%;
+  .chip {
+    min-width: 260px;
   }
 }
 
-@media (max-width: 1199px) {
-  .title h1 {
-    width: 700px;
-    max-width: 100%;
-    font-size: 54px;
-  }
-}
+/* ---------- Phone: copy only, over a taller scrim ---------- */
 @media (max-width: 809px) {
-  .title h1 {
-    font-size: 44px;
+  .stage {
+    min-height: clamp(560px, 100svh, 760px);
+  }
+  /* the portrait crop is already centred on the farmhouse */
+  .image {
+    object-position: center;
+  }
+  .scrim {
+    background: linear-gradient(180deg, rgba(24, 14, 36, 0.66) 0%, rgba(24, 14, 36, 0.56) 62%, rgba(24, 14, 36, 0.24) 100%);
+  }
+  .inner {
+    padding: 112px 16px 48px;
+  }
+  .title {
+    font-size: 40px;
+    line-height: 1.08;
+  }
+  .sub {
+    font-size: 16px;
+  }
+  .chips {
+    display: none;
   }
 }

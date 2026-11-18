@@ -98,3 +98,163 @@
     padding: 24px 0;
   }
 }
+
+/* ---------- Over the hero (home page) ----------
+   The header lies on the painting: white logo, the links in a dark glass pill, a white button. Its
+   colours are custom properties, and a scroll-driven animation on the hero's view timeline (named in
+   Hero.module.css) moves them to a solid white bar with black text in the last 140px before the
+   painting leaves, so the header never sits unreadably over the light sections below. Browsers
+   without scroll-driven animations get a header that scrolls away with the hero instead. */
+@property --nav-fg {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #fff;
+}
+@property --nav-bar {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(255, 255, 255, 0);
+}
+@property --nav-line {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(0, 0, 0, 0);
+}
+@property --nav-glass {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(24, 14, 36, 0.3);
+}
+@property --nav-edge {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(255, 255, 255, 0.26);
+}
+@property --nav-blur {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+@property --nav-ring {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(0, 0, 0, 0);
+}
+
+.over {
+  /* the hero's steady fonts (Hero.module.css): the header doesn't reflow as they load */
+  --font-display: 'DM Sans Steady', sans-serif;
+  --font-body: 'Geist Steady', sans-serif;
+  margin-bottom: -72px;
+}
+.over .nav {
+  position: relative;
+  isolation: isolate;
+  background: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  color: var(--nav-fg);
+}
+/* the bar's ground is a layer of its own, so the pill's glass still sees the painting through it */
+.over .nav::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--nav-bar);
+  border-bottom: 1px solid var(--nav-line);
+  -webkit-backdrop-filter: blur(var(--nav-blur));
+  backdrop-filter: blur(var(--nav-blur));
+}
+.over .logo,
+.over .links {
+  --c-ink: var(--nav-fg);
+}
+.pill {
+  height: 44px;
+  gap: 0;
+  padding: 0 6px;
+  border-radius: 999px;
+  border: 1px solid var(--nav-edge);
+  background: var(--nav-glass);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+.pill .link {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 999px;
+}
+.over .link:hover {
+  color: var(--nav-fg);
+  opacity: 0.72;
+}
+.divider {
+  width: 1px;
+  height: 16px;
+  background: var(--nav-edge);
+}
+.over a:focus-visible,
+.over button:focus-visible {
+  outline: 2px solid var(--nav-fg);
+  outline-offset: 3px;
+}
+.over .pill .link:focus-visible {
+  outline-offset: 0;
+}
+.over .burger span {
+  background: var(--nav-fg);
+}
+/* the white button keeps an edge once the bar behind it turns white */
+.over .menu > a {
+  box-shadow: 0 0 0 1px var(--nav-ring);
+}
+
+@keyframes nav-solid {
+  to {
+    --nav-fg: #000;
+    --nav-bar: rgba(255, 255, 255, 0.88);
+    --nav-line: rgba(0, 0, 0, 0.06);
+    --nav-glass: rgba(0, 0, 0, 0.035);
+    --nav-edge: rgba(0, 0, 0, 0.1);
+    --nav-blur: 20px;
+    --nav-ring: rgba(0, 0, 0, 0.14);
+  }
+}
+/* The timeline sits in a rule of its own: a minifier folds longhands that share a rule into the
+   `animation` shorthand, which can't carry a timeline, and the browser then drops the whole line. */
+@supports (animation-timeline: view()) {
+  .over .nav {
+    animation: nav-solid linear both;
+  }
+  .over > .nav {
+    animation-timeline: --hero;
+    animation-range: exit calc(100% - 140px) exit calc(100% - 72px);
+  }
+}
+@supports not (animation-timeline: view()) {
+  .over {
+    position: absolute;
+    left: 0;
+    right: 0;
+  }
+}
+
+/* the phone menu opens on a white sheet, wherever the page is */
+.over .nav:has([aria-expanded='true']) {
+  --nav-fg: #000 !important;
+  --nav-bar: #fff !important;
+  --nav-line: rgba(0, 0, 0, 0.06) !important;
+  --nav-blur: 0px !important;
+}
+
+@media (max-width: 809px) {
+  .over {
+    margin-bottom: 0;
+  }
+  .over .nav {
+    padding-bottom: 16px;
+  }
+}

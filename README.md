@@ -18,8 +18,12 @@ npm run build    # static production build into dist/
 - `src/components/ui/` — `ArrowButton` (sliding-arrow button), `SectionHeading`, `MaskIcon`, `BrandLogo` (mark +
   name), `BrandWordmark`
 - `src/components/*.astro` — one component per section, each with a co-located CSS module. Interactive parts (menu,
-  benefit cards, FAQ, hero scroll zoom) are small vanilla
-  `<script>`s in the component; everything else is plain HTML with no JavaScript.
+  benefit cards, FAQ) are small vanilla `<script>`s in the component; everything else is plain HTML with no
+  JavaScript.
+- The hero's painting fills the first screen (a portrait crop on phones, three widths elsewhere, preloaded at high
+  priority from `src/lib/hero-image.ts`), and on the home page the header (`<Nav overHero />`) sits on it. A
+  scroll-driven CSS animation on the hero's view timeline turns the header into a solid bar as the painting leaves;
+  browsers without scroll-driven animations get a header that scrolls away with the hero.
 - The FAQ also emits `FAQPage` structured data (JSON-LD).
 
 ## Security headers and checks
