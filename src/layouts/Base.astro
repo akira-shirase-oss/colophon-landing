@@ -3,6 +3,7 @@
 // optional structured data. Pages pass their own preloads through the `head` slot.
 import '../styles/global.css'
 import { jsonLd } from '../lib/json-ld'
+import { hero } from '../data/hero'
 
 type Props = {
   title: string
@@ -25,7 +26,7 @@ const {
   description,
   type = 'website',
   image = '/og.jpg',
-  imageAlt = 'Colophon: a CMS where every publish leaves a receipt',
+  imageAlt = `Colophon: ${hero.headline}`,
   published,
   modified,
   noindex = false,
@@ -64,6 +65,8 @@ const ld = structured ? (Array.isArray(structured) ? structured : [structured]) 
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={imageUrl} />
     <meta name="twitter:image:alt" content={imageAlt} />
+    <!-- Every page's title is set in Geist Pixel, and on the home page it is the largest paint. -->
+    <link rel="preload" href="/fonts/geist-pixel-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate" type="application/rss+xml" title="Colophon blog" href="/rss.xml" />
     <link rel="sitemap" type="application/xml" href="/sitemap.xml" />

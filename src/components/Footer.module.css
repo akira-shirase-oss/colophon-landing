@@ -98,29 +98,24 @@
   color: var(--c-muted);
 }
 
-.wordmark {
-  position: relative;
-  height: 235px;
-  overflow: hidden;
-}
-.wordmarkImg {
-  position: absolute;
-  top: -10.5px;
-  left: 0;
-  width: 100%;
-  height: 347px;
-  object-fit: cover;
-}
+/* The legal line, then the pixel wordmark below it: the word's cap height shows, cut by the panel's
+   rounded bottom (the grid is 112 cells wide; 21 rows show). */
 .legal {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 23px;
-  z-index: 1;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  gap: 8px 24px;
+  padding-top: 8px;
+}
+.wordmark {
+  aspect-ratio: 112 / 21;
+  overflow: hidden;
+}
+.wordmarkImg {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 /* links inside the legal and imprint lines: ink and an underline, as in running text elsewhere,
    so they never rely on colour alone */
@@ -144,12 +139,13 @@
   .column {
     width: 147px;
   }
-  .wordmarkImg {
-    top: 120.8px;
-    height: 215px;
-  }
 }
 @media (max-width: 809px) {
+  .legal {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
   .footer {
     padding: 0 16px 16px;
   }
@@ -173,16 +169,5 @@
   .column {
     flex: 1 1 0;
     width: auto;
-  }
-  .wordmarkImg {
-    top: 168px;
-    height: 100px;
-  }
-  .legal {
-    top: 141.6px;
-    bottom: auto;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
   }
 }

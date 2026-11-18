@@ -17,6 +17,19 @@
 .block {
   width: 100%;
 }
+/* On the blue hero: a cream pill, an ink square with a white arrow, ink text; the same in both themes. */
+.onBrand {
+  background: var(--c-on-brand-pill);
+  color: var(--c-on-brand-ink);
+}
+/* A focus ring that shows on every ground: the page's focus colour, and white on the blue hero. */
+.button:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 3px;
+}
+.onBrand:focus-visible {
+  outline-color: var(--c-on-sky);
+}
 
 .content {
   display: flex;
@@ -61,7 +74,7 @@
   display: block;
   height: 17px;
   overflow: hidden;
-  font-family: var(--font-body);
+  font-family: var(--font-text);
   font-size: 14px;
   line-height: 16.8px;
   font-weight: 500;
@@ -94,4 +107,10 @@
 }
 .secondary .arrow {
   background: var(--c-on-ink);
+}
+.onBrand .square {
+  background: var(--c-on-brand-ink);
+}
+.onBrand .arrow {
+  background: var(--c-on-brand-mark);
 }

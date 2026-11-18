@@ -35,7 +35,6 @@
 .menu {
   display: flex;
   align-items: center;
-  gap: 24px;
 }
 .links {
   display: flex;
@@ -54,43 +53,61 @@
   background: var(--c-ink);
 }
 
-/* Theme switch: three small segments on a quiet track. It stays invisible (its space kept, so nothing
-   shifts) until the script that makes it work has run. */
-.theme {
-  display: flex;
-  gap: 2px;
-  padding: 2px;
-  margin-left: 16px;
-  border-radius: 8px;
-  background: var(--c-switch-bg);
-  visibility: hidden;
-}
-.theme[data-ready] {
-  visibility: visible;
-}
-.themeOption {
-  width: 28px;
-  height: 28px;
-  display: flex;
+/* Theme toggle: the Studio's ghost icon button (36px, the control radius, a ground only on hover), set
+   before the header's button. The sun and moon swap with a turn and a scale. */
+.toggle {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  margin: 0 12px 0 16px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
-  color: var(--c-text);
+  flex-shrink: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--c-ink);
   transition:
-    color 0.2s var(--ease),
-    background-color 0.2s var(--ease);
+    background-color 0.15s var(--ease),
+    border-color 0.15s var(--ease);
 }
-.themeOption:hover {
-  color: var(--c-ink);
+.toggle:hover {
+  background: var(--c-switch-bg);
 }
-.themeOption[aria-checked='true'] {
-  background: var(--c-switch-on);
-  color: var(--c-ink);
-  box-shadow: 0 1px 2px var(--c-switch-shadow);
+.toggle:active {
+  transform: scale(0.985);
 }
-.themeOption:focus-visible {
-  outline: 2px solid var(--c-focus);
-  outline-offset: 1px;
+.toggle:focus-visible {
+  outline: none;
+  border-color: var(--c-focus);
+  box-shadow: 0 0 0 4px var(--c-focus-ring);
+}
+.icon {
+  transition: transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.sun {
+  transform: rotate(0deg) scale(1);
+}
+.moon {
+  position: absolute;
+  transform: rotate(90deg) scale(0);
+}
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme='light'])) .sun {
+    transform: rotate(-90deg) scale(0);
+  }
+  :global(:root:not([data-theme='light'])) .moon {
+    transform: rotate(0deg) scale(1);
+  }
+}
+:global(:root[data-theme='dark']) .sun {
+  transform: rotate(-90deg) scale(0);
+}
+:global(:root[data-theme='dark']) .moon {
+  transform: rotate(0deg) scale(1);
+}
+.cta {
+  display: flex;
 }
 
 .burger,
@@ -116,13 +133,13 @@
   .menu {
     display: none;
   }
-  .theme {
-    margin-right: 16px;
-    padding: 1px;
+  .cta {
+    display: none;
   }
-  .themeOption {
-    width: 30px;
-    height: 30px;
+  .toggle {
+    width: 32px;
+    height: 32px;
+    margin: 0 8px 0 0;
   }
   .burger {
     display: flex;

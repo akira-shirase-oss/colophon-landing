@@ -56,7 +56,7 @@ The idea behind every cheap answer is the same: record when each version was liv
 Number every publish. A publish that changes five entries is release 41; the next publish is release 42. Then, for each entry, keep a [publication interval](/blog/headless-cms-glossary/#publication-interval) for each time a version was live: "this version was live from release A up to, but not including, release B". An entry has at most one open interval, and its intervals never overlap. "What was live at release 41" becomes: every interval that contains 41.
 
 <figure>
-<svg viewBox="0 0 640 300" role="img" aria-labelledby="intervals-title intervals-desc" xmlns="http://www.w3.org/2000/svg" font-family="Geist, sans-serif">
+<svg viewBox="0 0 640 300" role="img" aria-labelledby="intervals-title intervals-desc" xmlns="http://www.w3.org/2000/svg" font-family="Inter, sans-serif">
 <title id="intervals-title">Publication intervals for three entries across releases 39 to 44</title>
 <desc id="intervals-desc">Pricing: version 1 live from release 39 until release 42, then version 2 from 42 onwards. About: version 1 live from 39 onwards. Promo: version 1 live from release 40 until 43, when it was taken down. A dashed line at release 41, Tuesday at 3 pm, crosses pricing version 1, about version 1 and promo version 1: that is what was live.</desc>
 <g font-size="17" font-weight="600" style="fill: var(--c-figure-ink)">

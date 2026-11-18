@@ -24,13 +24,11 @@ const columns = [
   },
 ]
 
-// The wordmark's treatment (BrandWordmark.astro). The receipt adds the printer's imprint for this build.
-const wordmark = process.env.WORDMARK ?? 'plain'
-// Arms the type-setting wordmark only when it is still below the fold and motion is allowed, then lets it
-// settle once when it scrolls into view. Without this script the letters simply stand in place.
-const TYPE_SETTING =
-  "var s=document.querySelector('[data-wordmark=type]');if(s&&'IntersectionObserver'in window&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&s.getBoundingClientRect().top>innerHeight){s.dataset.set='armed';var o=new IntersectionObserver(function(e){if(e[0].isIntersecting){o.disconnect();requestAnimationFrame(function(){s.dataset.set='go'})}},{threshold:0.35});o.observe(s)}"
-const built = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date())
+// Prints the pixel wordmark once, row by row, when the footer first comes into view (only if it starts below
+// the fold and motion is allowed). It watches the word's frame, because the clipped word itself never counts
+// as in view. Without this script the word simply stands there.
+const PRINT =
+  "var w=document.querySelector('[data-wordmark]');if(w&&'IntersectionObserver'in window&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&w.getBoundingClientRect().top>innerHeight){w.dataset.print='armed';var o=new IntersectionObserver(function(e){if(e[0].isIntersecting){o.disconnect();requestAnimationFrame(function(){w.dataset.print='go'})}},{threshold:0.3});o.observe(w.parentElement)}"
 
 const socials = [
   { icon: '/icons/x.svg', label: 'Colophon on X', href: 'https://x.com/404humandev' },
@@ -81,19 +79,13 @@ const socials = [
       </nav>
     </div>
 
+    <div class={styles.legal}>
+      <p class="t-small">© 2026 Colophon · Made with <a href={REPO}>Rust and Svelte</a></p>
+      <p class={`t-small ${styles.imprint}`}>Set in Geist Pixel and Inter</p>
+    </div>
     <div class={styles.wordmark}>
       <BrandWordmark class={styles.wordmarkImg} />
-      <div class={styles.legal}>
-        <p class="t-small">© 2026 Colophon · Made with <a href={REPO}>Rust and Svelte</a></p>
-        {
-          wordmark === 'receipt' && (
-            <p class={`t-tiny ${styles.imprint}`}>
-              Set in DM Sans and Geist · Built {built} · No trackers · <a href={REPO}>See the source</a>
-            </p>
-          )
-        }
-      </div>
     </div>
   </div>
 </footer>
-{wordmark === 'type' && <script is:inline set:html={TYPE_SETTING} />}
+<script is:inline set:html={PRINT} />

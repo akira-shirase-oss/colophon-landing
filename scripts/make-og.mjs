@@ -42,13 +42,14 @@ await page.evaluate(() => {
   const card = document.querySelector('main section > div')
   const logo = document.querySelector('header a[aria-label="Colophon home"]').cloneNode(true)
   card.querySelector('a[href*="github.com"]')?.remove()
+  card.querySelector('[data-hero-field]')?.remove()
   Object.assign(logo.style, { position: 'absolute', top: '44px', left: '56px', zIndex: '3', transform: 'scale(1.5)', transformOrigin: 'left top' })
   card.append(logo)
   Object.assign(card.style, { width: '1200px', maxWidth: 'none', height: '630px', borderRadius: '0', padding: '0' })
   const h1 = card.querySelector('h1')
-  Object.assign(h1.style, { width: '900px', fontSize: '76px' })
-  card.querySelector('p').style.maxWidth = '560px'
-  card.querySelector('p').style.fontSize = '22px'
+  Object.assign(h1.style, { maxWidth: '1100px', fontSize: '78.95px' })
+  card.querySelector('p').style.maxWidth = '720px'
+  card.querySelector('p').style.fontSize = '24px'
   card.querySelector('p').style.lineHeight = '1.35'
   document.body.replaceChildren(card)
   Object.assign(document.body.style, { margin: '0', overflow: 'hidden' })
