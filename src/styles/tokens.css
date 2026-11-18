@@ -51,12 +51,18 @@
   /* The draft stamp on unpublished posts */
   --c-draft-bg: #fff4d6;
   --c-draft-ink: #6b4e00;
+  /* Pixel-art illustrations in the closing statement: one small palette with a 1-cell outline */
+  --c-px-outline: #14161c;
+  --c-px-blue: #0061ff;
+  --c-px-orange: #ff8a3d;
+  --c-px-green: #3fbf6b;
+  --c-px-pink: #ff7eb6;
+  --c-px-cream: #fff1d0;
   /* The brand block (the hero and the CTA): white at the top to #0061ff at the bottom, the same in both
      themes, with navy type, a navy button and quiet navy icons; a hairline edge where the page is white. */
   --c-brand-top: #ffffff;
   --c-brand-bottom: #0061ff;
   --c-on-brand: #08142b;
-  --c-on-brand-soft: #2c3d5e;
   --c-brand-button: #08142b;
   --c-brand-button-text: #ffffff;
   --c-brand-edge: rgba(8, 20, 43, 0.12);
@@ -127,12 +133,17 @@
 
     --c-draft-bg: #3a2f12;
     --c-draft-ink: #f0d58c;
+    --c-px-outline: #e9e7e1;
+    --c-px-blue: #4d8dff;
+    --c-px-orange: #ff9a55;
+    --c-px-green: #55cf7f;
+    --c-px-pink: #ff8fc0;
+    --c-px-cream: #2b2924;
     /* The brand block (the hero and the CTA): white at the top to #0061ff at the bottom, the same in both
        themes, with navy type, a navy button and quiet navy icons; a hairline edge where the page is white. */
     --c-brand-top: #ffffff;
     --c-brand-bottom: #0061ff;
     --c-on-brand: #08142b;
-    --c-on-brand-soft: #2c3d5e;
     --c-brand-button: #08142b;
     --c-brand-button-text: #ffffff;
     --c-brand-edge: rgba(255, 255, 255, 0.1);
@@ -198,12 +209,17 @@
 
   --c-draft-bg: #3a2f12;
   --c-draft-ink: #f0d58c;
+  --c-px-outline: #e9e7e1;
+  --c-px-blue: #4d8dff;
+  --c-px-orange: #ff9a55;
+  --c-px-green: #55cf7f;
+  --c-px-pink: #ff8fc0;
+  --c-px-cream: #2b2924;
   /* The brand block (the hero and the CTA): white at the top to #0061ff at the bottom, the same in both
      themes, with navy type, a navy button and quiet navy icons; a hairline edge where the page is white. */
   --c-brand-top: #ffffff;
   --c-brand-bottom: #0061ff;
   --c-on-brand: #08142b;
-  --c-on-brand-soft: #2c3d5e;
   --c-brand-button: #08142b;
   --c-brand-button-text: #ffffff;
   --c-brand-edge: rgba(255, 255, 255, 0.1);

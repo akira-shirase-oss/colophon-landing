@@ -1,21 +1,29 @@
 ---
-import ArrowButton from './ui/ArrowButton.astro'
+// The closing statement: one sentence in display-size Inter on the page itself, with small pixel-art
+// illustrations between the words, and the build log link under it. The words live in src/data/statement.ts.
+import PixelArt from './ui/PixelArt.astro'
+import { statement } from '../data/statement'
 import styles from './CTA.module.css'
 ---
 
-<section class={styles.section}>
-  <div class={`brand-block ${styles.card}`}>
-    <div class={styles.title}>
-      <h2 class={`t-h2 ${styles.heading}`}>
-        Follow the build.
-        <br />
-        <span class={styles.soft}>Mistakes included</span>
-      </h2>
-      <p class={`t-body ${styles.sub}`}>
-        Colophon is being built in public, one write-up at a time. Read along as it comes together, or poke around the
-        demo sites.
-      </p>
-      <ArrowButton href="https://404human.dev/colophon/" variant="onBrand">Read the build log</ArrowButton>
-    </div>
+<section class={styles.section} aria-labelledby="statement-heading">
+  <div class={styles.inner}>
+    <h2 id="statement-heading" class="visually-hidden">{statement.heading}</h2>
+    <p class={styles.statement}>
+      {
+        statement.parts.map((p) => (
+          <>
+            {p.lead}
+            <span class={styles.keep}>
+              {p.word}&nbsp;<PixelArt name={p.icon} />
+              {p.after}
+            </span>
+          </>
+        ))
+      }
+    </p>
+    <a class={styles.more} href={statement.link.href}>
+      {statement.link.text} <span aria-hidden="true">→</span>
+    </a>
   </div>
 </section>

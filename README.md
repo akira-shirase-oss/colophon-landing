@@ -38,12 +38,16 @@ pinned theme never flashes the other one. It is hash-allowed in `public/_headers
 - **Dark is designed, not inverted:** a warm near-black page, surfaces that step up in lightness, an off-white
   ink, chips re-tinted for the dark surface, code drawn with `github-dark-default` (every token at least
   4.8:1, checked by `npm run check`).
-- **The hero and the CTA are one brand block** (`.brand-block` in `global.css`): a CSS gradient from white at
+- **The hero is a brand block** (`.brand-block` in `global.css`): a CSS gradient from white at
   the top to #0061ff at the bottom, the same in both themes, with navy type and a navy button (AA or better on
   the worst pixel under every word), a hairline edge so the card reads on a white page, and no image at all. The
   hero adds eight quiet navy line icons around the edges that drift and lean away from the pointer (static under
   reduced motion or without JavaScript). The headline and description live in `src/data/hero.ts`, which also
   feeds the page title and the share image's alt text.
+- **The closing statement** (`CTA.astro`) is one sentence in display-size Inter on the page itself, with five
+  original pixel-art illustrations between the words (`ui/PixelArt.astro`: grids of colour letters turned into
+  `<rect>` runs at build time, colours from tokens with dark twins). The words live in `src/data/statement.ts`;
+  each illustration stays on the line with the word before it.
 - **The share image** (`public/og.jpg`) is rendered from the built hero: `npm run build && node scripts/make-og.mjs`
   (needs Playwright, as below). Re-run it after changing the hero, and commit the JPEG.
 - **The footer wordmark** is "Colophon" in Geist Pixel's own cells, like a receipt printer's dots, generated

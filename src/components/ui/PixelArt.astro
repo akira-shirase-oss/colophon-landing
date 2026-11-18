@@ -1,0 +1,143 @@
+---
+/** Small original pixel-art illustrations, drawn as grids of colour letters and turned into <rect> runs at build
+ * time (one path per colour): k outline, b blue, o orange, g green, p pink, c cream, . empty. Every colour is a token (tokens.css, with
+ * a dark twin). Sized in em so it sits on the text line as a word would, and decorative (aria-hidden). */
+type Name = 'pen' | 'people' | 'stamp' | 'receipt' | 'globe'
+type Props = { name: Name; class?: string }
+const { name, class: className } = Astro.props
+
+const ART: Record<Name, string[]> = {
+  pen: [
+    '.........kkk',
+    '........kpppk',
+    '.......kooppk',
+    '......koook.',
+    '.....koook..',
+    '....koook...',
+    '...koook....',
+    '..kcook.....',
+    '.kccck......',
+    '.kckk.......',
+    'kkk.........',
+    '............',
+  ],
+  people: [
+    '..kkk...kkk..',
+    '.kccck.kccck.',
+    '.kccck.kccck.',
+    '..kkk...kkk..',
+    '.............',
+    '..kkk...kkk..',
+    '.kbbbk.kgggk.',
+    'kbbbbbkgggggk',
+    'kbbbbbkgggggk',
+    'kbbbbbkgggggk',
+    'kkkkkkkkkkkkk',
+    '.............',
+  ],
+  stamp: [
+    '....kkkk....',
+    '...kppppk...',
+    '...kppppk...',
+    '....kppk....',
+    '....kppk....',
+    '..kkkkkkkk..',
+    '.kppppppppk.',
+    '.kkkkkkkkkk.',
+    '............',
+    '..bbbbbbbb..',
+    '..bbbbbbbb..',
+    '............',
+  ],
+  receipt: [
+    'kkkkkkkkk',
+    'kccccccck',
+    'kcbbbbcck',
+    'kccccccck',
+    'kcbbbccck',
+    'kccccccck',
+    'kcooooock',
+    'kccccccck',
+    'kccgggcck',
+    'kccccccck',
+    'kckckckck',
+    '.k.k.k.k.',
+  ],
+  globe: [
+    '...kkkkk...',
+    '..kbbggbk..',
+    '.kbgggbbbk.',
+    'kbbgggbbggk',
+    'kbbbggbbggk',
+    'kbbbbbbgggk',
+    'kbggbbbbbbk',
+    'kbgggbbbbbk',
+    '.kgggbbbbk.',
+    '..kbgbbbk..',
+    '...kkkkk...',
+    '...........',
+  ],
+}
+const CLASS: Record<string, string> = { k: 'px-k', b: 'px-b', o: 'px-o', g: 'px-g', p: 'px-p', c: 'px-c' }
+
+const rows = ART[name]
+const width = Math.max(...rows.map((r) => r.length))
+const height = rows.length
+// one path per colour, made of that colour's runs: a handful of elements instead of a rect per run
+const paths = new Map<string, string>()
+rows.forEach((row, y) => {
+  let x = 0
+  while (x < row.length) {
+    const c = row[x]
+    let end = x
+    while (end < row.length && row[end] === c) end++
+    if (CLASS[c]) paths.set(CLASS[c], `${paths.get(CLASS[c]) ?? ''}M${x} ${y}h${end - x}v1h-${end - x}z`)
+    x = end
+  }
+})
+// 0.9em tall, as wide as its grid is in proportion, so the line keeps its height and nothing shifts
+const style = `width: ${((0.9 * width) / height).toFixed(3)}em; height: 0.9em;`
+---
+
+<svg
+  class={`pixel ${className ?? ''}`}
+  viewBox={`0 0 ${width} ${height}`}
+  style={style}
+  aria-hidden="true"
+  focusable="false"
+  shape-rendering="crispEdges"
+>
+  {[...paths].map(([c, d]) => <path class={c} d={d} />)}
+</svg>
+
+<style>
+  .pixel {
+    display: inline-block;
+    vertical-align: -0.1em;
+    overflow: visible;
+    transition: transform 0.2s steps(2, end);
+  }
+  .px-k {
+    fill: var(--c-px-outline);
+  }
+  .px-b {
+    fill: var(--c-px-blue);
+  }
+  .px-o {
+    fill: var(--c-px-orange);
+  }
+  .px-g {
+    fill: var(--c-px-green);
+  }
+  .px-p {
+    fill: var(--c-px-pink);
+  }
+  .px-c {
+    fill: var(--c-px-cream);
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .pixel:hover {
+      transform: translateY(-2px);
+    }
+  }
+</style>

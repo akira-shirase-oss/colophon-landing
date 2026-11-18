@@ -233,6 +233,30 @@ await visit('/', desktop, async (page, report) => {
   if ((await page.evaluate(() => document.documentElement.dataset.theme)) !== 'light') report('with storage blocked, the toggle did not switch to Light')
 }, 'dark')
 
+// The hero title prints at load but is real text from the first moment: in the accessibility tree at once,
+// fully revealed by 1.5 s, and still when motion is reduced.
+{
+  const context = await browser.newContext({ viewport: phone })
+  const page = await context.newPage()
+  await page.goto(origin + '/', { waitUntil: 'commit' })
+  await page.waitForSelector('h1')
+  const tree = await page.locator('h1').ariaSnapshot()
+  const early = await page.evaluate(() => { const h = document.querySelector('h1'); return { print: h.dataset.print, lines: getComputedStyle(h).getPropertyValue('--print-lines') } })
+  interactions++
+  if (!/Know exactly what went live/.test(tree)) problems.push(`/ [hero title]: not in the accessibility tree at load (${tree})`)
+  if (early.print !== 'go') problems.push(`/ [hero title]: the print was not armed (${JSON.stringify(early)})`)
+  await page.waitForTimeout(1500)
+  const later = await page.evaluate(() => getComputedStyle(document.querySelector('h1')).clipPath)
+  if (later !== 'none' && !/inset\(0px\)/.test(later)) problems.push(`/ [hero title]: not fully shown after 1.5 s (clip-path ${later})`)
+  await context.close()
+  const still = await browser.newContext({ viewport: phone, reducedMotion: 'reduce' })
+  const quiet = await still.newPage()
+  await quiet.goto(origin + '/', { waitUntil: 'domcontentloaded' })
+  const s = await quiet.evaluate(() => { const h = document.querySelector('h1'); return { print: h.dataset.print ?? null, anim: getComputedStyle(h).animationName } })
+  if (s.print !== null || s.anim !== 'none') problems.push(`/ [hero title, reduced motion]: it still prints (${JSON.stringify(s)})`)
+  await still.close()
+}
+
 // The footer wordmark prints once when it scrolls into view, and the hero's icons lean away from the pointer.
 // Both are still under reduced motion.
 await visit('/', desktop, async (page, report) => {

@@ -16,6 +16,11 @@ const ICONS = [
   { name: 'shield-check', x: 70, y: 91, s: 38, r: 4, k: 0.45, d: 20, dx: -2, dy: -3, paths: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>' },
   { name: 'undo-2', x: 86, y: 82, s: 52, r: -6, k: 0.75, d: 13, dx: 3, dy: -2, phone: { x: 88, y: 94 }, paths: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/>' },
 ]
+// Prints the title once at load, a pixel row at a time and line after line: it counts the title's lines
+// (before the first paint, so nothing flashes), then arms the shared `print` animation (global.css). The text
+// stays real text throughout; without this script, or with reduced motion, it is simply there.
+const PRINT_TITLE =
+  "var h=document.querySelector('[data-print-title]');if(h&&!matchMedia('(prefers-reduced-motion: reduce)').matches){var s=getComputedStyle(h),n=Math.max(1,Math.round(h.offsetHeight/parseFloat(s.lineHeight)));h.style.setProperty('--print-lines',n);h.style.setProperty('--print-steps',n*parseInt(s.getPropertyValue('--print-rows')||'29'));h.dataset.print='go'}"
 const place = (i: (typeof ICONS)[number]) =>
   `--x: ${i.x}%; --y: ${i.y}%; --s: ${i.s}px; --r: ${i.r}deg; --k: ${i.k}; --d: ${i.d}s; --dx: ${i.dx}px; --dy: ${i.dy}px;` +
   (i.phone ? ` --px-x: ${i.phone.x}%; --px-y: ${i.phone.y}%;` : '')
@@ -44,7 +49,8 @@ const place = (i: (typeof ICONS)[number]) =>
       }
     </div>
     <div class={styles.title}>
-      <h1 class={`t-hero ${styles.headline}`}>{hero.headline}</h1>
+      <h1 class={`t-hero ${styles.headline}`} data-print-title>{hero.headline}</h1>
+      <script is:inline set:html={PRINT_TITLE} />
       <p class={`t-body ${styles.sub}`}>{hero.description}</p>
       <ArrowButton href="https://github.com/akira-shirase-oss/colophon-cms" variant="onBrand">See the source</ArrowButton>
     </div>
