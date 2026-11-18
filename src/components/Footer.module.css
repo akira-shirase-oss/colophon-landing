@@ -9,7 +9,7 @@
 }
 .inner {
   width: 100%;
-  max-width: 1240px;
+  max-width: 1380px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -17,6 +17,12 @@
   border-radius: 24px;
   background: var(--c-surface);
   overflow: hidden;
+}
+/* The panel is as wide as the hero card (1380); its content keeps the page's column. */
+.inner > * {
+  width: 100%;
+  max-width: 1176px;
+  align-self: center;
 }
 .top {
   position: relative;
