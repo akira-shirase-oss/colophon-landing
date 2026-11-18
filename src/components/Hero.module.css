@@ -2,13 +2,13 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 20px;
+  padding: var(--panel-inset) var(--panel-inset) 0;
   background: var(--c-bg);
 }
 .card {
   position: relative;
   width: 100%;
-  max-width: 1380px;
+  max-width: var(--panel-max);
   height: 619px;
   display: flex;
   align-items: center;
@@ -113,7 +113,7 @@
 }
 @media (max-width: 809px) {
   .hero {
-    padding: 100px 16px 20px;
+    padding: 100px var(--panel-inset) 0;
   }
   .card {
     height: auto;

@@ -317,6 +317,25 @@ for (const path of ['/', '/blog/', pages.find((p) => p.startsWith('/blog/') && p
   })
 }
 
+// The home page's layout system: the header and every section's content column start at the same x (within 1 px), and every
+// gap between consecutive sections (hero card, integrations, features, FAQ, statement, footer panel) is the
+// same (within 4 px), at desktop and phone widths.
+for (const viewport of [desktop, phone, { width: 360, height: 780 }]) {
+  await visit('/', viewport, async (page, report) => {
+    interactions++
+    const m = await page.evaluate(() => {
+      const sections = [...document.querySelectorAll('main > section')]
+      const panel = document.querySelector('footer > div')
+      const boxes = [sections[0].firstElementChild, ...sections.slice(1), panel].map((e) => e.getBoundingClientRect())
+      const gaps = boxes.slice(1).map((b, i) => Math.round(b.top - boxes[i].bottom))
+      const lefts = [document.querySelector('header nav > div'), ...sections.slice(1).map((s) => s.firstElementChild), panel.firstElementChild].map((e) => Math.round(e.getBoundingClientRect().left))
+      return { gaps, lefts }
+    })
+    if (Math.max(...m.lefts) - Math.min(...m.lefts) > 1) report(`home sections start at different x: ${m.lefts.join(', ')}`)
+    if (Math.max(...m.gaps) - Math.min(...m.gaps) > 4) report(`home section gaps differ: ${m.gaps.join(', ')}`)
+  })
+}
+
 await visit('/blog/', phone, async (page, report) => {
   await page.locator('[data-nav-toggle]').click()
   await expectAttr(page, report, '[data-nav-toggle]', 'aria-expanded', 'true')
