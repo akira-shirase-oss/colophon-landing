@@ -115,7 +115,11 @@
     width: 100%;
     height: auto;
   }
+  /* on a phone the cards keep their questions to one line where they can: a step smaller type, a step less padding */
+  .item {
+    padding: 16px;
+  }
   .question :global(.t-h5) {
-    font-size: 18px;
+    font-size: 17px;
   }
 }
