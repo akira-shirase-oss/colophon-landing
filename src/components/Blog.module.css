@@ -168,9 +168,14 @@
   overflow-x: auto;
   padding: 16px 20px;
   border-radius: 12px;
-  background: var(--c-surface) !important;
+  background: var(--c-surface);
+  color: var(--c-ink);
   font-size: 15px;
   line-height: 1.55;
+}
+/* Each token's colour comes from the theme drawn for this light surface (astro.config.mjs). */
+.prose :global(pre span) {
+  color: var(--shiki-light);
 }
 .prose :global(pre code) {
   padding: 0;

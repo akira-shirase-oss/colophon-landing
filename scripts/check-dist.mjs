@@ -18,6 +18,8 @@
 //          its dates and author; the sitemap lists exactly the indexable pages and the feed every post.
 // jsonld   every JSON-LD block is valid JSON with no "<" in it, so its data can't end the script
 //          (`</script>`) or swallow the rest of the page (`<!--`).
+// code     every highlighted code block is coloured through the theme variables (--shiki-light), never
+//          a fixed colour, and every token reaches WCAG AA (4.5:1) on the code surface (--c-surface).
 // redirects dist/_redirects matches public/_redirects; every rule is a permanent redirect from a plain
 //          path that is no longer built to a built page, never to another rule's source; a retired post
 //          address has a rule for both spellings (with and without the trailing slash); and no page, the
@@ -586,6 +588,46 @@ function checkRedirects() {
 }
 
 // ---------------------------------------------------------------------------------------------
+// code: highlighted code stays readable on the surface it is drawn on
+
+const luminance = (hex) => {
+  const h = hex.replace('#', '')
+  const full = h.length === 3 ? [...h].map((c) => c + c).join('') : h
+  return [0, 2, 4]
+    .map((i) => parseInt(full.slice(i, i + 2), 16) / 255)
+    .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
+    .reduce((sum, v, i) => sum + v * [0.2126, 0.7152, 0.0722][i], 0)
+}
+const contrast = (a, b) => {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x)
+  return (hi + 0.05) / (lo + 0.05)
+}
+
+function checkCode() {
+  const surface = css.map((sheet) => sheet.text.match(/--c-surface:\s*(#[0-9a-f]{3,6})\b/i)?.[1]).find(Boolean)
+  if (!surface) return void fail('code', 'no --c-surface colour in the built CSS, so the code surface is unknown')
+  let tokens = 0
+  for (const page of html) {
+    const blocks = page.text.match(/<pre class="astro-code[\s\S]*?<\/pre>/g) ?? []
+    for (const block of blocks) {
+      for (const m of block.matchAll(/style="([^"]*)"/g)) {
+        const style = m[1]
+        if (/(^|;)\s*color\s*:/i.test(style)) {
+          fail('code', `${page.file}: a code token has a fixed colour (${style.slice(0, 60)}); use the theme variables`)
+          continue
+        }
+        const light = style.match(/--shiki-light:\s*(#[0-9a-f]{3,6})\b/i)?.[1]
+        if (!light) continue
+        tokens++
+        const ratio = contrast(light, surface)
+        if (ratio < 4.5) fail('code', `${page.file}: code token ${light} is ${ratio.toFixed(2)}:1 on the code surface ${surface} (AA wants 4.5)`)
+      }
+    }
+  }
+  return tokens
+}
+
+// ---------------------------------------------------------------------------------------------
 
 checkHeaders()
 const namesScanned = checkLeaks()
@@ -595,6 +637,7 @@ const linksChecked = checkInternalLinks()
 const seo = checkSeo()
 const jsonLdBlocks = checkJsonLd()
 const redirectRules = checkRedirects()
+const codeTokens = checkCode()
 
 if (failures.length) {
   console.error(`check-dist: ${failures.length} failure(s) in ${dist}\n`)
@@ -608,4 +651,5 @@ console.log(`  drafts   ok: ${draftCount} draft post(s), none built, linked or n
 console.log(`  links    ok: every target="_blank" link has noopener or noreferrer; ${linksChecked} same-origin links resolve`)
 console.log(`  seo      ok: titles, descriptions, one h1, canonicals, share cards, alt; ${seo.indexable} pages in the sitemap, ${seo.posts} posts in the feed`)
 console.log(`  jsonld   ok: ${jsonLdBlocks} JSON-LD blocks, all valid JSON with no "<"`)
+console.log(`  code     ok: ${codeTokens} code tokens coloured by the theme, all at AA on the code surface`)
 console.log(`  redirects ok: ${redirectRules} permanent redirects to built pages; nothing links to a retired address`)
