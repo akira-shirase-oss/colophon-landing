@@ -1,3 +1,5 @@
+@import './tokens.css';
+
 /* ---------- Fonts (self-hosted copies of the source's files) ---------- */
 @font-face {
   font-family: 'DM Sans';
@@ -52,23 +54,11 @@
   font-display: swap;
 }
 
-/* ---------- Tokens ---------- */
+/* ---------- Tokens (colours live in tokens.css) ---------- */
 :root {
   --font-display: 'DM Sans', sans-serif;
   --font-body: 'Geist', sans-serif;
   --font-quote: 'Inter', sans-serif;
-
-  /* Palette: black is primary, white is secondary; greys are neutral tints between them. */
-  --c-bg: #ffffff;
-  --c-surface: #f2f2f2;
-  --c-ink: #000000;
-  --c-text: #5e5e5e;
-  --c-muted: #8c8c8c;
-  --c-faint: #e5e5e5;
-  --c-line: #dedede;
-  --c-dash: #d4d4d4;
-  --c-shadow: #ebebeb;
-  --c-accent: #000000;
 
   /* One easing curve for every transition; --spring is kept as an alias for older rules */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -162,7 +152,7 @@ figcaption {
   font-size: 68px;
   line-height: 1.05;
   font-weight: 600;
-  color: #fff;
+  color: var(--c-on-image);
 }
 .t-h2 {
   font-family: var(--font-display);

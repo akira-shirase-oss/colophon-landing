@@ -8,10 +8,10 @@
 }
 .primary {
   background: var(--c-ink);
-  color: #fff;
+  color: var(--c-on-ink);
 }
 .secondary {
-  background: #fff;
+  background: var(--c-on-ink);
   color: var(--c-ink);
 }
 .block {
@@ -81,17 +81,17 @@
   transform: translateY(-17px);
 }
 
-/* Black / white scheme: primary = black pill, white square, black arrow;
-   secondary = white pill, black square, white arrow. */
+/* Ink / paper scheme, which swaps with the theme: primary = ink pill, paper square, ink arrow;
+   secondary = paper pill, ink square, paper arrow. */
 .primary .square {
-  background: #fff;
+  background: var(--c-on-ink);
 }
 .primary .arrow {
-  background: #000;
+  background: var(--c-ink);
 }
 .secondary .square {
-  background: #000;
+  background: var(--c-ink);
 }
 .secondary .arrow {
-  background: #fff;
+  background: var(--c-on-ink);
 }

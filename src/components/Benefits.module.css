@@ -24,8 +24,8 @@
   align-items: flex-start;
   padding: 36px;
   border-radius: 24px;
-  background: #fafafa;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.012);
+  background: var(--c-raised);
+  box-shadow: inset 0 0 0 1px var(--c-card-edge);
   transition:
     background-color 0.15s var(--ease),
     box-shadow 0.15s var(--ease),
@@ -47,12 +47,12 @@
   justify-content: center;
   flex-shrink: 0;
   border-radius: 8px;
-  background: linear-gradient(180deg, #f6f6f6 0%, #efefef 100%);
-  color: #0a0a0a;
+  background: linear-gradient(180deg, var(--c-tile-top) 0%, var(--c-tile-bottom) 100%);
+  color: var(--c-tile-ink);
   box-shadow:
-    0 1px 1px rgba(0, 0, 0, 0.06),
-    0 2px 6px -1px rgba(0, 0, 0, 0.07),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    0 1px 1px var(--c-tile-drop),
+    0 2px 6px -1px var(--c-tile-spread),
+    inset 0 1px 0 var(--c-tile-highlight);
 }
 
 .body {
@@ -82,7 +82,7 @@
   font-size: 14px;
   line-height: 1;
   font-weight: 400;
-  color: #1f1f1f;
+  color: var(--c-chip-ink);
   background: var(--tint);
 }
 .dot {
@@ -93,34 +93,34 @@
   box-shadow: 0 0 0 var(--ring-w, 3px) var(--ring);
 }
 .blue {
-  --tone: #2f64e8;
-  --ring: #c9d8fb;
-  --tint: #eef2fc;
+  --tone: var(--c-blue);
+  --ring: var(--c-blue-ring);
+  --tint: var(--c-blue-tint);
 }
 .green {
-  --tone: #3fb24f;
-  --ring: #d0eed4;
-  --tint: #edf7ee;
+  --tone: var(--c-green);
+  --ring: var(--c-green-ring);
+  --tint: var(--c-green-tint);
 }
 .pink {
-  --tone: #e04a8f;
-  --ring: #f7cfe1;
-  --tint: #fcedf3;
+  --tone: var(--c-pink);
+  --ring: var(--c-pink-ring);
+  --tint: var(--c-pink-tint);
 }
 /* soft variants: a lighter, smaller dot with no ring */
 .blueSoft {
-  --tone: #7d9ff0;
+  --tone: var(--c-blue-soft);
   --ring: transparent;
   --ring-w: 0px;
   --dot: 8px;
-  --tint: #eef2fc;
+  --tint: var(--c-blue-tint);
 }
 .pinkSoft {
-  --tone: #ee8cb9;
+  --tone: var(--c-pink-soft);
   --ring: transparent;
   --ring-w: 0px;
   --dot: 8px;
-  --tint: #fcedf3;
+  --tint: var(--c-pink-tint);
 }
 
 /* ---------- Motion ---------- */
@@ -128,8 +128,8 @@
 /* hover: a quiet surface step, nothing moves */
 @media (hover: hover) {
   .card:hover {
-    background: #f4f4f4;
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+    background: var(--c-raised-hover);
+    box-shadow: inset 0 0 0 1px var(--c-card-edge-hover);
   }
 }
 

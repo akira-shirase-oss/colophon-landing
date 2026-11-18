@@ -1,24 +1,142 @@
 ---
-/** Oversized, soft-gradient wordmark that sits behind the footer's legal line. */
+/** The oversized "Colophon" behind the footer's legal line. Decorative (aria-hidden): the name is already in
+ * the footer. Three treatments, chosen at build time with WORDMARK (default `plain`):
+ *
+ * - `plain`   a faint tone on the footer panel, as it has always been.
+ * - `receipt` a colophon is the printer's note on how a book was made; Colophon's promise is a receipt for
+ *             every publish. The letters are filled with tiny receipt lines, set in monospace, tone on tone.
+ * - `type`    the letters as letterpress sorts, each pressed slightly into the panel. When the footer first
+ *             comes into view they settle one after another, like type being set (under 600 ms, once; still
+ *             when motion is reduced, and still without JavaScript). The script lives in Footer.astro.
+ */
 type Props = { class?: string }
 const { class: className } = Astro.props
+const variant = (process.env.WORDMARK ?? 'plain') as 'plain' | 'receipt' | 'type'
+
+// Where each letter sits in the 1240-wide word, measured once from DM Sans 600 at 360px squeezed to 1240.
+const SORTS = [
+  { c: 'C', x: 0, w: 195 },
+  { c: 'o', x: 194.9, w: 161.2 },
+  { c: 'l', x: 356.1, w: 67.6 },
+  { c: 'o', x: 423.7, w: 161.1 },
+  { c: 'p', x: 584.8, w: 172.1 },
+  { c: 'h', x: 756.9, w: 161.1 },
+  { c: 'o', x: 918, w: 161.1 },
+  { c: 'n', x: 1079.1, w: 160.9 },
+]
+
+// Receipt lines that fill the letters: what Colophon's own release receipts say, in its words.
+const RECEIPTS = [
+  'Release 12 · 18 Nov 2026 · 3 entries went live · reached 2 sites · verified',
+  'Release 13 · 18 Nov 2026 · 1 entry taken down · reached 2 sites · verified',
+  'Release 14 · 19 Nov 2026 · 5 entries went live · reached 1 of 2 sites · pending',
+  'Release 15 · 19 Nov 2026 · rollback to 12 · 3 entries restored · verified',
+  'Release 16 · 20 Nov 2026 · 2 entries went live · scheduled 09:00 UTC · verified',
+]
+const LINE = 13
+const ROWS = 27
 ---
 
-<svg class={className} viewBox="0 0 1240 347" preserveAspectRatio="none" aria-hidden="true">
-  <defs>
-    <linearGradient id="wordmark-fill" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ebebeb"></stop>
-      <stop offset="1" stop-color="#e2e2e2"></stop>
-    </linearGradient>
-  </defs>
-  <text
-    x="0"
-    y="262"
-    textLength="1240"
-    lengthAdjust="spacingAndGlyphs"
-    fill="url(#wordmark-fill)"
-    font-family="DM Sans, sans-serif"
-    font-weight="700"
-    font-size="360">Colophon</text
-  >
-</svg>
+{
+  variant === 'plain' && (
+    <svg class={className} viewBox="0 0 1240 347" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="wordmark-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" style="stop-color: var(--c-wordmark-top)" />
+          <stop offset="1" style="stop-color: var(--c-wordmark-bottom)" />
+        </linearGradient>
+      </defs>
+      <text
+        x="0"
+        y="262"
+        textLength="1240"
+        lengthAdjust="spacingAndGlyphs"
+        fill="url(#wordmark-fill)"
+        font-family="DM Sans, sans-serif"
+        font-weight="700"
+        font-size="360"
+      >
+        Colophon
+      </text>
+    </svg>
+  )
+}
+{
+  variant === 'receipt' && (
+    <svg class={className} viewBox="0 0 1240 347" preserveAspectRatio="none" aria-hidden="true" data-wordmark="receipt">
+      <defs>
+        <pattern id="wordmark-receipts" patternUnits="userSpaceOnUse" x="0" y="0" width="1240" height={LINE * ROWS}>
+          <rect width="1240" height={LINE * ROWS} style="fill: var(--c-wordmark-top)" />
+          <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" style="fill: var(--c-wordmark-type)">
+            {Array.from({ length: ROWS }, (_, row) => (
+              <text x={-((row * 97) % 380)} y={LINE * row + 10}>
+                {[0, 1, 2].map((k) => RECEIPTS[(row + k) % RECEIPTS.length]).join('   ·   ')}
+              </text>
+            ))}
+          </g>
+        </pattern>
+      </defs>
+      <text
+        x="0"
+        y="262"
+        textLength="1240"
+        lengthAdjust="spacingAndGlyphs"
+        fill="url(#wordmark-receipts)"
+        font-family="DM Sans, sans-serif"
+        font-weight="600"
+        font-size="360"
+      >
+        Colophon
+      </text>
+    </svg>
+  )
+}
+{
+  variant === 'type' && (
+    <svg class={className} viewBox="0 0 1240 347" preserveAspectRatio="none" aria-hidden="true" data-wordmark="type">
+      <defs>
+        {/* Pressed in: a shade along the top-left inner edge and a catch of light along the bottom-right. */}
+        <filter id="wordmark-press" x="-5%" y="-5%" width="110%" height="110%">
+          <feFlood style="flood-color: var(--c-wordmark-shade)" result="shade" />
+          <feComposite in="shade" in2="SourceAlpha" operator="out" result="outside" />
+          <feOffset in="outside" dx="5" dy="6" result="down" />
+          <feGaussianBlur in="down" stdDeviation="3" result="soft" />
+          <feComposite in="soft" in2="SourceAlpha" operator="in" result="inner" />
+          <feFlood style="flood-color: var(--c-wordmark-catch)" result="light" />
+          <feComposite in="light" in2="SourceAlpha" operator="out" result="outside2" />
+          <feOffset in="outside2" dx="-3" dy="-3" result="up" />
+          <feGaussianBlur in="up" stdDeviation="1.5" result="soft2" />
+          <feComposite in="soft2" in2="SourceAlpha" operator="in" result="catch" />
+          <feMerge>
+            <feMergeNode in="SourceGraphic" />
+            <feMergeNode in="inner" />
+            <feMergeNode in="catch" />
+          </feMerge>
+        </filter>
+      </defs>
+      <g filter="url(#wordmark-press)" font-family="DM Sans, sans-serif" font-weight="600" font-size="360" style="fill: var(--c-wordmark-top)">
+        {SORTS.map((s, i) => (
+          <text x={s.x} y="262" textLength={s.w} lengthAdjust="spacingAndGlyphs" class="sort" style={`--i: ${i}`}>
+            {s.c}
+          </text>
+        ))}
+      </g>
+    </svg>
+  )
+}
+
+<style>
+  /* Type being set: each sort drops the last few pixels into place, one after another. Only when the
+     footer's script has armed it (so the letters are visible without JavaScript) and motion is allowed. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global([data-wordmark='type'][data-set='armed']) .sort {
+      opacity: 0;
+      transform: translateY(-18px);
+    }
+    :global([data-wordmark='type'][data-set='go']) .sort {
+      transition:
+        transform 0.2s cubic-bezier(0.3, 1.4, 0.5, 1) calc(var(--i) * 48ms),
+        opacity 0.12s linear calc(var(--i) * 48ms);
+    }
+  }
+</style>

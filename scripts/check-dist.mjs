@@ -18,8 +18,9 @@
 //          its dates and author; the sitemap lists exactly the indexable pages and the feed every post.
 // jsonld   every JSON-LD block is valid JSON with no "<" in it, so its data can't end the script
 //          (`</script>`) or swallow the rest of the page (`<!--`).
-// code     every highlighted code block is coloured through the theme variables (--shiki-light), never
-//          a fixed colour, and every token reaches WCAG AA (4.5:1) on the code surface (--c-surface).
+// code     every highlighted code block is coloured through the theme variables (--shiki-light and
+//          --shiki-dark), never a fixed colour; every token reaches WCAG AA (4.5:1) on the light code
+//          surface (--c-surface) and 4.8:1 on the dark one.
 // redirects dist/_redirects matches public/_redirects; every rule is a permanent redirect from a plain
 //          path that is no longer built to a built page, never to another rule's source; a retired post
 //          address has a rule for both spellings (with and without the trailing slash); and no page, the
@@ -604,8 +605,13 @@ const contrast = (a, b) => {
 }
 
 function checkCode() {
+  // The light surface is the first --c-surface; the dark one is the one set for :root[data-theme=dark].
   const surface = css.map((sheet) => sheet.text.match(/--c-surface:\s*(#[0-9a-f]{3,6})\b/i)?.[1]).find(Boolean)
   if (!surface) return void fail('code', 'no --c-surface colour in the built CSS, so the code surface is unknown')
+  const darkSurface = css
+    .map((sheet) => sheet.text.match(/:root\[data-theme=["']?dark["']?\]\s*{[^}]*--c-surface:\s*(#[0-9a-f]{3,6})\b/i)?.[1])
+    .find(Boolean)
+  if (!darkSurface) return void fail('code', 'no dark --c-surface in the built CSS, so the dark code surface is unknown')
   let tokens = 0
   for (const page of html) {
     const blocks = page.text.match(/<pre class="astro-code[\s\S]*?<\/pre>/g) ?? []
@@ -617,10 +623,16 @@ function checkCode() {
           continue
         }
         const light = style.match(/--shiki-light:\s*(#[0-9a-f]{3,6})\b/i)?.[1]
+        const dark = style.match(/--shiki-dark:\s*(#[0-9a-f]{3,6})\b/i)?.[1]
         if (!light) continue
         tokens++
-        const ratio = contrast(light, surface)
-        if (ratio < 4.5) fail('code', `${page.file}: code token ${light} is ${ratio.toFixed(2)}:1 on the code surface ${surface} (AA wants 4.5)`)
+        if (!dark) fail('code', `${page.file}: code token ${light} has no dark colour (--shiki-dark)`)
+        // AA is 4.5:1; small monospace loses some to anti-aliasing, so the dark theme keeps a margin.
+        for (const [colour, ground, floor, name] of [[light, surface, 4.5, 'light'], [dark, darkSurface, 4.8, 'dark']]) {
+          if (!colour) continue
+          const ratio = contrast(colour, ground)
+          if (ratio < floor) fail('code', `${page.file}: ${name} code token ${colour} is ${ratio.toFixed(2)}:1 on the ${name} code surface ${ground} (want ${floor})`)
+        }
       }
     }
   }
@@ -651,5 +663,5 @@ console.log(`  drafts   ok: ${draftCount} draft post(s), none built, linked or n
 console.log(`  links    ok: every target="_blank" link has noopener or noreferrer; ${linksChecked} same-origin links resolve`)
 console.log(`  seo      ok: titles, descriptions, one h1, canonicals, share cards, alt; ${seo.indexable} pages in the sitemap, ${seo.posts} posts in the feed`)
 console.log(`  jsonld   ok: ${jsonLdBlocks} JSON-LD blocks, all valid JSON with no "<"`)
-console.log(`  code     ok: ${codeTokens} code tokens coloured by the theme, all at AA on the code surface`)
+console.log(`  code     ok: ${codeTokens} code tokens coloured by the theme, all at AA on the light and dark code surfaces`)
 console.log(`  redirects ok: ${redirectRules} permanent redirects to built pages; nothing links to a retired address`)

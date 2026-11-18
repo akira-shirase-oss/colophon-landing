@@ -72,8 +72,8 @@
 .draft {
   padding: 2px 8px;
   border-radius: 6px;
-  background: #fff4d6;
-  color: #6b4e00;
+  background: var(--c-draft-bg);
+  color: var(--c-draft-ink);
 }
 
 /* ---------- Post ---------- */
@@ -108,7 +108,7 @@
   font-family: var(--font-body);
   font-size: 18px;
   line-height: 1.65;
-  color: #2b2b2b;
+  color: var(--c-prose);
 }
 .prose :global(:where(p, ul, ol, blockquote, pre, table, figure)) {
   margin-bottom: 24px;
@@ -133,7 +133,7 @@
 .prose :global(a) {
   color: var(--c-ink);
   text-decoration: underline;
-  text-decoration-color: #bdbdbd;
+  text-decoration-color: var(--c-underline);
   text-underline-offset: 3px;
 }
 .prose :global(a:hover) {
@@ -173,9 +173,18 @@
   font-size: 15px;
   line-height: 1.55;
 }
-/* Each token's colour comes from the theme drawn for this light surface (astro.config.mjs). */
+/* Each token's colour comes from the theme drawn for the surface it sits on (astro.config.mjs): the light
+   theme by default, the dark one wherever the dark tokens apply (the same two conditions as tokens.css). */
 .prose :global(pre span) {
   color: var(--shiki-light);
+}
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme='light'])) .prose :global(pre span) {
+    color: var(--shiki-dark);
+  }
+}
+:global(:root[data-theme='dark']) .prose :global(pre span) {
+  color: var(--shiki-dark);
 }
 .prose :global(pre code) {
   padding: 0;
@@ -254,7 +263,7 @@
 .status a {
   color: var(--c-ink);
   text-decoration: underline;
-  text-decoration-color: #bdbdbd;
+  text-decoration-color: var(--c-underline);
   text-underline-offset: 3px;
 }
 

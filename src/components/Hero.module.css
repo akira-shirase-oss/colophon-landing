@@ -15,35 +15,58 @@
   justify-content: center;
   border-radius: 24px;
   overflow: clip;
+  isolation: isolate;
 }
-/* The painting is stretched to a fixed box and shown at 1.5x. It stays still while the page scrolls. */
-.bg {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  /* sized from the card like the source: desktop card − 409px */
-  width: max(calc(100% - 409px), calc(100% / 1.49));
-  height: 526px;
-  transform: translate(-50%, -50%) scale(1.5);
-  /* cover keeps the painting's proportions in every box shape */
-  background: url('/images/hero.webp') 55% center / cover no-repeat;
-  will-change: transform;
-}
-.overlay {
+
+/* A sunset sky in layers, top layer first: the sun's glow low on the left, three long cloud bands lit
+   from below, and the sky itself from dusty rose overhead through apricot to lavender at the horizon.
+   Dark mode swaps every colour for a dusk (tokens.css): the glow is nearly gone, an ember line holds
+   the horizon. No image is downloaded. */
+.sky {
   position: absolute;
   inset: 0;
-  background: var(--c-ink);
-  opacity: 0.15;
+  background:
+    radial-gradient(18% 24% at 19% 42%, var(--c-sun) 0%, var(--c-sun-halo) 38%, var(--c-sky-clear) 100%),
+    radial-gradient(48% 40% at 19% 46%, var(--c-sun-wash) 0%, var(--c-sky-clear) 100%),
+    radial-gradient(42% 3.2% at 30% 30%, var(--c-cloud) 0%, var(--c-sky-clear) 100%),
+    radial-gradient(36% 2.6% at 70% 22%, var(--c-cloud) 0%, var(--c-sky-clear) 100%),
+    radial-gradient(52% 3.6% at 56% 44%, var(--c-cloud-low) 0%, var(--c-sky-clear) 100%),
+    radial-gradient(70% 10% at 40% 76%, var(--c-ember) 0%, var(--c-sky-clear) 100%),
+    linear-gradient(
+      180deg,
+      var(--c-sky-top) 0%,
+      var(--c-sky-high) 30%,
+      var(--c-sky-glow) 55%,
+      var(--c-sky-low) 72%,
+      var(--c-sky-horizon) 88%
+    );
 }
-/* Soft scrim behind the headline so white text holds on bright paintings. */
-.card::before {
-  content: '';
+/* Two low hills along the bottom edge, so it reads as a landscape rather than a gradient. */
+.hills {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 22%;
+}
+.hillFar {
+  fill: var(--c-hill-far);
+}
+.hillNear {
+  fill: var(--c-hill-near);
+}
+/* Fine grain, so the sky feels painted and its long gradients never band. */
+.grain {
   position: absolute;
   inset: 0;
-  z-index: 1;
-  background: radial-gradient(ellipse 36% 30% at 50% 52%, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 100%);
+  width: 100%;
+  height: 100%;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: overlay;
   pointer-events: none;
 }
+
 .title {
   position: relative;
   z-index: 2;
@@ -57,18 +80,17 @@
 .title h1 {
   width: 660px;
 }
+.headline {
+  color: var(--c-on-sky);
+}
 .sub {
   max-width: 420px;
-  color: #fff;
+  color: var(--c-on-sky-soft);
 }
 
 @media (max-width: 1199px) {
   .card {
     max-width: none;
-  }
-  .bg {
-    width: calc((100% - 254px) * 1.2);
-    height: 700px;
   }
   .title {
     width: 100%;
@@ -81,11 +103,10 @@
   }
   .card {
     height: auto;
-    padding: 120px 20px;
+    padding: 120px 20px 140px;
   }
-  .bg {
-    width: calc((100% - 118px) * 1.2);
-    height: 700px;
+  .hills {
+    height: 96px;
   }
   .title h1 {
     width: 100%;

@@ -26,6 +26,7 @@
   display: flex;
   align-items: center;
   padding: 10px 0;
+  margin-right: auto;
 }
 .logo img {
   border-radius: 4px;
@@ -53,6 +54,45 @@
   background: var(--c-ink);
 }
 
+/* Theme switch: three small segments on a quiet track. It stays invisible (its space kept, so nothing
+   shifts) until the script that makes it work has run. */
+.theme {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  margin-left: 16px;
+  border-radius: 8px;
+  background: var(--c-switch-bg);
+  visibility: hidden;
+}
+.theme[data-ready] {
+  visibility: visible;
+}
+.themeOption {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--c-text);
+  transition:
+    color 0.2s var(--ease),
+    background-color 0.2s var(--ease);
+}
+.themeOption:hover {
+  color: var(--c-ink);
+}
+.themeOption[aria-checked='true'] {
+  background: var(--c-switch-on);
+  color: var(--c-ink);
+  box-shadow: 0 1px 2px var(--c-switch-shadow);
+}
+.themeOption:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 1px;
+}
+
 .burger,
 .mobileMenu {
   display: none;
@@ -75,6 +115,14 @@
   }
   .menu {
     display: none;
+  }
+  .theme {
+    margin-right: 16px;
+    padding: 1px;
+  }
+  .themeOption {
+    width: 30px;
+    height: 30px;
   }
   .burger {
     display: flex;
