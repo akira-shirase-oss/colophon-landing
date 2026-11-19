@@ -1,4 +1,5 @@
 ---
+import Badge from './ui/Badge.astro'
 import Button from './ui/Button.astro'
 import MaskIcon from './ui/MaskIcon.astro'
 import { jsonLd } from '../lib/json-ld'
@@ -39,7 +40,7 @@ const faq = {
   <div class={styles.inner}>
     <div class={styles.left}>
       <div class={styles.titleBadge}>
-        <p class={styles.kicker}>FAQ</p>
+        <Badge as="p" tone="brand">FAQ</Badge>
         <h2 class={styles.h2}>
           Questions
           <br />
