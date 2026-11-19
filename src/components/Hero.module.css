@@ -88,12 +88,16 @@
 .headline {
   color: var(--hero-fg);
 }
-/* The two actions: side by side, centred, 12px apart (they fit side by side at 390 too: measured) */
+/* The two actions: side by side, centred, 12px apart. At 390 the pair needs 323px on macOS and 327px on Linux,
+   whose text rendering is a pixel or two wider per label, while the hero's content box is 326px, so on Linux
+   they wrapped and sat off centre. The row may reach 12px into the hero's 32px side padding: still centred,
+   nothing moves where they already fitted, and they still wrap on a genuinely narrow screen. */
 .actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 12px;
+  margin-inline: -12px;
 }
 /* 17.5px on a phone, growing to 20px from about 1024px wide */
 .sub {

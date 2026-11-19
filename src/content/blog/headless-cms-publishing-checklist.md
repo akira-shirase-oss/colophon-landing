@@ -69,3 +69,5 @@ The changelog keeps the rest in its [known limitations](https://github.com/akira
 ## Where to go next
 
 The words used above, such as changeset, release, receipt and tombstone, are defined in plain terms in the [headless CMS glossary](/blog/headless-cms-glossary/). To build a site on Colophon, start with [using Colophon as a headless CMS for Astro](/blog/astro-headless-cms/). To weigh it against the usual choices, read the comparisons with [Strapi](/blog/colophon-vs-strapi/), [Payload](/blog/colophon-vs-payload/) and [Directus](/blog/colophon-vs-directus/).
+
+The same ideas, in the words the Studio and the API use, are in the docs' [core concepts](https://docs.colophon.404human.dev/concepts/).

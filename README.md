@@ -110,7 +110,14 @@ Authors) and `public/fonts/OFL-Inter.txt` (© 2020 The Inter Project Authors).
 
 `public/_headers` holds the headers Cloudflare Pages sends with every response: a Content-Security-Policy,
 HSTS, nosniff, `X-Frame-Options`, Referrer-Policy, Permissions-Policy and COOP. The policy allows only the
-site's own files plus a SHA-256 hash for each inline script.
+site's own files plus a SHA-256 hash for each inline script, and one third party: Cloudflare Web Analytics.
+Cloudflare adds its beacon to every page. It sets no cookies and gives page views and real-user Core Web
+Vitals, which search needs and lab tests can't give. The policy allows exactly its script origin
+(`https://static.cloudflareinsights.com`) and where it reports (`'self'`, since on this proxied site it posts to
+`/cdn-cgi/rum`, and `https://cloudflareinsights.com`). `npm run check` fails on any other origin
+(`scripts/csp-rules.mjs`). No other analytics, tag managers or pixels. JSON-LD blocks need no hash: they are
+data the browser never runs. The exemption covers only an exact `type="application/ld+json"`, and any other
+unknown script type fails the check.
 
 ```bash
 npm test                 # unit tests: JSON-LD output can't leave its <script> element; no colour
@@ -141,7 +148,8 @@ is not a dependency here; see the top of `scripts/check-csp-browser.mjs`.
 
 `.github/workflows/ci.yml` runs on every push, every pull request and daily: workflow hygiene
 (`scripts/check-workflows.mjs`), `npm ci`, `npm audit --omit=dev --audit-level=moderate`, lint, `npm test`, the
-build and `npm run check`. Dependabot proposes one grouped npm PR and one grouped Actions PR a week.
+build and `npm run check`; then, in a second job with a pinned Playwright, `check-csp-browser.mjs --mutate`
+(which must fail) and `npm run check:browser`. Dependabot proposes one grouped npm PR and one grouped Actions PR a week.
 
 ## License
 

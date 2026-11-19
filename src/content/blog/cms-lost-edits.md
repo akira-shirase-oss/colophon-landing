@@ -66,3 +66,4 @@ Publishing has the same kind of protection as saving, which is the subject of [s
 - **Unsent typing on a lost device.** If a laptop dies before the browser stores the edit, that edit is gone. The guarantee starts when the server acknowledges a save.
 - **The whole-system crash demo.** A recorded run that kills the server and worker at random during saves and publishes, then checks that nothing was lost or doubled, is on the list for version 0.1. It isn't recorded yet. What is recorded, including a server killed behind a load balancer with no acknowledged write lost, is in [Colophon's load tests, with the caveats](/blog/load-testing-a-cms/).
 
+What each saving state means in the Studio is in the docs' [writing and autosave](https://docs.colophon.404human.dev/studio/writing/); `If-Match` and idempotency keys for scripts are in [the management API](https://docs.colophon.404human.dev/api/management/).

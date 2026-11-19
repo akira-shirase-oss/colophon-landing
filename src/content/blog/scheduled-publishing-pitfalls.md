@@ -64,3 +64,4 @@ Cancelling a schedule waits for a run already in progress and never undoes a rel
 - **No crash test for the scheduler itself yet.** The scheduler is tested with a fake clock that's advanced in the test: on time, late and labelled delayed, cancelled, blocked by an edit or an expired approval, run as its author, and raced by two workers. The killed-process tests cover saving and delivery, not a worker killed mid-schedule.
 - **Delayed by how much is a label, not an alert.** Colophon records that a publish was late; it doesn't notify anyone yet.
 
+The steps in the Studio, including the choice at a clock change, are in the docs: [scheduling](https://docs.colophon.404human.dev/studio/scheduling/).

@@ -119,6 +119,8 @@ There's no Payload importer. Colophon imports its own JSONL and JSON arrays, plu
 - **[On the roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md):** draft preview for headless sites (the Studio already previews pages of its own website starter), choosing a locale in the public content API, and images inside rich text (the editor inserts a placeholder for now).
 - **The 24-hour soak hasn't passed yet.**
 
+To try it, the docs' [quick start](https://docs.colophon.404human.dev/quick-start/) runs Colophon with Docker, and [installation](https://docs.colophon.404human.dev/installation/) covers serving it on a domain or under systemd.
+
 ## Who it isn't for
 
 If you want the CMS inside your Next.js codebase, with the schema as TypeScript and types shared with your front end, Payload is designed for exactly that, and Colophon isn't. Colophon fits a team that wants the CMS as its own service, with a history of every publish and a check of what reached the live site.

@@ -93,3 +93,5 @@ Some full runs miss their own thresholds, and they stay in the store. On 7 Novem
 ## Where the evidence is
 
 The result files behind every number here, failed runs included, and the soak's definition and status are in [Colophon's repository](https://github.com/akira-shirase-oss/colophon-cms/tree/main/perf). Why the server behaves this way under failure is covered in [six publishing questions a CMS should answer](/blog/headless-cms-publishing-checklist/).
+
+Running Colophon yourself, and what it reports about its own health, is in the docs: [monitoring](https://docs.colophon.404human.dev/self-hosting/monitoring/) and [configuration](https://docs.colophon.404human.dev/self-hosting/configuration/).

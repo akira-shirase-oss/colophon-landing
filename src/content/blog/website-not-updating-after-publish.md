@@ -193,6 +193,8 @@ Each release then gets a [receipt](/blog/headless-cms-glossary/#receipt) with on
 
 Colophon's own API answers carry the headers from step 1: `Cache-Control: public, max-age=0, must-revalidate, s-maxage=30` for the latest release (browsers revalidate every time, shared caches may keep it 30 seconds) and `s-maxage=300` for a read pinned to a past release, with an `ETag`, a `Cache-Tag` and a `Colophon-Cache` header that says `hit`, `miss`, `coalesced` or `bypass`. Its own cache keys include the release number, so a cached answer for release 41 can't be served for release 42. Wiring this into a site, marker included, is in [using Colophon as a headless CMS for Astro](/blog/astro-headless-cms/), and reading a past release is in [how to see what your website said on a past date](/blog/website-history-past-date/).
 
+Setting up the webhook, the CDN purge and the site checks is in the docs: [website connections and receipts](https://docs.colophon.404human.dev/api/website-connections/).
+
 ## What no check can prove
 
 - **A check sees one URL, at one moment, from one place.** Colophon runs one worker by default, so its receipts say "verified at 1 location". Another edge in another region may still hold an old copy until it expires or the purge reaches it.

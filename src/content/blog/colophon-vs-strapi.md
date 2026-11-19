@@ -118,6 +118,8 @@ Colophon's import reads Strapi v4 and v5 export shapes. A dry run reports an out
 - **[On the roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md):** draft preview for headless sites (the Studio already previews pages of its own website starter), choosing a locale in the public content API (locales are stored and published today), and images inside rich text (the editor inserts a placeholder for now).
 - **The 24-hour soak hasn't passed yet.**
 
+To try it, the docs' [quick start](https://docs.colophon.404human.dev/quick-start/) runs Colophon with Docker, and [installation](https://docs.colophon.404human.dev/installation/) covers serving it on a domain or under systemd.
+
 ## Who it isn't for
 
 If you need a plugin marketplace, a choice of databases or a managed cloud today, Strapi fits that need and Colophon doesn't try to. Colophon fits a team that wants proof of what it published and is happy to run PostgreSQL itself.

@@ -7,23 +7,60 @@ import FAQ from '../components/FAQ.astro'
 import Integrations from '../components/Integrations.astro'
 import CTA from '../components/CTA.astro'
 import Footer from '../components/Footer.astro'
-import { hero } from '../data/hero'
 
-const title = `Colophon | ${hero.headline.replace(/\.$/, '')}`
+// What people search for comes first in the title (the brand last, as on every other page); the
+// visible headline stays the hero's. Every claim in the description is built and tested.
+const title = 'Open-source headless CMS with publish receipts | Colophon'
 const description =
-  'Colophon is a content management system where every publish becomes a numbered release, with a record of exactly what went live and where it was seen.'
+  'Open-source headless CMS in Rust and Svelte: every publish is a numbered release with a receipt, rollbacks are reviewed, and roles reach each field.'
+const site = Astro.site!.href
+const REPO = 'https://github.com/akira-shirase-oss/colophon-cms'
+// The project (never a person) is the organisation; the docs refer to it by this @id.
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': `${site}#organization`,
+  name: 'Colophon CMS',
+  url: site,
+  logo: new URL('/favicon.svg', site).href,
+  sameAs: [REPO, 'https://x.com/404humandev'],
+}
+// The software itself. No rating or review: it has none, and none is invented (so Google shows no
+// rich result for it; the data still ties the name to what it is). No version while the first
+// release is unpublished.
+const software = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Colophon CMS',
+  url: site,
+  description,
+  applicationCategory: 'DeveloperApplication',
+  applicationSubCategory: 'Headless content management system',
+  operatingSystem: 'Linux, macOS',
+  license: 'https://opensource.org/license/mit',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
+  sameAs: [REPO],
+  publisher: { '@id': organization['@id'] },
+}
 ---
 
 <Base
   title={title}
   description={description}
-  jsonLd={{
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: 'Colophon',
-    url: Astro.site?.href,
-    description,
-  }}
+  jsonLd={[
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      '@id': `${site}#website`,
+      name: 'Colophon',
+      url: site,
+      description,
+      publisher: { '@id': organization['@id'] },
+    },
+    organization,
+    software,
+  ]}
 >
     <div id="root">
       <div style="display: flex; flex-direction: column; align-items: center; overflow: clip;">
