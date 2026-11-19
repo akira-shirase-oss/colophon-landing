@@ -78,7 +78,7 @@ const cards: { title: string; lines: [string, string]; tag: string; tone: Tone; 
             <p class={styles.body}>
               <span>{c.lines[0]}</span> <span>{c.lines[1]}</span>
             </p>
-            <Badge tone={c.tone} dot>
+            <Badge tone={c.tone} dot class={styles.tag}>
               {c.tag}
             </Badge>
           </Card>

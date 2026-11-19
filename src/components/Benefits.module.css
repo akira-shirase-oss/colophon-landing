@@ -33,10 +33,13 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
 }
-/* the kit's card shape (hairline, radius, --card-spacing gap), but filled with the section ground,
-   not the Studio's white sheet: the maintainer's call (theme.css --surface-section) */
+/* the kit's card shape (hairline, --radius-card), filled with the section ground and the section cards'
+   roomier padding, not the Studio's white sheet (the maintainer's call, theme.css --surface-section and
+   --section-card-padding). The inner rhythm is the old margins, so the card's own gap stays off. */
 .grid .card {
   align-items: flex-start;
+  gap: 0;
+  padding: var(--section-card-padding);
   background: var(--surface-section);
   transition:
     border-color 0.15s var(--ease),
@@ -70,6 +73,7 @@
 }
 
 .body {
+  margin-top: 32px;
   max-width: 500px;
   font-family: var(--font-sans);
   font-size: 16px;
@@ -81,6 +85,14 @@
 /* one sentence per line where there is room, as in the reference */
 .body span {
   display: block;
+}
+
+/* the tag: ui/Badge with the tone's dot, at the old pill's size (origin/main: 40px tall, 16px sides;
+   the badge's own 14px already matches) — a class on the badge, not an edit to it */
+.card .tag {
+  margin-top: 20px;
+  height: 40px;
+  padding: 0 16px;
 }
 
 /* ---------- Motion ---------- */
@@ -106,6 +118,9 @@
   .inner {
     gap: 40px;
   }
+  .body {
+    margin-top: 24px;
+  }
   .body span {
     display: inline;
   }
@@ -127,5 +142,12 @@
   .icon svg {
     width: 26px;
     height: 26px;
+  }
+  .body {
+    margin-top: 20px;
+  }
+  .card .tag {
+    margin-top: 16px;
+    height: 36px;
   }
 }
