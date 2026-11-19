@@ -1,5 +1,17 @@
+/* Questions answered: the kicker and heading beside an accordion of quiet items — one open at a
+   time (the component's script), every answer visible in the markup for search and for no-JS. */
+
+.section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 var(--content-pad);
+}
 .inner {
   position: relative;
+  width: 100%;
+  max-width: var(--content-max);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -20,11 +32,27 @@
   flex-direction: column;
   gap: 12px;
 }
+.h2 {
+  font-family: var(--font-title);
+  font-size: 52.63px;
+  line-height: 1.1;
+  font-weight: 400;
+  font-synthesis: none;
+  letter-spacing: 0;
+  color: var(--foreground);
+}
 .cta {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 20px;
+}
+.ctaText {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: 400;
+  color: var(--muted-foreground);
 }
 
 .list {
@@ -34,19 +62,35 @@
   flex-direction: column;
   gap: 8px;
 }
+/* the row ground is the sections' own, a grey a step off the page (theme.css --surface-section) */
 .item {
   padding: 20px;
-  border-radius: 12px;
-  background: var(--c-surface);
+  border-radius: var(--radius-control);
+  background: var(--surface-section);
 }
 .question {
   width: 100%;
   display: flex;
   align-items: center;
   gap: 12px;
+  border: 1px solid transparent;
+  border-radius: calc(var(--radius-control) - 4px);
+}
+/* the kit's focus ring: the ring colour on the edge, a 4px halo at 25% around it (theme.css --focus-halo) */
+.question:focus-visible {
+  outline: none;
+  border-color: var(--ring);
+  box-shadow: var(--focus-halo);
 }
 .question > :first-child {
   flex: 1;
+}
+.q {
+  font-family: var(--font-sans);
+  font-size: 20px;
+  line-height: 1.1;
+  font-weight: 500;
+  color: var(--foreground);
 }
 .icon {
   position: relative;
@@ -61,7 +105,7 @@
   margin: auto;
   transition:
     opacity 0.3s var(--ease),
-    transform 0.4s var(--spring);
+    transform 0.4s var(--ease);
 }
 .close {
   opacity: 0;
@@ -79,8 +123,8 @@
   display: grid;
   grid-template-rows: 0fr;
   transition:
-    grid-template-rows 0.45s var(--spring),
-    margin-top 0.45s var(--spring);
+    grid-template-rows 0.45s var(--ease),
+    margin-top 0.45s var(--ease);
 }
 .answer > div {
   overflow: hidden;
@@ -88,6 +132,13 @@
 .item[data-open='true'] .answer {
   grid-template-rows: 1fr;
   margin-top: 20px;
+}
+.a {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: 400;
+  color: var(--muted-foreground);
 }
 
 @media (max-width: 1199px) {
@@ -100,7 +151,10 @@
     height: 217px;
     justify-content: flex-start;
   }
-  .question :global(.t-h5) {
+  .h2 {
+    font-size: 39.47px;
+  }
+  .q {
     font-size: 18px;
   }
 }
@@ -115,11 +169,14 @@
     width: 100%;
     height: auto;
   }
+  .h2 {
+    font-size: 32.9px;
+  }
   /* on a phone the cards keep their questions to one line where they can: a step smaller type, a step less padding */
   .item {
     padding: 16px;
   }
-  .question :global(.t-h5) {
+  .q {
     font-size: 17px;
   }
 }

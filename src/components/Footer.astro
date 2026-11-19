@@ -26,11 +26,6 @@ const columns = [
   },
 ]
 
-// Prints the pixel wordmark once, row by row, when the footer first comes into view (only if it starts below
-// the fold and motion is allowed). It watches the word's frame, because the clipped word itself never counts
-// as in view. Without this script the word simply stands there.
-const PRINT =
-  "var w=document.querySelector('[data-wordmark]');if(w&&'IntersectionObserver'in window&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&w.getBoundingClientRect().top>innerHeight){w.dataset.print='armed';var o=new IntersectionObserver(function(e){if(e[0].isIntersecting){o.disconnect();requestAnimationFrame(function(){w.dataset.print='go'})}},{threshold:0.3});o.observe(w.parentElement)}"
 
 const socials = [
   { icon: '/icons/x.svg', label: 'Colophon on X', href: 'https://x.com/404humandev' },
@@ -50,7 +45,7 @@ const socials = [
           {
             socials.map((s) => (
               <a href={s.href} aria-label={s.label} class={styles.socialBtn}>
-                <MaskIcon src={s.icon} size={24} color="var(--c-ink)" />
+                <MaskIcon src={s.icon} size={18} color="var(--c-ink)" />
               </a>
             ))
           }
@@ -90,4 +85,3 @@ const socials = [
     </div>
   </div>
 </footer>
-<script is:inline set:html={PRINT} />

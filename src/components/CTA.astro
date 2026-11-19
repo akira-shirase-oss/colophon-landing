@@ -1,27 +1,51 @@
 ---
 // The closing statement: one sentence in display-size Inter on the page itself, with small pixel-art
 // illustrations between the words, and the build log link under it. The words live in src/data/statement.ts.
+//
+// The one scroll effect on the site (the maintainer's call, 2026-11-19): the sentence is readable at rest in
+// --muted-foreground (4.5:1 or more, never hidden), and the first time it comes into view its words brighten to
+// --foreground once, in reading order, about 700ms in all, a colour transition only; each illustration pops once
+// (scale, 250ms) as its word lights up, and wiggles on hover or tap. Without JavaScript, or with reduced motion,
+// the sentence is simply --foreground and nothing moves. One IntersectionObserver, for this section only, and it
+// disconnects after it fires. scripts/check-dist.mjs and check-csp-browser.mjs hold it to exactly that.
 import PixelArt from './ui/PixelArt.astro'
 import { statement } from '../data/statement'
 import styles from './CTA.module.css'
+
+// The words in reading order, each with its delay: the leads split into words (spaces kept as they are), then the
+// word an illustration follows, which carries the illustration and its punctuation.
+type Piece = { text: string; i?: number }
+let n = 0
+const parts = statement.parts.map((p) => ({
+  lead: p.lead.split(/(\s+)/).filter(Boolean).map((t): Piece => (/^\s+$/.test(t) ? { text: t } : { text: t, i: n++ })),
+  word: { text: p.word, i: n++ },
+  icon: p.icon,
+  after: p.after,
+}))
+const TOTAL_MS = 450 // the last word starts here; with its 250ms transition the sentence is lit in about 700ms
+const delay = (i: number) => `--d: ${Math.round((i * TOTAL_MS) / Math.max(1, n - 1))}ms`
+
+const LIGHT =
+  "var s=document.querySelector('[data-statement]');if(s&&'IntersectionObserver'in window&&!matchMedia('(prefers-reduced-motion: reduce)').matches){s.dataset.light='rest';var o=new IntersectionObserver(function(e){if(e[0].isIntersecting){o.disconnect();requestAnimationFrame(function(){requestAnimationFrame(function(){s.dataset.light='go'})})}},{threshold:0.4});o.observe(s);s.addEventListener('click',function(e){var w=e.target.closest&&e.target.closest('[data-wiggle]');if(w){w.removeAttribute('data-tap');void w.offsetWidth;w.setAttribute('data-tap','')}});s.addEventListener('animationend',function(e){if(e.target.hasAttribute&&e.target.hasAttribute('data-tap'))e.target.removeAttribute('data-tap')})}"
 ---
 
 <section class={styles.section} aria-labelledby="statement-heading">
   <div class={styles.inner}>
-    <h2 id="statement-heading" class="visually-hidden">{statement.heading}</h2>
-    <p class={styles.statement}>
+    <h2 id="statement-heading" class={styles.vh}>{statement.heading}</h2>
+    <p class={styles.statement} data-statement>
       {
-        statement.parts.map((p) => (
+        parts.map((p) => (
           <>
-            {p.lead}
+            {p.lead.map((t) => (t.i === undefined ? t.text : <span class={styles.w} style={delay(t.i)}>{t.text}</span>))}
             <span class={styles.keep}>
-              {p.word}&nbsp;<PixelArt name={p.icon} />
-              {p.after}
+              <span class={styles.w} style={delay(p.word.i)}>{p.word.text}</span>&nbsp;<span class={styles.pop} style={delay(p.word.i)}><span class={styles.wiggle} data-wiggle><PixelArt name={p.icon} /></span></span>
+              {p.after && <span class={styles.w} style={delay(p.word.i)}>{p.after}</span>}
             </span>
           </>
         ))
       }
     </p>
+    <script is:inline set:html={LIGHT} />
     <a class={styles.more} href={statement.link.href}>
       {statement.link.text} <span aria-hidden="true">→</span>
     </a>

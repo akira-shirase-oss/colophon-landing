@@ -13,3 +13,6 @@ export const app = base
 
 // The documentation site (guides, the API and tokens).
 export const DOCS_URL = 'https://docs.colophon.404human.dev'
+
+/** Where the header's Get started goes while the app isn't live: the docs' quick start. */
+export const QUICK_START = `${DOCS_URL}/quick-start/`

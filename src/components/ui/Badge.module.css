@@ -1,0 +1,66 @@
+.badge {
+  display: inline-flex;
+  width: fit-content;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-text);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--tone, currentColor);
+  box-shadow: 0 0 0 2px var(--tone-ring, transparent);
+}
+.brand {
+  background: var(--brand-soft);
+  color: var(--brand-ink);
+  --tone: var(--brand);
+}
+.secondary {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+}
+.outline {
+  border-color: var(--border);
+  background: var(--popover);
+  color: var(--foreground);
+}
+.live {
+  background: var(--live-soft);
+  color: var(--live-ink);
+  --tone: var(--live);
+  --tone-ring: var(--live-ring);
+}
+.changed {
+  background: var(--changed-soft);
+  color: var(--changed-ink);
+  --tone: var(--changed);
+  --tone-ring: var(--changed-ring);
+}
+.pending {
+  background: var(--pending-soft);
+  color: var(--pending-ink);
+  --tone: var(--pending);
+  --tone-ring: var(--pending-ring);
+}
+.attention {
+  background: var(--attention-soft);
+  color: var(--attention-ink);
+  --tone: var(--attention);
+  --tone-ring: var(--attention-ring);
+}
+.draft {
+  background: var(--draft-soft);
+  color: var(--draft-ink);
+  --tone: var(--draft);
+  --tone-ring: var(--draft-ring);
+}

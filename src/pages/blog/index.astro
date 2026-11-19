@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro'
 import Nav from '../../components/Nav.astro'
 import Footer from '../../components/Footer.astro'
+import Badge from '../../components/ui/Badge.astro'
 import styles from '../../components/Blog.module.css'
 import { posts, formatDate } from '../../lib/posts'
 
@@ -27,16 +28,16 @@ const description =
     <main class={styles.page}>
       <div class={styles.column}>
         <header class={styles.head}>
-          <p class="t-badge">Blog</p>
-          <h1 class="t-h2">Notes on publishing you can check</h1>
-          <p class={`t-body ${styles.lede}`}>
+          <Badge as="p" tone="brand">Blog</Badge>
+          <h1 class={styles.hTitle}>Notes on publishing you can check</h1>
+          <p class={styles.lede}>
             How Colophon works and why, written from the code that does it. The failures go in the{' '}
             <a href="https://404human.dev/colophon/">build log</a>.
           </p>
         </header>
         {
           list.length === 0 ? (
-            <p class={`t-body ${styles.empty}`}>The first posts are on their way.</p>
+            <p class={styles.empty}>The first posts are on their way.</p>
           ) : (
             <ul class={styles.list}>
               {list.map((p) => (
@@ -44,10 +45,10 @@ const description =
                   <a href={`/blog/${p.id}/`}>
                     <span class={styles.stamp}>
                       <time datetime={p.data.pubDate.toISOString()}>{formatDate(p.data.pubDate)}</time>
-                      {p.data.draft && <span class={styles.draft}>Draft</span>}
+                      {p.data.draft && <Badge tone="draft" dot>Draft</Badge>}
                     </span>
-                    <h2 class={`t-h4 ${styles.itemTitle}`}>{p.data.title}</h2>
-                    <p class={`t-body ${styles.itemDesc}`}>{p.data.description}</p>
+                    <h2 class={styles.itemTitle}>{p.data.title}</h2>
+                    <p class={styles.itemDesc}>{p.data.description}</p>
                   </a>
                 </li>
               ))}

@@ -14,8 +14,8 @@
   flex-direction: column;
   gap: 20px;
   padding: 40px var(--panel-pad) 0;
-  border-radius: 24px;
-  background: var(--c-surface);
+  border-radius: var(--radius-card);
+  background: var(--surface-footer);
   overflow: hidden;
 }
 /* The panel is as wide as the hero card (1380); its content keeps the page's column. */
@@ -53,17 +53,24 @@
   gap: 8px;
 }
 .socialBtn {
-  width: 32px;
-  height: 32px;
+  /* the Studio's ghost icon button: no ground until hovered, the control radius, the kit's focus ring */
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  background: var(--c-faint);
-  transition: background-color 0.3s var(--ease);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  color: var(--c-ink);
+  outline: none;
+  transition: background-color 150ms var(--ease);
 }
 .socialBtn:hover {
-  background: var(--c-line);
+  background: var(--accent);
+}
+.socialBtn:focus-visible {
+  border-color: var(--ring);
+  box-shadow: var(--focus-halo);
 }
 
 .links {

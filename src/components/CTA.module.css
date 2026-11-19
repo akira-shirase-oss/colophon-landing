@@ -1,4 +1,5 @@
 /* The closing statement: no card, the page's own surface, the content column. */
+
 .section {
   width: 100%;
   display: flex;
@@ -12,31 +13,87 @@
   flex-direction: column;
   gap: 32px;
 }
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
 /* about 56px at 1440 and 30px at 390 */
 .statement {
-  font-family: var(--font-text);
+  font-family: var(--font-sans);
   font-size: clamp(30px, 20.3px + 2.5vw, 56px);
   line-height: 1.18;
   font-weight: 550;
   letter-spacing: -0.02em;
-  color: var(--c-ink);
+  color: var(--foreground);
   text-wrap: pretty;
 }
 /* the word before an illustration, the illustration and its punctuation never part across a line */
 .keep {
   white-space: nowrap;
 }
+
+/* The one scroll effect (CTA.astro): at rest the words are --muted-foreground, and once in view they brighten to
+   --foreground in reading order. The rest state is set by the script, only when motion is allowed, so without it
+   the sentence is --foreground. */
+.statement[data-light='rest'] .w {
+  color: var(--muted-foreground);
+}
+.statement[data-light='go'] .w {
+  color: var(--foreground);
+  transition: color 250ms var(--ease) var(--d);
+}
+.pop,
+.wiggle {
+  display: inline-block;
+}
+@keyframes pop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-8deg);
+  }
+  75% {
+    transform: rotate(8deg);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .statement[data-light='go'] .pop {
+    animation: pop 250ms var(--ease) var(--d) 1 both;
+  }
+  .wiggle[data-tap] {
+    animation: wiggle 300ms var(--ease) 1;
+  }
+  @media (hover: hover) {
+    .wiggle:hover {
+      animation: wiggle 300ms var(--ease) 1;
+    }
+  }
+}
 .more {
   align-self: flex-start;
-  font-family: var(--font-text);
+  font-family: var(--font-sans);
   font-size: 18px;
   font-weight: 500;
-  color: var(--c-ink);
+  color: var(--link);
   text-decoration: underline;
-  text-decoration-color: var(--c-underline);
+  text-decoration-color: var(--border);
   text-underline-offset: 4px;
 }
 .more:hover {
   text-decoration-color: currentColor;
 }
-

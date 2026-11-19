@@ -1,13 +1,29 @@
-/* "Why Colophon": a 2-column grid of quiet cards (the section heading is for screen readers only).
-   Measurements follow the reference at 1x: 1240px grid, 20px gutters, 36px card padding,
-   52px icon tiles, 40px tags. Type sizes follow the site's presets (52px headline, 24px titles,
-   16px body, 14px tags). */
+/* "Why Colophon": a 2-column grid of the kit's cards (src/components/ui/Card.astro — flat, a hairline,
+   the card radius and padding), the section heading for screen readers only. Each card: a secondary icon
+   tile, the title and lines, and a status-tone badge whose word is the tag. */
 
+.section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 var(--content-pad);
+}
 .inner {
+  width: 100%;
+  max-width: var(--content-max);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 52px;
+}
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .grid {
@@ -17,19 +33,15 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
 }
-.card {
-  display: flex;
-  flex-direction: column;
+/* the kit's card shape (hairline, --radius-card), filled with the section ground and the section cards'
+   roomier padding, not the Studio's white sheet (the maintainer's call, theme.css --surface-section and
+   --section-card-padding). The inner rhythm is the old margins, so the card's own gap stays off. */
+.grid .card {
   align-items: flex-start;
-  padding: 36px;
-  border-radius: 24px;
-  background: var(--c-raised);
-  box-shadow: inset 0 0 0 1px var(--c-card-edge);
-  transition:
-    background-color 0.15s var(--ease),
-    box-shadow 0.15s var(--ease),
-    transform 0.4s var(--ease),
-    opacity 0.4s var(--ease);
+  gap: 0;
+  padding: var(--section-card-padding);
+  background: var(--surface-section);
+  transition: border-color 0.15s var(--ease);
 }
 
 .titleRow {
@@ -37,7 +49,7 @@
   align-items: center;
   gap: 12px;
 }
-/* Raised tile: a soft drop shadow below and a white highlight on the top edge */
+/* the icon tile inside a card: the Studio's sheet on the section ground, so it still reads as a tile */
 .icon {
   width: 52px;
   height: 52px;
@@ -45,23 +57,26 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border-radius: 8px;
-  background: linear-gradient(180deg, var(--c-tile-top) 0%, var(--c-tile-bottom) 100%);
-  color: var(--c-tile-ink);
-  box-shadow:
-    0 1px 1px var(--c-tile-drop),
-    0 2px 6px -1px var(--c-tile-spread),
-    inset 0 1px 0 var(--c-tile-highlight);
+  border-radius: var(--radius-control);
+  background: var(--card);
+  color: var(--foreground);
+}
+.cardTitle {
+  font-family: var(--font-sans);
+  font-size: 24px;
+  line-height: 1.1;
+  font-weight: 600;
+  color: var(--foreground);
 }
 
 .body {
   margin-top: 32px;
   max-width: 500px;
-  font-family: var(--font-text);
+  font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.5;
   font-weight: 400;
-  color: var(--c-text);
+  color: var(--muted-foreground);
   text-wrap: pretty;
 }
 /* one sentence per line where there is room, as in the reference */
@@ -69,85 +84,28 @@
   display: block;
 }
 
-.tag {
+/* the tag: ui/Badge with the tone's dot, at the old pill's size (origin/main: 40px tall, 16px sides;
+   the badge's own 14px already matches) — a class on the badge, not an edit to it */
+.card .tag {
   margin-top: 20px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
   height: 40px;
   padding: 0 16px;
-  border-radius: 999px;
-  font-family: var(--font-text);
-  font-size: 14px;
-  line-height: 1;
-  font-weight: 400;
-  color: var(--c-chip-ink);
-  background: var(--tint);
-}
-.dot {
-  width: var(--dot, 10px);
-  height: var(--dot, 10px);
-  border-radius: 50%;
-  background: var(--tone);
-  box-shadow: 0 0 0 var(--ring-w, 3px) var(--ring);
-}
-.blue {
-  --tone: var(--c-blue);
-  --ring: var(--c-blue-ring);
-  --tint: var(--c-blue-tint);
-}
-.green {
-  --tone: var(--c-green);
-  --ring: var(--c-green-ring);
-  --tint: var(--c-green-tint);
-}
-.pink {
-  --tone: var(--c-pink);
-  --ring: var(--c-pink-ring);
-  --tint: var(--c-pink-tint);
-}
-/* soft variants: a lighter, smaller dot with no ring */
-.blueSoft {
-  --tone: var(--c-blue-soft);
-  --ring: transparent;
-  --ring-w: 0px;
-  --dot: 8px;
-  --tint: var(--c-blue-tint);
-}
-.pinkSoft {
-  --tone: var(--c-pink-soft);
-  --ring: transparent;
-  --ring-w: 0px;
-  --dot: 8px;
-  --tint: var(--c-pink-tint);
 }
 
 /* ---------- Motion ---------- */
 
-/* hover: a quiet surface step, nothing moves */
+/* hover: a quiet edge step, nothing moves */
 @media (hover: hover) {
   .card:hover {
-    background: var(--c-raised-hover);
-    box-shadow: inset 0 0 0 1px var(--c-card-edge-hover);
+    border-color: var(--input);
   }
 }
 
-/* entrance, once: set by the component's script only, so the cards are always visible without it */
-.grid[data-reveal='pending'] .card {
-  opacity: 0;
-  transform: translateY(8px);
-}
-.grid[data-reveal='shown'] .card {
-  transition-delay: 0s, 0s, calc(var(--i) * 50ms), calc(var(--i) * 50ms);
-}
 
 /* ---------- Tablet ---------- */
 @media (max-width: 1199px) {
   .inner {
     gap: 40px;
-  }
-  .card {
-    padding: 28px;
   }
   .body {
     margin-top: 24px;
@@ -166,10 +124,6 @@
     grid-template-columns: 1fr;
     gap: 12px;
   }
-  .card {
-    padding: 24px;
-    border-radius: 20px;
-  }
   .icon {
     width: 46px;
     height: 46px;
@@ -181,9 +135,8 @@
   .body {
     margin-top: 20px;
   }
-  .tag {
+  .card .tag {
     margin-top: 16px;
     height: 36px;
-    padding: 0 12px;
   }
 }

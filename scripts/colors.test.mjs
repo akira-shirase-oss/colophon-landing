@@ -1,6 +1,7 @@
-// Every colour lives in src/styles/tokens.css, as a light value on :root with its dark twin. Components,
-// pages, posts and the global styles use var(--…) only, so a new screen can't forget dark mode.
-// Exempt, by explicit path only: the token file itself and the static SVG assets, which are drawn once
+// Every colour lives in src/styles/tokens.css (the byte copy of Colophon's design tokens, light on :root, dark on
+// .dark; scripts/tokens.test.mjs checks it) or src/styles/theme.css (the site's names for them, and its own few
+// colours, each with a dark twin). Components, pages, posts and the global styles use var(--…) only, so a new
+// screen can't forget dark mode. Exempt, by explicit path only: the two token files and the static SVG assets, which are drawn once
 // in one colour and tinted through CSS masks where they need to follow the theme.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
@@ -11,6 +12,7 @@ import { fileURLToPath } from 'node:url'
 const root = fileURLToPath(new URL('..', import.meta.url))
 const EXEMPT = new Set([
   'src/styles/tokens.css',
+  'src/styles/theme.css',
   'public/favicon.svg',
   'public/icons/arrow.svg',
   'public/icons/close.svg',
@@ -51,27 +53,21 @@ test('no hard-coded colour outside the token file', () => {
   assert.deepEqual(found, [], `hard-coded colours (use a token from src/styles/tokens.css):\n${found.join('\n')}`)
 })
 
-test('every light token has a dark twin, in both dark blocks, and nothing else is in them', () => {
-  const css = readFileSync(join(root, 'src/styles/tokens.css'), 'utf8')
+test("every colour of the site's own has a dark twin, and the dark block holds nothing else", () => {
+  const css = readFileSync(join(root, 'src/styles/theme.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
   const block = (selector) => {
-    const at = css.indexOf(selector)
-    assert.ok(at >= 0, `tokens.css has no ${selector} block`)
-    const open = css.indexOf('{', at + selector.length - 1)
-    let depth = 0
-    for (let i = open; i < css.length; i++) {
-      if (css[i] === '{') depth++
-      else if (css[i] === '}' && --depth === 0) return css.slice(open + 1, i)
-    }
-    throw new Error(`unclosed ${selector}`)
+    const at = css.indexOf(`${selector} {`)
+    assert.ok(at >= 0, `theme.css has no ${selector} block`)
+    return css.slice(at, css.indexOf('}', at))
   }
-  const names = (text) => [...text.matchAll(/(--c-[\w-]+)\s*:/g)].map((m) => m[1]).sort()
-  const light = names(block(':root {'))
-  const media = names(block(':root:not([data-theme="light"]) {'))
-  const forced = names(block(':root[data-theme="dark"] {'))
-  assert.ok(light.length > 10, 'the light palette is on :root')
-  assert.deepEqual(media, light, 'the prefers-color-scheme dark block names exactly the light tokens')
-  assert.deepEqual(forced, light, 'the data-theme="dark" block names exactly the light tokens')
-  assert.match(css, /@media \(prefers-color-scheme: dark\)\s*{\s*:root:not\(\[data-theme="light"\]\)/, 'the system dark set yields to an explicit Light choice')
+  const decls = (text) => Object.fromEntries([...text.matchAll(/(--(?:c|surface|hero)-[\w-]+)\s*:\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()]))
+  const light = decls(block(':root'))
+  const dark = decls(block('.dark'))
+  // An alias (var(--token)) follows tokens.css's .dark by itself; a literal colour needs its own dark value.
+  const own = Object.keys(light).filter((name) => !/^var\(--[\w-]+\)$/.test(light[name]) && !/^color-mix\(/.test(light[name]) && light[name] !== 'transparent').sort()
+  assert.ok(Object.keys(light).length > 30, 'the site\'s names are on :root')
+  assert.deepEqual(Object.keys(dark).sort(), own, 'the .dark block names exactly the site\'s own colours')
+  assert.doesNotMatch(css, /prefers-color-scheme/, 'dark is the .dark class (set by Base.astro), as in tokens.css')
 })
 
 test('the scanner itself catches each kind of literal', () => {

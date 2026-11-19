@@ -43,10 +43,11 @@ const ld = structured ? (Array.isArray(structured) ? structured : [structured]) 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
-    <!-- Before the first paint: a stored Light or Dark choice (else the device's setting decides, through
-         tokens.css), and whether the app's hint cookie says someone is signed in (colophon_signed_in, exactly
+    <!-- Before the first paint: a stored Light or Dark choice (else the device's setting decides), shown as
+         .dark on <html>, the class Colophon's design tokens switch on (D-210) and kept in step with the choice
+         and the device's setting from then on; and whether the app's hint cookie says someone is signed in (colophon_signed_in, exactly
          "1"; D-200), which swaps Sign in and Sign up for Dashboard. Nothing is fetched. Hash-allowed in _headers. -->
-    <script is:inline>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}try{if(document.cookie.split('; ').indexOf('colophon_signed_in=1')>=0)document.documentElement.dataset.session='in'}catch(e){}</script>
+    <script is:inline>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}try{var r=document.documentElement,m=matchMedia('(prefers-color-scheme: dark)'),f=function(){r.classList.toggle('dark',r.dataset.theme?r.dataset.theme==='dark':m.matches)};f();m.addEventListener('change',f);new MutationObserver(f).observe(r,{attributes:true,attributeFilter:['data-theme']})}catch(e){}try{if(document.cookie.split('; ').indexOf('colophon_signed_in=1')>=0)document.documentElement.dataset.session='in'}catch(e){}</script>
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
@@ -66,8 +67,10 @@ const ld = structured ? (Array.isArray(structured) ? structured : [structured]) 
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={imageUrl} />
     <meta name="twitter:image:alt" content={imageAlt} />
-    <!-- Every page's title is set in Geist Pixel, and on the home page it is the largest paint. -->
+    <!-- Every page's title is set in Geist Pixel, and on the home page it is the largest paint. Inter sets every
+         word under it: preloaded too, so a late swap can't re-wrap a centred paragraph (a layout shift). -->
     <link rel="preload" href="/fonts/geist-pixel-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate" type="application/rss+xml" title="Colophon blog" href="/rss.xml" />
     <link rel="sitemap" type="application/xml" href="/sitemap.xml" />

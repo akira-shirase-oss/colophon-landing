@@ -1,0 +1,12 @@
+---
+import styles from './Input.module.css'
+
+/**
+ * The Studio's text field (packages/ui input.svelte): 44px, --input edge (3:1 against the page), --popover
+ * ground, 16px text on a phone (no zoom on focus) and 14px from a tablet up, the kit's focus ring.
+ */
+type Props = { class?: string; [attr: string]: unknown }
+const { class: extra, ...rest } = Astro.props
+---
+
+<input class={[styles.input, extra ?? ''].filter(Boolean).join(' ')} {...rest} />
