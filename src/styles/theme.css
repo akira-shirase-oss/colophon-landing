@@ -1,0 +1,135 @@
+/* The website's layer over Colophon's design tokens (D-210).
+ *
+ * tokens.css beside this file is a byte copy of colophon-cms design/tokens.css: the Studio's colours, radius,
+ * shadows and font stacks, light on :root and dark on .dark (Base.astro puts .dark on <html> before the first
+ * paint, from the visitor's choice or the system's). Nothing edits that copy; scripts/tokens.test.mjs checks
+ * its bytes against the pinned source and CI fetches the source to compare.
+ *
+ * This file is the website's own:
+ *   - shape, as the Studio's kit names it (packages/ui styles.css): --radius-control, --radius-card, card padding;
+ *   - the --c-* names the site's components use, each an alias for a D-210 token, so a component never names
+ *     a colour of its own and both themes come from the source;
+ *   - the few colours the Studio has no token for (the hero's brand block, the pixel-art palette), each light
+ *     value on :root with a dark twin on .dark (scripts/colors.test.mjs checks the twins).
+ * scripts/design-contrast.mjs measures every text pair the site uses, in both themes, from these two files. */
+
+:root {
+  color-scheme: light;
+
+  /* ---- Shape: the Studio's kit (packages/ui) ---- */
+  --radius-control: calc(var(--radius) - 2px);
+  --radius-card: calc(var(--radius) + 4px);
+  --radius-pill: 9999px;
+  --card-padding: 1.5rem;
+  --card-padding-sm: 1rem;
+  /* The kit's focus ring: the ring colour on the edge, a 4px halo at 25% around it. */
+  --focus-halo: 0 0 0 4px color-mix(in srgb, var(--ring) 25%, transparent);
+
+  /* ---- Page and type ---- */
+  --c-bg: var(--background);
+  --c-surface: var(--secondary);
+  --c-raised: var(--card);
+  --c-raised-hover: var(--muted);
+  --c-ink: var(--foreground);
+  --c-prose: var(--foreground);
+  --c-text: var(--muted-foreground);
+  --c-muted: var(--muted-foreground);
+  --c-faint: var(--secondary);
+  --c-line: var(--border);
+  --c-dash: var(--border);
+  --c-underline: var(--input);
+  /* The small label over a section title: the brand's ink, as the Studio's brand badge. */
+  --c-accent: var(--brand-ink);
+  /* Text on an ink-filled shape */
+  --c-on-ink: var(--background);
+  --c-focus: var(--ring);
+  --c-focus-ring: color-mix(in srgb, var(--ring) 25%, transparent);
+  --c-link: var(--link);
+
+  /* ---- Cards and icon tiles: the kit's card is flat, a hairline on --card; only what floats has a shadow ---- */
+  --c-card-edge: var(--border);
+  --c-card-edge-hover: var(--input);
+  --c-tile-top: var(--card);
+  --c-tile-bottom: var(--card);
+  --c-tile-ink: var(--foreground);
+  --c-tile-drop: transparent;
+  --c-tile-spread: transparent;
+  --c-tile-highlight: transparent;
+
+  /* ---- Tags: the kit's badge tones. Blue is the brand, green is live, violet is changed. ---- */
+  --c-chip-ink: var(--foreground);
+  --c-blue: var(--brand);
+  --c-blue-ring: var(--brand-soft);
+  --c-blue-tint: var(--brand-soft);
+  --c-blue-soft: var(--brand);
+  --c-blue-ink: var(--brand-ink);
+  --c-green: var(--live);
+  --c-green-ring: var(--live-ring);
+  --c-green-tint: var(--live-soft);
+  --c-green-ink: var(--live-ink);
+  --c-pink: var(--changed);
+  --c-pink-ring: var(--changed-ring);
+  --c-pink-tint: var(--changed-soft);
+  --c-pink-soft: var(--changed);
+  --c-pink-ink: var(--changed-ink);
+  /* The draft stamp on unpublished posts: the kit's pending tone */
+  --c-draft-bg: var(--pending-soft);
+  --c-draft-ink: var(--pending-ink);
+
+  /* ---- Buttons: the kit's primary and secondary ---- */
+  --c-button: var(--primary);
+  --c-button-hover: var(--primary-hover);
+  --c-button-text: var(--primary-foreground);
+  --c-button-quiet: var(--popover);
+  --c-button-quiet-hover: var(--accent);
+  --c-button-quiet-text: var(--foreground);
+
+  /* ---- The brand block (the hero): white at the top to #0061ff at the bottom, the same in both themes,
+     with navy type. Its button is the kit's primary. ---- */
+  --c-brand-top: var(--gradient-brand-from);
+  --c-brand-bottom: var(--gradient-brand-to);
+  --c-on-brand: #08142b;
+  --c-brand-button: var(--primary);
+  --c-brand-button-text: var(--primary-foreground);
+  --c-brand-edge: oklch(0.2 0.04 260 / 0.12);
+  --c-brand-icon: oklch(0.33 0.12 262 / 0.5);
+
+  /* ---- Pixel-art illustrations in the closing statement: one small palette with a 1-cell outline ---- */
+  --c-px-outline: #14161c;
+  --c-px-blue: #0061ff;
+  --c-px-orange: #ff8a3d;
+  --c-px-green: #3fbf6b;
+  --c-px-pink: #ff7eb6;
+  --c-px-cream: #fff1d0;
+
+  /* ---- The footer's oversized wordmark, the theme switch, diagrams in posts ---- */
+  --c-wordmark: var(--border);
+  --c-switch-bg: var(--accent);
+  --c-figure-fill: var(--muted);
+  --c-figure-ink: var(--foreground);
+  --c-figure-text: var(--muted-foreground);
+  --c-figure-rule: var(--input);
+}
+
+/* On a phone a card gives its room to the content, as in the Studio. */
+@media (max-width: 39.99rem) {
+  :root {
+    --card-padding: 1rem;
+  }
+}
+
+/* Dark: the aliases above follow tokens.css's .dark by themselves; only the site's own colours need a twin. */
+.dark {
+  color-scheme: dark;
+
+  --c-on-brand: #08142b;
+  --c-brand-edge: oklch(1 0 0 / 0.1);
+  --c-brand-icon: oklch(0.33 0.12 262 / 0.5);
+
+  --c-px-outline: #e9e7e1;
+  --c-px-blue: #4d8dff;
+  --c-px-orange: #ff9a55;
+  --c-px-green: #55cf7f;
+  --c-px-pink: #ff8fc0;
+  --c-px-cream: #2b2924;
+}

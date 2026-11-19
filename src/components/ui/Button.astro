@@ -1,0 +1,37 @@
+---
+import styles from './Button.module.css'
+
+/**
+ * The Studio's button (packages/ui, D-182 and D-210), so the website and the dashboard are one product: one
+ * primary per screen in the blue, everything else secondary (a neutral sheet on a hairline) or ghost (a ground
+ * only on hover). Flat, the control radius, the kit's focus ring. With `href` it is a link.
+ */
+type Props = {
+  href?: string
+  variant?: 'primary' | 'secondary' | 'ghost'
+  size?: 'sm' | 'default' | 'lg'
+  /** a trailing arrow, for a link that goes somewhere */
+  arrow?: boolean
+  /** stretch to the parent's width */
+  block?: boolean
+  type?: 'button' | 'submit'
+  class?: string
+  [attr: string]: unknown
+}
+const { href, variant = 'primary', size = 'default', arrow = false, block = false, type = 'button', class: extra, ...rest } = Astro.props
+const cls = [styles.button, styles[variant], styles[size], arrow ? styles.withArrow : '', block ? styles.block : '', extra ?? ''].filter(Boolean).join(' ')
+---
+
+{
+  href ? (
+    <a href={href} class={cls} {...rest}>
+      <slot />
+      {arrow && <span class={styles.arrow} aria-hidden="true" />}
+    </a>
+  ) : (
+    <button type={type} class={cls} {...rest}>
+      <slot />
+      {arrow && <span class={styles.arrow} aria-hidden="true" />}
+    </button>
+  )
+}

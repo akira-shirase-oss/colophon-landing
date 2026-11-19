@@ -38,6 +38,21 @@ jobs:
         run: npm run lint
       - name: Unit tests
         run: npm test
+      - name: Design tokens are a byte copy of colophon-cms at the pinned ref (D-210)
+        # COLOPHON_REF matches scripts/tokens.test.mjs; moving both is the step that adopts a token change.
+        env:
+          COLOPHON_REF: 15b283db0391cff47fab8ac2d9fbf3d0e46b582a
+        run: |
+          set -euo pipefail
+          curl -fsSL "https://raw.githubusercontent.com/akira-shirase-oss/colophon-cms/$COLOPHON_REF/design/tokens.css" -o "$RUNNER_TEMP/colophon-tokens.css"
+          cmp -s "$RUNNER_TEMP/colophon-tokens.css" src/styles/tokens.css || {
+            echo "src/styles/tokens.css differs from colophon-cms $COLOPHON_REF design/tokens.css: copy it again" >&2
+            exit 1
+          }
+          grep -q "$COLOPHON_REF" scripts/tokens.test.mjs || { echo "scripts/tokens.test.mjs pins another ref" >&2; exit 1; }
+          echo "a50494ed7ca60a21f2ffb7fd93bc996aaa7b5a2f0246184543ad0dfd5f557ed5  public/fonts/geist-pixel-latin.woff2" | sha256sum -c -
+      - name: Contrast table (every text pair 4.5:1, every boundary 3:1, light and dark)
+        run: node scripts/design-contrast.mjs
       - name: Build
         run: npm run build
       - name: Dist checks (headers and CSP, leaks, drafts, links, SEO, JSON-LD)

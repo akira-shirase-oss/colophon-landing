@@ -36,6 +36,7 @@
 //          sitemap or the feed still links to a retired address.
 //
 // Exits 1 and lists every failure, or prints one line per check that passed.
+import { themes, ratio as measure } from './design-contrast.mjs'
 import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { homedir, userInfo } from 'node:os'
@@ -600,27 +601,13 @@ function checkRedirects() {
 // ---------------------------------------------------------------------------------------------
 // code: highlighted code stays readable on the surface it is drawn on
 
-const luminance = (hex) => {
-  const h = hex.replace('#', '')
-  const full = h.length === 3 ? [...h].map((c) => c + c).join('') : h
-  return [0, 2, 4]
-    .map((i) => parseInt(full.slice(i, i + 2), 16) / 255)
-    .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
-    .reduce((sum, v, i) => sum + v * [0.2126, 0.7152, 0.0722][i], 0)
-}
-const contrast = (a, b) => {
-  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x)
-  return (hi + 0.05) / (lo + 0.05)
-}
-
 function checkCode() {
-  // The light surface is the first --c-surface; the dark one is the one set for :root[data-theme=dark].
-  const surface = css.map((sheet) => sheet.text.match(/--c-surface:\s*(#[0-9a-f]{3,6})\b/i)?.[1]).find(Boolean)
-  if (!surface) return void fail('code', 'no --c-surface colour in the built CSS, so the code surface is unknown')
-  const darkSurface = css
-    .map((sheet) => sheet.text.match(/:root\[data-theme=["']?dark["']?\]\s*{[^}]*--c-surface:\s*(#[0-9a-f]{3,6})\b/i)?.[1])
-    .find(Boolean)
-  if (!darkSurface) return void fail('code', 'no dark --c-surface in the built CSS, so the dark code surface is unknown')
+  // The code surface is --c-surface in each theme, resolved from the design tokens (src/styles/tokens.css, the
+  // copy of Colophon's, and theme.css over it) by the contrast table's own reader.
+  const t = themes()
+  const surface = t.light['c-surface']
+  const darkSurface = t.dark['c-surface']
+  if (!surface || !darkSurface) return void fail('code', 'no --c-surface in the design tokens, so the code surface is unknown')
   let tokens = 0
   for (const page of html) {
     const blocks = page.text.match(/<pre class="astro-code[\s\S]*?<\/pre>/g) ?? []
@@ -639,7 +626,7 @@ function checkCode() {
         // AA is 4.5:1; small monospace loses some to anti-aliasing, so the dark theme keeps a margin.
         for (const [colour, ground, floor, name] of [[light, surface, 4.5, 'light'], [dark, darkSurface, 4.8, 'dark']]) {
           if (!colour) continue
-          const ratio = contrast(colour, ground)
+          const ratio = measure(colour, ground)
           if (ratio < floor) fail('code', `${page.file}: ${name} code token ${colour} is ${ratio.toFixed(2)}:1 on the ${name} code surface ${ground} (want ${floor})`)
         }
       }
