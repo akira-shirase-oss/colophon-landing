@@ -28,8 +28,8 @@ const blog = defineCollection({
 const pages = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/pages' }),
   schema: z.object({
-    /** Decides the address: compare → /compare/<id>/; hub → /<id>/ (the index of a section, such as /compare/). */
-    kind: z.enum(['compare', 'hub']),
+    /** Decides the address: compare → /compare/<id>/; use-case → /use-cases/<id>/; hub → /<id>/ (the index of a section, such as /compare/). */
+    kind: z.enum(['compare', 'use-case', 'hub']),
     title: z.string().max(49),
     description: z.string().min(120).max(155),
     /** The search the page answers. Recorded, not rendered: the plan and Search Console are read against it. */
