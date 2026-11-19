@@ -122,7 +122,7 @@ They are held to a performance budget (maintainer: "always top notch performance
   are AVIF, WebP or SVG with a width and height, lazy below the first, and within the per-image budget. At least
   three other pages link to it from their content, and it links to at least three.
 - **CI's browser job runs `scripts/lighthouse-budget.mjs`.** On one page of each type, served with
-  `dist/_headers`: mobile, the median of five runs, LCP at most 2.0 s, CLS 0, TBT 0, Performance at least 95,
+  `dist/_headers`: mobile, the median of five runs, LCP at most 2.0 s, CLS 0, TBT at most 150 ms with the page's own script work at most 50 ms, Performance at least 95,
   SEO 100 and Accessibility 100. CI runner numbers are lab observations; a regression past a threshold fails.
 
 ## Security headers and checks

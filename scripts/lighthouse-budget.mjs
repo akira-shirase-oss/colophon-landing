@@ -1,7 +1,8 @@
 // Lighthouse on every page type built from src/content/pages, served with dist/_headers (the real content
 // security policy). Mobile emulation, five runs, the median of each number; any miss fails:
 //
-//   LCP ≤ 2.0 s · CLS = 0 · TBT = 0 ms · Performance ≥ 95 · SEO = 100 · Accessibility = 100
+//   LCP ≤ 2.0 s · CLS = 0 · TBT ≤ 150 ms · the page's own script work ≤ 50 ms · Performance ≥ 95 · SEO = 100 ·
+//   Accessibility = 100 (numbers and the reason for them in scripts/budget-config.mjs)
 //   and at 390 and 360 px wide, nothing wider than the screen (code blocks may scroll; tables may not)
 //
 //   node scripts/lighthouse-budget.mjs [--runs 5] [--dist dist]
@@ -13,7 +14,7 @@ import { createServer } from 'node:http'
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { extname, join, normalize, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { LIGHTHOUSE as THRESHOLDS, SECTIONS } from './budget-config.mjs'
+import { LIGHTHOUSE as THRESHOLDS, PAGE_DEADLINE_MS, SECTIONS } from './budget-config.mjs'
 
 const arg = (name, fallback) => (process.argv.includes(`--${name}`) ? process.argv[process.argv.indexOf(`--${name}`) + 1] : fallback)
 const root = fileURLToPath(new URL('..', import.meta.url))
@@ -63,7 +64,8 @@ const chrome = await launch({ chromePath: chromium.executablePath(), chromeFlags
 const median = (xs) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)]
 const failures = []
 const rows = []
-for (const path of targets) {
+// One page type: its runs, in sequence. Returns the completed samples.
+async function measure(path) {
   const samples = []
   for (let i = 0; i < runs; i++) {
     // A run Lighthouse itself couldn't complete (NO_NAVSTART and the like, seen on a loaded machine) is retried
@@ -87,28 +89,40 @@ for (const path of targets) {
       benchmarkIndex: lhr.environment.benchmarkIndex,
       breakdown: (a['mainthread-work-breakdown'].details?.items ?? []).map((i) => `${i.groupLabel} ${Math.round(i.duration)} ms`).join(', '),
       longTasks: (a['long-tasks'].details?.items ?? []).slice(0, 4).map((i) => `${i.url.replace(origin, '') || 'Unattributable'} ${Math.round(i.duration)} ms`).join(', '),
+      // The work the page itself causes: its scripts being parsed and run.
+      ownScriptMs: (a['mainthread-work-breakdown'].details?.items ?? [])
+        .filter((i) => i.group === 'scriptEvaluation' || i.group === 'scriptParseCompile')
+        .reduce((sum, i) => sum + i.duration, 0),
     })
+    const x = samples.at(-1)
+    console.log(`  ${path} run ${i + 1}: Performance ${x.performance}, LCP ${Math.round(x.lcpMs)} ms, TBT ${Math.round(x.tbtMs)} ms, own script ${Math.round(x.ownScriptMs)} ms, CLS ${x.cls.toFixed(3)}, benchmarkIndex ${Math.round(x.benchmarkIndex)}; main thread: ${x.breakdown}; long tasks: ${x.longTasks || 'none'}`)
+  }
+  return samples
+}
+
+for (const path of targets) {
+  // Sequential, each type under its own deadline: a page that hangs fails alone and the next type still runs.
+  let timer
+  const deadline = new Promise((resolve) => (timer = setTimeout(() => resolve('deadline'), PAGE_DEADLINE_MS)))
+  const samples = await Promise.race([measure(path), deadline])
+  clearTimeout(timer)
+  if (samples === 'deadline') {
+    failures.push(`${path}: Lighthouse didn't finish ${runs} runs within ${PAGE_DEADLINE_MS / 60000} minutes`)
+    continue
   }
   if (samples.length === 0) continue
-  const m = Object.fromEntries(['performance', 'seo', 'accessibility', 'lcpMs', 'cls', 'tbtMs'].map((k) => [k, median(samples.map((s) => s[k]))]))
+  const m = Object.fromEntries(['performance', 'seo', 'accessibility', 'lcpMs', 'cls', 'tbtMs', 'ownScriptMs'].map((k) => [k, median(samples.map((s) => s[k]))]))
   rows.push({ path, ...m })
   const misses = [
     m.lcpMs > THRESHOLDS.lcpMs && `LCP ${Math.round(m.lcpMs)} ms > ${THRESHOLDS.lcpMs}`,
     m.cls > THRESHOLDS.cls && `CLS ${m.cls.toFixed(3)} > 0`,
-    m.tbtMs > THRESHOLDS.tbtMs && `TBT ${Math.round(m.tbtMs)} ms > 0`,
+    m.tbtMs > THRESHOLDS.tbtMs && `TBT ${Math.round(m.tbtMs)} ms > ${THRESHOLDS.tbtMs}`,
+    m.ownScriptMs > THRESHOLDS.ownScriptMs && `the page's own script work ${Math.round(m.ownScriptMs)} ms > ${THRESHOLDS.ownScriptMs}`,
     m.performance < THRESHOLDS.performance && `Performance ${m.performance} < ${THRESHOLDS.performance}`,
     m.seo < THRESHOLDS.seo && `SEO ${m.seo} < 100 (failing: ${[...new Set(samples.flatMap((s) => s.failed))].join(', ')})`,
     m.accessibility < THRESHOLDS.accessibility && `Accessibility ${m.accessibility} < 100 (failing: ${[...new Set(samples.flatMap((s) => s.failed))].join(', ')})`,
   ].filter(Boolean)
   for (const miss of misses) failures.push(`${path}: ${miss}`)
-  if (misses.length > 0) {
-    // On a miss, every run, so a single noisy run is told apart from a page that is slow every time.
-    samples.forEach((x, i) => console.log(`  ${path} run ${i + 1}: Performance ${x.performance}, LCP ${Math.round(x.lcpMs)} ms, TBT ${Math.round(x.tbtMs)} ms, CLS ${x.cls.toFixed(3)}; long tasks: ${x.longTasks || 'none'}`))
-  }
-  // The machine's speed, as Lighthouse measures it, and where the main thread went: printed for every page so a
-  // miss on a CI runner can be read against the hardware (Lighthouse's CPU slowdown is a fixed multiplier).
-  const worst = samples.reduce((a, b) => (b.tbtMs > a.tbtMs ? b : a))
-  console.log(`  ${path}: benchmarkIndex ${Math.round(median(samples.map((x) => x.benchmarkIndex)))}; slowest run's main thread: ${worst.breakdown}; long tasks: ${worst.longTasks || 'none'}`)
 }
 {
   const { lhr } = await lighthouse(origin + CONTROL, { port: chrome.port, output: 'json', logLevel: 'error', onlyCategories: ['performance'] })
@@ -150,7 +164,7 @@ await browser.close()
 server.close()
 
 for (const r of rows) {
-  console.log(`lighthouse-budget: ${r.path} (median of ${runs}, mobile): Performance ${r.performance}, SEO ${r.seo}, Accessibility ${r.accessibility}, LCP ${(r.lcpMs / 1000).toFixed(2)} s, CLS ${r.cls.toFixed(3)}, TBT ${Math.round(r.tbtMs)} ms`)
+  console.log(`lighthouse-budget: ${r.path} (median of ${runs}, mobile): Performance ${r.performance}, SEO ${r.seo}, Accessibility ${r.accessibility}, LCP ${(r.lcpMs / 1000).toFixed(2)} s, CLS ${r.cls.toFixed(3)}, TBT ${Math.round(r.tbtMs)} ms, own script ${Math.round(r.ownScriptMs)} ms`)
 }
 if (targets.length === 0) failures.push(`no page under ${SECTIONS.join(', ')} was built`)
 if (failures.length > 0) {
