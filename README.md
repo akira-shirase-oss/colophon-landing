@@ -170,6 +170,20 @@ is not a dependency here; see the top of `scripts/check-csp-browser.mjs`.
 build and `npm run check`; then, in a second job with a pinned Playwright, `check-csp-browser.mjs --mutate`
 (which must fail) and `npm run check:browser`. Dependabot proposes one grouped npm PR and one grouped Actions PR a week.
 
+## After a deploy: IndexNow
+
+Once a new build is live, `node scripts/indexnow.mjs` tells search engines which pages changed through
+[IndexNow](https://www.indexnow.org) (Bing, Yandex and others share submissions). It works out the changes since
+the merge's first parent, the previous deploy:
+
+- **A changed or deleted post or page** sends its own address and the list that shows it.
+- **A change to layouts, components, styles, data, config or `public/`** sends every address in the sitemap.
+
+It sends one request with at most 10,000 URLs and a 10-second deadline, and it never fails a deploy: every outcome
+is printed and the exit code is 0. `--dry-run` prints the URLs without sending them; `--from` and `--to` take any two
+commits. The key in `public/<key>.txt` is public by design, because IndexNow verifies a submission by fetching it
+from the site. The maintainer approved IndexNow on 19 November 2026.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
