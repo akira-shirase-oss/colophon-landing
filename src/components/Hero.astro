@@ -1,6 +1,7 @@
 ---
 import ArrowButton from './ui/ArrowButton.astro'
 import { hero } from '../data/hero'
+import { QUICK_START } from '../data/app'
 import styles from './Hero.module.css'
 
 // Eight Colophon ideas as quiet line icons around the edges (lucide, stroke 1.5), placed outside the clear zone
@@ -50,7 +51,12 @@ const place = (i: (typeof ICONS)[number]) =>
       <h1 class={`t-hero ${styles.headline}`} data-print-title>{hero.headline}</h1>
       <script is:inline set:html={PRINT_TITLE} />
       <p class={`t-body ${styles.sub}`}>{hero.description}</p>
-      <ArrowButton href="https://github.com/akira-shirase-oss/colophon-cms" size="lg" focus="onBrand">See the source</ArrowButton>
+      <!-- Two actions (the maintainer's call): Get started in the kit's primary, the header's blue, and See the
+           source transparent on the gradient in the hero's navy. Both take the navy focus ring the blue needs. -->
+      <div class={styles.actions}>
+        <ArrowButton href={QUICK_START} size="lg" focus="onBrand">Get started</ArrowButton>
+        <ArrowButton href="https://github.com/akira-shirase-oss/colophon-cms" variant="onBrand" size="lg" focus="onBrand">See the source</ArrowButton>
+      </div>
     </div>
   </div>
 </section>

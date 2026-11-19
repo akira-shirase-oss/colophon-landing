@@ -18,6 +18,7 @@
 //          its dates and author; the sitemap lists exactly the indexable pages and the feed every post.
 // jsonld   every JSON-LD block is valid JSON with no "<" in it, so its data can't end the script
 //          (`</script>`) or swallow the rest of the page (`<!--`).
+// hero     the home page's two actions: Get started to the docs' quick start, then See the source
 // code     every highlighted code block is coloured through the theme variables (--shiki-light and
 //          --shiki-dark), never a fixed colour; every token reaches WCAG AA (4.5:1) on the light code
 //          surface (--c-surface) and 4.8:1 on the dark one.
@@ -681,6 +682,20 @@ function checkApp() {
   return { pages, appUrl }
 }
 
+// hero: the home page's two actions, in order (the maintainer's call): Get started to the docs' quick start, then
+// See the source to the repository.
+function checkHero() {
+  const home = html.find((page) => page.file === 'index.html')
+  if (!home) return void fail('hero', 'no index.html')
+  const at = home.text.indexOf('data-print-title')
+  const section = at < 0 ? '' : home.text.slice(at, home.text.indexOf('</section>', at))
+  const links = [...section.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)].map((m) => [m[1], m[2].replace(/<[^>]+>/g, '').trim()])
+  const want = [[/\/quick-start\/$/, 'Get started'], [/^https:\/\/github\.com\/akira-shirase-oss\/colophon-cms$/, 'See the source']]
+  if (links.length !== 2 || !want.every(([href, label], i) => href.test(links[i][0]) && links[i][1] === label))
+    fail('hero', `the hero's actions should be Get started (quick start) then See the source (repository): ${JSON.stringify(links)}`)
+  return links.length
+}
+
 // ---------------------------------------------------------------------------------------------
 // light: nothing that keeps painting while the visitor does nothing, or runs on every pointer or scroll move
 
@@ -722,6 +737,7 @@ const codeTokens = checkCode()
 const fontFaces = checkFonts()
 const appCheck = checkApp()
 const lightChecked = checkLight()
+const heroLinks = checkHero()
 
 if (failures.length) {
   console.error(`check-dist: ${failures.length} failure(s) in ${dist}\n`)
@@ -738,5 +754,6 @@ console.log(`  jsonld   ok: ${jsonLdBlocks} JSON-LD blocks, all valid JSON with 
 console.log(`  code     ok: ${codeTokens} code tokens coloured by the theme, all at AA on the light and dark code surfaces`)
 console.log(`  light    ok: ${lightChecked} stylesheets and scripts: no backdrop-filter, no endless animation, no move or scroll listeners`)
 console.log(appCheck.appUrl ? `  app      ok: ${appCheck.pages} pages link Sign in, Sign up and Dashboard to ${appCheck.appUrl}` : `  app      ok: no PUBLIC_APP_URL, so none of ${appCheck.pages} pages links to the app`)
+console.log(`  hero     ok: ${heroLinks} actions, Get started (the docs' quick start) then See the source`)
 console.log(`  fonts    ok: ${fontFaces} @font-face rules, all Geist Pixel or Inter; no other font file or preload`)
 console.log(`  redirects ok: ${redirectRules} permanent redirects to built pages; nothing links to a retired address`)

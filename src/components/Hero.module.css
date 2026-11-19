@@ -78,6 +78,13 @@
 .headline {
   color: var(--c-on-brand);
 }
+/* The two actions: side by side, centred, 12px apart (they fit side by side at 390 too: measured) */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
 /* 17.5px on a phone, growing to 20px from about 1024px wide */
 .sub {
   max-width: 60ch;

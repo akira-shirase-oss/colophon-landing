@@ -286,6 +286,30 @@ for (const viewport of [desktop, phone]) {
   })
 }
 
+// The hero's two actions: the same height, never overlapping, side by side and centred at 1440 and at 390 (they
+// fit there; a narrower phone may wrap them, centred), and See the source transparent on the gradient.
+for (const [width, height] of [[1440, 900], [390, 844]]) {
+  await visit('/', { width, height }, async (page, report) => {
+    interactions++
+    const h = await page.evaluate(() => {
+      const links = [...document.querySelector('[data-print-title]').parentElement.querySelectorAll('a')]
+      const card = document.querySelector('[data-print-title]').parentElement.getBoundingClientRect()
+      return {
+        card: [card.left, card.right],
+        boxes: links.map((a) => { const r = a.getBoundingClientRect(); return { label: a.textContent.trim(), left: r.left, right: r.right, top: r.top, h: r.height } }),
+        fill: links[1] ? getComputedStyle(links[1]).backgroundColor : null,
+      }
+    })
+    const [a, b] = h.boxes
+    if (!a || !b || a.label !== 'Get started' || b.label !== 'See the source') return void report(`[${width}px] the hero's actions are not Get started then See the source: ${JSON.stringify(h.boxes)}`)
+    if (a.h !== b.h) report(`[${width}px] the hero's buttons differ in height: ${a.h} vs ${b.h}`)
+    if (a.top !== b.top || a.right > b.left) report(`[${width}px] the hero's buttons are not side by side: ${JSON.stringify(h.boxes)}`)
+    const centre = (h.card[0] + h.card[1]) / 2, mid = (a.left + b.right) / 2
+    if (Math.abs(centre - mid) > 2) report(`[${width}px] the hero's buttons are off centre by ${(mid - centre).toFixed(1)}px`)
+    if (h.fill !== 'rgba(0, 0, 0, 0)') report(`[${width}px] See the source should be transparent on the gradient, not ${h.fill}`)
+  })
+}
+
 // The header's buttons. A build without PUBLIC_APP_URL shows "Get started" (the docs' quick start) and no account buttons; a build
 // with it follows the app's hint cookie (D-200): exactly colophon_signed_in=1 shows Dashboard alone; no cookie,
 // any other value, or no JavaScript shows Sign in and Sign up. The state is decided before the first paint, so

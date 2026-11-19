@@ -117,18 +117,19 @@ export const TEXT = [
   // The hero's brand block: navy type on the white-to-#0061ff gradient. The type sits in its top 70% (the
   // button's label is on the button), so the deepest ground it meets is the blue at 70% over the white.
   ['c-on-brand', 'c-brand-top'], ['c-on-brand', 'c-brand-bottom/70 over c-brand-top'],
-  ['c-brand-button-text', 'c-brand-button'], ['c-brand-button-text', 'c-brand-button-hover'],
+  // The hero's button is transparent: its navy label sits on the gradient itself. The button spans 62-77% of the
+  // way down the block at 1440 and 390 (measured from the layout), so its label is checked at the white top and
+  // at 85%, a margin past the deepest point; on hover the white/20 ground only lightens what is under it.
+  ['c-brand-button-text', 'c-brand-top'], ['c-brand-button-text', 'c-brand-bottom/85 over c-brand-top'],
   // Hover grounds on the page (secondary's tint over the page, the switch's ground).
   ['c-ink', 'c-switch-bg'], ['c-ink', 'muted/50 over c-bg'], ['c-text', 'muted/50 over c-bg'],
 ]
 export const MARKS = [
   ['input', 'c-bg'], ['input', 'popover'], ['ring', 'c-bg'], ['ring', 'card'], ['ring', 'c-surface'],
   ['brand', 'c-bg'], ['c-focus', 'c-bg'],
-  // Not measured: the hero button's fill against the gradient. It is the kit's primary (the maintainer's call,
-  // 2026-11-19) and reads about 1.5-2:1 there, which WCAG 1.4.11 allows: a button whose text label identifies
-  // it needs no 3:1 boundary (the label is the information that identifies the component, and white on
-  // --primary is in TEXT above). Its keyboard focus edge must show on the blue, so that is measured:
-  ['c-on-brand', 'c-brand-bottom/80 over c-brand-top'],
+  // The hero button's 1px edge and its keyboard focus edge, both the hero's navy, on the deepest blue under them
+  // (its label identifies it, so WCAG 1.4.11 doesn't require the edge at 3:1; it reaches it anyway):
+  ['c-brand-button-edge', 'c-brand-bottom/85 over c-brand-top'], ['c-on-brand', 'c-brand-bottom/85 over c-brand-top'],
   ['live', 'c-bg'], ['changed', 'c-bg'], ['pending', 'c-bg'], ['attention', 'c-bg'], ['draft', 'c-bg'],
 ]
 

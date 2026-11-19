@@ -50,6 +50,15 @@
   border-color: var(--c-on-brand);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-on-brand) 35%, transparent);
 }
+/* On the hero's gradient: no fill, the hero's navy edge and label, a white/20 ground on hover. */
+.onBrand {
+  border-color: var(--c-brand-button-edge);
+  background: transparent;
+  color: var(--c-brand-button-text);
+}
+.onBrand:hover {
+  background: var(--c-brand-button-hover);
+}
 .secondary {
   border-color: var(--border);
   background: var(--popover);
