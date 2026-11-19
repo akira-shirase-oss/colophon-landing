@@ -1,10 +1,31 @@
+/* "Ways to connect": one quiet strip of flat icon tiles and labels — the same surfaces the
+   permissions cover (REST, GraphQL, the TypeScript SDK, the CLI, the MCP server). */
+
+.section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 var(--content-pad, 52px);
+}
 .inner {
+  width: 100%;
+  max-width: var(--content-max, 1176px);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 40px;
   overflow: clip;
 }
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 .surfaces {
   list-style: none;
   display: flex;
@@ -19,26 +40,22 @@
   align-items: center;
   gap: 12px;
 }
-/* the same raised tile as the Why Colophon cards */
+/* a flat tile on the secondary ground, like the Why Colophon cards' icons */
 .icon {
   width: 64px;
   height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
-  background: linear-gradient(180deg, var(--c-tile-top) 0%, var(--c-tile-bottom) 100%);
-  color: var(--c-tile-ink);
-  box-shadow:
-    0 1px 1px var(--c-tile-drop),
-    0 2px 6px -1px var(--c-tile-spread),
-    inset 0 1px 0 var(--c-tile-highlight);
+  border-radius: calc(var(--radius) - 4px);
+  background: var(--secondary);
+  color: var(--secondary-foreground);
 }
 .label {
-  font-family: var(--font-text);
+  font-family: var(--font-sans);
   font-size: 14px;
   line-height: 1.4;
-  color: var(--c-ink);
+  color: var(--foreground);
   text-align: center;
 }
 
