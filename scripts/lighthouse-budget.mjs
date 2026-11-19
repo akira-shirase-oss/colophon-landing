@@ -47,11 +47,12 @@ const server = createServer((req, res) => {
 await new Promise((r) => server.listen(0, '127.0.0.1', r))
 const origin = `http://127.0.0.1:${server.address().port}`
 
-// One page of each type: the first built page in each section.
+// One page of each type: a section's own index (a hub) when it has one, and the first built page in it.
 const targets = SECTIONS.flatMap((s) => {
   const dir = join(dist, s)
-  const first = existsSync(dir) ? readdirSync(dir).filter((n) => existsSync(join(dir, n, 'index.html'))).sort()[0] : undefined
-  return first ? [`/${s}/${first}/`] : []
+  if (!existsSync(dir)) return []
+  const first = readdirSync(dir).filter((n) => existsSync(join(dir, n, 'index.html'))).sort()[0]
+  return [...(existsSync(join(dir, 'index.html')) ? [`/${s}/`] : []), ...(first ? [`/${s}/${first}/`] : [])]
 })
 
 const chrome = await launch({ chromePath: chromium.executablePath(), chromeFlags: ['--headless=new', '--no-sandbox'] })
@@ -61,8 +62,15 @@ const rows = []
 for (const path of targets) {
   const samples = []
   for (let i = 0; i < runs; i++) {
-    const { lhr } = await lighthouse(origin + path, { port: chrome.port, output: 'json', logLevel: 'error', onlyCategories: ['performance', 'seo', 'accessibility'] })
-    if (lhr.runtimeError) failures.push(`${path}: Lighthouse could not load the page (${lhr.runtimeError.code})`)
+    // A run Lighthouse itself couldn't complete (NO_NAVSTART and the like, seen on a loaded machine) is retried
+    // once; a second failure fails the budget. Every number used below comes from a completed run.
+    const audit = () => lighthouse(origin + path, { port: chrome.port, output: 'json', logLevel: 'error', onlyCategories: ['performance', 'seo', 'accessibility'] })
+    let { lhr } = await audit()
+    if (lhr.runtimeError) ({ lhr } = await audit())
+    if (lhr.runtimeError) {
+      failures.push(`${path}: Lighthouse could not load the page twice in a row (${lhr.runtimeError.code})`)
+      continue
+    }
     const a = lhr.audits
     samples.push({
       performance: Math.round(lhr.categories.performance.score * 100),
@@ -74,6 +82,7 @@ for (const path of targets) {
       failed: Object.values(a).filter((x) => x.scoreDisplayMode === 'binary' && x.score === 0).map((x) => x.id),
     })
   }
+  if (samples.length === 0) continue
   const m = Object.fromEntries(['performance', 'seo', 'accessibility', 'lcpMs', 'cls', 'tbtMs'].map((k) => [k, median(samples.map((s) => s[k]))]))
   rows.push({ path, ...m })
   const misses = [
