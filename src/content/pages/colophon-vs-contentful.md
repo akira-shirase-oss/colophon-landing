@@ -49,15 +49,15 @@ Checked on 19 November 2026.
 
 | | Colophon | Contentful |
 |---|---|---|
-| Where it runs | On your own servers: Docker, or a binary under systemd, with PostgreSQL | On Contentful's platform; plans are hosted spaces ([pricing](https://www.contentful.com/pricing/)) |
+| Where it runs | On your own servers: Docker, or a binary under systemd, with PostgreSQL | Hosted by Contentful; plans are hosted spaces ([pricing](https://www.contentful.com/pricing/)) |
 | Licence | MIT | A commercial service; its [MCP server](https://www.contentful.com/developers/docs/tools/mcp-server/) is open source |
 | Price | Free; you pay for your own servers | Free plan with 10 users, 2 roles, 2 locales and 100K API calls a month; Lite at $300 a month; Enterprise priced on request ([pricing](https://www.contentful.com/pricing/)) |
-| Grouped publishing | Every publish is a numbered release of the whole environment, and any past release can be read by its number | [Releases](https://www.contentful.com/help/content-releases-eap/) group entries and assets so one action publishes or unpublishes them together, and can be scheduled |
+| Releases | Every publish is a numbered release of the whole site, and any past release can be read by its number | [Releases](https://www.contentful.com/help/content-releases-eap/) group entries and assets so one action publishes or unpublishes them together, and can be scheduled |
 | Going back | A rollback is a publish request, reviewed like any other, that lands as a new release | [Environment aliases](https://www.contentful.com/developers/docs/tutorials/general/deploying-changes-with-environment-aliases/) let you point production back at a previous environment, mainly for content-model changes |
-| Scheduling | A local time in a named time zone, an explicit choice when the clocks change, and a full recheck when it runs | On Lite and above ([pricing](https://www.contentful.com/pricing/)); up to 200 pending scheduled entries per environment ([help](https://www.contentful.com/help/scheduled-publishing/)) |
+| Schedules | A local time in a named time zone, an explicit choice when the clocks change, and a full recheck when it runs | On Lite and above ([pricing](https://www.contentful.com/pricing/)); up to 200 pending scheduled entries per environment ([help](https://www.contentful.com/help/scheduled-publishing/)) |
 | Roles | Roles down to a single field or an editor's own entries; access changes go to an append-only audit log | Free: 2 roles; Lite: 3; Enterprise: custom ([pricing](https://www.contentful.com/pricing/)) |
 | AI agents | An MCP server: agents draft and ask for review with a scoped token; budgets and quotas per token | An official MCP server, hosted or local; tools include publishing entries ([docs](https://www.contentful.com/developers/docs/tools/mcp-server/)) |
-| Maturity | Pre-release (0.1.0-alpha.1), one maintainer, no users yet | An established hosted product |
+| Maturity | Pre-release, one maintainer, no users yet | An established hosted product |
 
 ## What Colophon does, and why it matters
 
