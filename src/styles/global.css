@@ -61,6 +61,10 @@
   --content-max: 1176px;
   --content-pad: calc(var(--panel-inset) + var(--panel-pad));
   --section-gap: clamp(72px, 9vw, 128px);
+  /* A page without a hero (the blog, a post, 404): the header to its first line. --header-clearance is the room the
+     header takes when it floats over the page (on a phone it is fixed; from a tablet up it is in the flow). */
+  --page-top: 56px;
+  --header-clearance: 0px;
 }
 /* Breakpoints mirror the source: desktop ≥1200, tablet 810–1199, phone <810 */
 @media (max-width: 1199px) {
@@ -74,6 +78,8 @@
     /* phones: tighter panels, so cards and text keep their width (content at 24px from the edge) */
     --panel-inset: 12px;
     --panel-pad: 12px;
+    --page-top: 40px;
+    --header-clearance: 72px;
   }
 }
 

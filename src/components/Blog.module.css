@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 148px var(--pad-x) 96px;
+  padding: calc(var(--header-clearance) + var(--page-top)) var(--pad-x) 96px;
 }
 .column {
   width: 100%;
@@ -270,9 +270,6 @@
   }
 }
 @media (max-width: 809px) {
-  .page {
-    padding-top: 120px;
-  }
   .hTitle,
   .postTitle {
     font-size: 32.9px;
