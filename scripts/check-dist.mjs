@@ -41,6 +41,7 @@
 // Exits 1 and lists every failure, or prints one line per check that passed.
 import { themes, ratio as measure } from './design-contrast.mjs'
 import { createHash } from 'node:crypto'
+import { ANALYTICS, scriptKind } from './csp-rules.mjs'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { homedir, userInfo } from 'node:os'
 import { extname, join, relative, resolve, sep } from 'node:path'
@@ -115,9 +116,8 @@ const decode = (s) =>
 
 const sha256 = (s) => `'sha256-${createHash('sha256').update(s, 'utf8').digest('base64')}'`
 
-/** Script types a browser runs, and so the CSP governs. Anything else (JSON-LD) is a data block. */
-const JS_TYPES = new Set(['', 'module', 'importmap', 'speculationrules', 'text/javascript', 'application/javascript'])
-const runs = (script) => JS_TYPES.has((script.attrs.get('type') ?? '').trim().toLowerCase())
+const typeOf = (script) => (script.attrs.get('type') ?? '').trim().toLowerCase()
+const runs = (script) => scriptKind(typeOf(script)) === 'runs'
 
 /** Relative URLs and the site's own origin are same-origin; everything else is not. */
 const sameOrigin = (url) => {
@@ -214,10 +214,12 @@ function checkPolicy(csp) {
   const scriptSrc = policy.get('script-src')
   if (!scriptSrc) return void fail('csp', "missing script-src (want 'self' plus hashes)")
   for (const s of scriptSrc) {
-    if (s !== "'self'" && !/^'sha(256|384|512)-[A-Za-z0-9+/]+={0,2}'$/.test(s)) {
-      fail('csp', `script-src allows ${s}; only 'self' and hashes are allowed`)
+    if (s !== "'self'" && s !== ANALYTICS.script && !/^'sha(256|384|512)-[A-Za-z0-9+/]+={0,2}'$/.test(s)) {
+      fail('csp', `script-src allows ${s}; only 'self', hashes and ${ANALYTICS.script} are allowed`)
     }
   }
+  if (!scriptSrc.includes(ANALYTICS.script)) fail('csp', `script-src lacks ${ANALYTICS.script}, so the analytics beacon is blocked`)
+  is('connect-src', `'self' ${ANALYTICS.report}`)
   const allowed = new Set(scriptSrc.filter((s) => s.startsWith("'sha")))
   const needed = new Map()
   for (const page of html) {
@@ -227,6 +229,8 @@ function checkPolicy(csp) {
       } else if (runs(script)) {
         const hash = sha256(script.body)
         if (!needed.has(hash)) needed.set(hash, { page: page.file, excerpt: script.body.trim().slice(0, 70) })
+      } else if (scriptKind(typeOf(script)) === 'unknown') {
+        fail('csp', `${page.file}: an inline <script type="${typeOf(script)}"> is neither JavaScript nor JSON-LD; hash it or remove it`)
       }
     }
   }

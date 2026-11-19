@@ -68,6 +68,8 @@ The field-level checks above live in one policy function in Colophon's Rust code
 
 Project API tokens use the same permission model as roles: read-only, full access, or a custom list narrowed by fields and own entries. A token is an identity of its own, so what it writes names the token. Revoking it is exact: no new request starts under it once the revocation commits. How this applies to AI agents, including the rule that a token can't approve what a token submitted, is in [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
 
+Setting this up is in the docs: [members and roles](https://docs.colophon.404human.dev/studio/members-and-roles/) in the Studio, and [authentication and API tokens](https://docs.colophon.404human.dev/api/authentication/) for scripts.
+
 ## What this doesn't cover yet
 
 - **The audit log doesn't record content edits or publishes.** Those are attributed through revision history and the release record, which name who saved and who published.

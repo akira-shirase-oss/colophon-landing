@@ -80,3 +80,5 @@ There's no model in the suite on purpose. The cases are deterministic attacks on
 ## Where to read next
 
 Roles for people work the same way and are covered in [field-level permissions](/blog/field-level-permissions/). How a CMS should answer for every publish, whoever proposed it, is in [six publishing questions a CMS should answer](/blog/headless-cms-publishing-checklist/).
+
+To connect an agent, the docs cover [the MCP server](https://docs.colophon.404human.dev/mcp/) and [making and scoping API tokens](https://docs.colophon.404human.dev/api/authentication/).

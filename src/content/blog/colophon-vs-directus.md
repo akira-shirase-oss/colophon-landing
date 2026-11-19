@@ -117,6 +117,8 @@ There's no Directus importer. Colophon imports JSONL and JSON arrays, plus Strap
 - **[On the roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md):** draft preview for headless sites (the Studio already previews pages of its own website starter), choosing a locale in the public content API, and images inside rich text (the editor inserts a placeholder for now).
 - **The 24-hour soak hasn't passed yet.**
 
+To try it, the docs' [quick start](https://docs.colophon.404human.dev/quick-start/) runs Colophon with Docker, and [installation](https://docs.colophon.404human.dev/installation/) covers serving it on a domain or under systemd.
+
 ## Who it isn't for
 
 If you need an admin and API over an existing SQL database, or a back office as much as a CMS, Directus is built for that and Colophon isn't. Colophon fits a team publishing a website that wants a record of every publish and a check of what reached the live site.

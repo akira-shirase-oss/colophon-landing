@@ -89,3 +89,5 @@ Entries can have locale variants, grouped as one logical entry. Each variant has
 ## Where to read next
 
 To see how this compares with a schema-as-code CMS, read [Colophon vs Strapi](/blog/colophon-vs-strapi/) or [Colophon vs Payload](/blog/colophon-vs-payload/). Why a rollback refuses old content that no longer fits the model is in [rolling back a release as a reviewed change](/blog/roll-back-a-bad-publish/).
+
+In the docs: how [linked entries](https://docs.colophon.404human.dev/studio/linked-entries/) behave in the Studio, and where content types and migrations live under [Settings](https://docs.colophon.404human.dev/studio/settings/).
