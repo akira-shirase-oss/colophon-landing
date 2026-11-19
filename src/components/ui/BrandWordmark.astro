@@ -1,9 +1,8 @@
 ---
 /** The oversized "Colophon" at the foot of every page, set in Geist Pixel's own cells (wordmark-cells.ts,
  * generated from the shipped font), like a receipt printer's dots: every publish leaves a receipt. One path
- * of separate squares with the hairline between them drawn in, so there is no mask to paint. Decorative: the name is already in the footer. The first time the footer comes into view it
- * prints from the top down, row by row (Footer.astro's script arms it; still without JavaScript or when
- * motion is reduced). */
+ * of separate squares with the hairline between them drawn in, so there is no mask to paint. Decorative: the name
+ * is already in the footer. It is there from the first paint: nothing waits for a scroll (the maintainer's call). */
 import { wordmark } from './wordmark-cells'
 
 type Props = { class?: string }
@@ -27,15 +26,6 @@ const { class: className } = Astro.props
   @media (max-width: 809px) {
     svg {
       shape-rendering: geometricPrecision;
-    }
-  }
-  /* Printing: the rows appear from the top, in steps, once. */
-  @media (prefers-reduced-motion: no-preference) {
-    :global([data-wordmark][data-print='armed']) {
-      clip-path: inset(0 0 100% 0);
-    }
-    :global([data-wordmark][data-print='go']) {
-      animation: print var(--print-line) steps(var(--rows), end) both;
     }
   }
 </style>

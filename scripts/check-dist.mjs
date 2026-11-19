@@ -18,13 +18,15 @@
 //          its dates and author; the sitemap lists exactly the indexable pages and the feed every post.
 // jsonld   every JSON-LD block is valid JSON with no "<" in it, so its data can't end the script
 //          (`</script>`) or swallow the rest of the page (`<!--`).
+// reveal   every section is visible at the first paint: no data-reveal or armed start state, and no
+//          IntersectionObserver but the closing statement's (it starts readable, muted, and lights its words once)
 // hero     the home page's two actions: Get started to the docs' quick start, then See the source
 // code     every highlighted code block is coloured through the theme variables (--shiki-light and
 //          --shiki-dark), never a fixed colour; every token reaches WCAG AA (4.5:1) on the light code
 //          surface (--c-surface) and 4.8:1 on the dark one.
 // light    the page stays still unless someone acts: no backdrop-filter (a blurred sticky layer re-blurs on
 //          every frame), no animation that repeats forever, and no script listening to pointer or mouse moves,
-//          scroll, wheel or touch moves. One-time effects (the title and wordmark print, the theme toggle's view
+//          scroll, wheel or touch moves. One-time effects (the title's print at load, the theme toggle's view
 //          transition on click) are fine.
 // app      the account buttons ship only in a build made with PUBLIC_APP_URL: without it, no page links to the
 //          app's sign-in, sign-up or dashboard (the app isn't live), and the header shows "Get started"
@@ -696,6 +698,32 @@ function checkHero() {
   return links.length
 }
 
+// reveal: every section is there at the first paint (the maintainer's call): nothing starts hidden waiting for a
+// scroll. No element carries a reveal or armed state, and nothing observes the viewport (IntersectionObserver),
+// with ONE exception, also the maintainer's: the home page's closing statement ([data-statement]) brightens its
+// words once when it comes into view. It starts readable (--muted-foreground, 4.5:1 in the contrast table), its
+// rest state is set by its script rather than the HTML, and its one inline script observes that section only.
+function checkReveal() {
+  let scanned = 0
+  for (const page of html) {
+    scanned++
+    if (/\bdata-reveal\b|data-print="armed"|data-light=/.test(page.text)) fail('reveal', `${page.file} has an element that starts in a scroll-reveal state`)
+    const observers = [...page.text.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]).filter((js) => /IntersectionObserver/.test(js))
+    const statement = page.file === 'index.html' && observers.length === 1 && /querySelector\('\[data-statement\]'\)/.test(observers[0]) && /\.disconnect\(\)/.test(observers[0]) && /prefers-reduced-motion: reduce/.test(observers[0]) && (observers[0].match(/\.observe\(/g) ?? []).length === 1
+    if (observers.length && !statement) fail('reveal', `${page.file} observes the viewport (IntersectionObserver): only the closing statement may, once, and only itself`)
+    if (/IntersectionObserver/.test(page.text.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, ''))) fail('reveal', `${page.file} mentions IntersectionObserver outside a script`)
+  }
+  for (const sheet of css) {
+    scanned++
+    if (/\[data-reveal|data-print=["']?armed/.test(sheet.text)) fail('reveal', `${sheet.file} styles a scroll-reveal start state`)
+  }
+  for (const file of files.filter((f) => extname(f) === '.js')) {
+    scanned++
+    if (/IntersectionObserver/.test(readFileSync(file, 'utf8'))) fail('reveal', `${rel(file)} observes the viewport (IntersectionObserver): sections must not wait for a scroll`)
+  }
+  return scanned
+}
+
 // ---------------------------------------------------------------------------------------------
 // light: nothing that keeps painting while the visitor does nothing, or runs on every pointer or scroll move
 
@@ -738,6 +766,7 @@ const fontFaces = checkFonts()
 const appCheck = checkApp()
 const lightChecked = checkLight()
 const heroLinks = checkHero()
+const revealScanned = checkReveal()
 
 if (failures.length) {
   console.error(`check-dist: ${failures.length} failure(s) in ${dist}\n`)
@@ -754,6 +783,7 @@ console.log(`  jsonld   ok: ${jsonLdBlocks} JSON-LD blocks, all valid JSON with 
 console.log(`  code     ok: ${codeTokens} code tokens coloured by the theme, all at AA on the light and dark code surfaces`)
 console.log(`  light    ok: ${lightChecked} stylesheets and scripts: no backdrop-filter, no endless animation, no move or scroll listeners`)
 console.log(appCheck.appUrl ? `  app      ok: ${appCheck.pages} pages link Sign in, Sign up and Dashboard to ${appCheck.appUrl}` : `  app      ok: no PUBLIC_APP_URL, so none of ${appCheck.pages} pages links to the app`)
+console.log(`  reveal   ok: ${revealScanned} pages, stylesheets and scripts: nothing starts hidden for a scroll; one observer, the closing statement's`)
 console.log(`  hero     ok: ${heroLinks} actions, Get started (the docs' quick start) then See the source`)
 console.log(`  fonts    ok: ${fontFaces} @font-face rules, all Geist Pixel or Inter; no other font file or preload`)
 console.log(`  redirects ok: ${redirectRules} permanent redirects to built pages; nothing links to a retired address`)

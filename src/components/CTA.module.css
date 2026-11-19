@@ -35,6 +35,55 @@
 .keep {
   white-space: nowrap;
 }
+
+/* The one scroll effect (CTA.astro): at rest the words are --muted-foreground, and once in view they brighten to
+   --foreground in reading order. The rest state is set by the script, only when motion is allowed, so without it
+   the sentence is --foreground. */
+.statement[data-light='rest'] .w {
+  color: var(--muted-foreground);
+}
+.statement[data-light='go'] .w {
+  color: var(--foreground);
+  transition: color 250ms var(--ease) var(--d);
+}
+.pop,
+.wiggle {
+  display: inline-block;
+}
+@keyframes pop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-8deg);
+  }
+  75% {
+    transform: rotate(8deg);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .statement[data-light='go'] .pop {
+    animation: pop 250ms var(--ease) var(--d) 1 both;
+  }
+  .wiggle[data-tap] {
+    animation: wiggle 300ms var(--ease) 1;
+  }
+  @media (hover: hover) {
+    .wiggle:hover {
+      animation: wiggle 300ms var(--ease) 1;
+    }
+  }
+}
 .more {
   align-self: flex-start;
   font-family: var(--font-sans);

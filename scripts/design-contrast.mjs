@@ -114,22 +114,21 @@ export const TEXT = [
   ['foreground', 'popover'], ['muted-foreground', 'popover'],
   // Diagrams in posts.
   ['c-figure-ink', 'c-figure-fill'], ['c-figure-text', 'c-figure-fill'],
-  // The hero's brand block: navy type on the white-to-#0061ff gradient. The type sits in its top 70% (the
-  // button's label is on the button), so the deepest ground it meets is the blue at 70% over the white.
-  ['c-on-brand', 'c-brand-top'], ['c-on-brand', 'c-brand-bottom/70 over c-brand-top'],
-  // The hero's button is transparent: its navy label sits on the gradient itself. The button spans 62-77% of the
-  // way down the block at 1440 and 390 (measured from the layout), so its label is checked at the white top and
-  // at 85%, a margin past the deepest point; on hover the white/20 ground only lightens what is under it.
-  ['c-brand-button-text', 'c-brand-top'], ['c-brand-button-text', 'c-brand-bottom/85 over c-brand-top'],
+  // The hero, inverted against the page (black on the light page, white on the dark one): its title, its paragraph,
+  // the outline button's label and that label on its 9% hover ground; white on the blue button.
+  ['hero-fg', 'hero-bg'], ['hero-muted', 'hero-bg'], ['hero-fg', 'hero-fg/9 over hero-bg'],
+  ['primary-foreground', 'primary'],
+  // The closing statement: its words rest in --muted-foreground and light to --foreground on the page (CTA.astro).
+  ['muted-foreground', 'background'], ['foreground', 'background'],
   // Hover grounds on the page (secondary's tint over the page, the switch's ground).
   ['c-ink', 'c-switch-bg'], ['c-ink', 'muted/50 over c-bg'], ['c-text', 'muted/50 over c-bg'],
 ]
 export const MARKS = [
   ['input', 'c-bg'], ['input', 'popover'], ['ring', 'c-bg'], ['ring', 'card'], ['ring', 'c-surface'],
   ['brand', 'c-bg'], ['c-focus', 'c-bg'],
-  // The hero button's 1px edge and its keyboard focus edge, both the hero's navy, on the deepest blue under them
-  // (its label identifies it, so WCAG 1.4.11 doesn't require the edge at 3:1; it reaches it anyway):
-  ['c-brand-button-edge', 'c-brand-bottom/85 over c-brand-top'], ['c-on-brand', 'c-brand-bottom/85 over c-brand-top'],
+  // The hero's icons (3:1 on the hero, the same grey in both themes), the outline button's edge, the blue
+  // button's fill and the kit's focus ring, each against the hero's ground.
+  ['hero-icon', 'hero-bg'], ['hero-fg', 'hero-bg'], ['primary', 'hero-bg'], ['ring', 'hero-bg'],
   ['live', 'c-bg'], ['changed', 'c-bg'], ['pending', 'c-bg'], ['attention', 'c-bg'], ['draft', 'c-bg'],
 ]
 

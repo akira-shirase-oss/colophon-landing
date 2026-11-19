@@ -4,8 +4,6 @@ import Button from './Button.astro'
 type Props = {
   href: string
   variant?: 'primary' | 'secondary' | 'onBrand'
-  /** onBrand: the navy focus edge, for a button on the hero's gradient */
-  focus?: 'ring' | 'onBrand'
   /** stretch to the parent's width */
   block?: boolean
   size?: 'sm' | 'default' | 'lg'
@@ -14,9 +12,9 @@ type Props = {
 /**
  * A link that goes somewhere: the Studio's button (Button.astro) with the site's pixel arrow after the label.
  */
-const { href, variant = 'primary', block = false, size = 'default', focus = 'ring' } = Astro.props
+const { href, variant = 'primary', block = false, size = 'default' } = Astro.props
 ---
 
-<Button href={href} variant={variant} size={size} focus={focus} block={block} arrow>
+<Button href={href} variant={variant} size={size} block={block} arrow>
   <slot />
 </Button>

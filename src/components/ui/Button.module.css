@@ -45,19 +45,15 @@
 .primary:hover {
   background: var(--primary-hover);
 }
-/* On the hero's gradient the ring's blue disappears: the focus edge and halo are the brand block's navy. */
-.focusOnBrand:focus-visible {
-  border-color: var(--c-on-brand);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-on-brand) 35%, transparent);
-}
-/* On the hero's gradient: no fill, the hero's navy edge and label, a white/20 ground on hover. */
+/* On the hero: no fill, its edge and label in the hero's ink (white on the black hero, near-black on the white
+   one), a ground of that ink at 9% on hover. The kit's focus ring reads on both heroes. */
 .onBrand {
-  border-color: var(--c-brand-button-edge);
+  border-color: var(--hero-fg);
   background: transparent;
-  color: var(--c-brand-button-text);
+  color: var(--hero-fg);
 }
 .onBrand:hover {
-  background: var(--c-brand-button-hover);
+  background: var(--hero-hover);
 }
 .secondary {
   border-color: var(--border);

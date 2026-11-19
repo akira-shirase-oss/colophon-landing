@@ -8,11 +8,8 @@ import styles from './Button.module.css'
  */
 type Props = {
   href?: string
-  /** onBrand: transparent with a navy edge and label, for the hero's gradient (pair it with focus="onBrand") */
+  /** onBrand: transparent, its edge and label in the hero's ink, for a button on the hero */
   variant?: 'primary' | 'secondary' | 'ghost' | 'onBrand'
-  /** onBrand: a focus edge and halo in the brand block's navy, for a button on the hero's gradient, where the
-      ring's blue would disappear */
-  focus?: 'ring' | 'onBrand'
   size?: 'sm' | 'default' | 'lg'
   /** a trailing arrow, for a link that goes somewhere */
   arrow?: boolean
@@ -22,8 +19,8 @@ type Props = {
   class?: string
   [attr: string]: unknown
 }
-const { href, variant = 'primary', size = 'default', focus = 'ring', arrow = false, block = false, type = 'button', class: extra, ...rest } = Astro.props
-const cls = [styles.button, styles[variant], styles[size], focus === 'onBrand' ? styles.focusOnBrand : '', arrow ? styles.withArrow : '', block ? styles.block : '', extra ?? ''].filter(Boolean).join(' ')
+const { href, variant = 'primary', size = 'default', arrow = false, block = false, type = 'button', class: extra, ...rest } = Astro.props
+const cls = [styles.button, styles[variant], styles[size], arrow ? styles.withArrow : '', block ? styles.block : '', extra ?? ''].filter(Boolean).join(' ')
 ---
 
 {

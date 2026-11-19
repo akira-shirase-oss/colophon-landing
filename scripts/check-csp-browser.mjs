@@ -287,7 +287,7 @@ for (const viewport of [desktop, phone]) {
 }
 
 // The hero's two actions: the same height, never overlapping, side by side and centred at 1440 and at 390 (they
-// fit there; a narrower phone may wrap them, centred), and See the source transparent on the gradient.
+// fit there; a narrower phone may wrap them, centred), and See the source transparent on the hero.
 for (const [width, height] of [[1440, 900], [390, 844]]) {
   await visit('/', { width, height }, async (page, report) => {
     interactions++
@@ -306,7 +306,7 @@ for (const [width, height] of [[1440, 900], [390, 844]]) {
     if (a.top !== b.top || a.right > b.left) report(`[${width}px] the hero's buttons are not side by side: ${JSON.stringify(h.boxes)}`)
     const centre = (h.card[0] + h.card[1]) / 2, mid = (a.left + b.right) / 2
     if (Math.abs(centre - mid) > 2) report(`[${width}px] the hero's buttons are off centre by ${(mid - centre).toFixed(1)}px`)
-    if (h.fill !== 'rgba(0, 0, 0, 0)') report(`[${width}px] See the source should be transparent on the gradient, not ${h.fill}`)
+    if (h.fill !== 'rgba(0, 0, 0, 0)') report(`[${width}px] See the source should be transparent on the hero, not ${h.fill}`)
   })
 }
 
@@ -345,7 +345,8 @@ if (!appBuild) {
       window.__csp = []
       window.__cls = 0
       document.addEventListener('securitypolicyviolation', (e) => window.__csp.push(e.effectiveDirective))
-      new PerformanceObserver((l) => { for (const e of l.getEntries()) if (!e.hadRecentInput) window.__cls += e.value }).observe({ type: 'layout-shift', buffered: true })
+      window.__shifted = []
+      new PerformanceObserver((l) => { for (const e of l.getEntries()) if (!e.hadRecentInput) { window.__cls += e.value; window.__shifted.push(...e.sources.map((x) => `${x.node?.nodeName ?? '?'}${x.node?.className && typeof x.node.className === 'string' ? '.' + x.node.className.split(' ')[0] : ''} y ${Math.round(x.previousRect.y)}→${Math.round(x.currentRect.y)} h ${Math.round(x.previousRect.height)}→${Math.round(x.currentRect.height)} at ${Math.round(e.startTime)}ms`)) } }).observe({ type: 'layout-shift', buffered: true })
     })
     const page = await context.newPage()
     await page.goto(origin + '/', { waitUntil: 'networkidle' })
@@ -353,8 +354,8 @@ if (!appBuild) {
     interactions++
     const got = (await shown(page)).join(',')
     if (got !== want) problems.push(`/ [account buttons, ${name}]: shows ${got || 'nothing'} (want ${want})`)
-    const { csp, cls } = await page.evaluate(() => ({ csp: window.__csp.length, cls: window.__cls }))
-    if (cls > 0) problems.push(`/ [account buttons, ${name}]: the page shifted (CLS ${cls.toFixed(4)})`)
+    const { csp, cls, shifted } = await page.evaluate(() => ({ csp: window.__csp.length, cls: window.__cls, shifted: window.__shifted }))
+    if (cls > 0) problems.push(`/ [account buttons, ${name}]: the page shifted (CLS ${cls.toFixed(4)}): ${shifted.join('; ')}`)
     if (csp) problems.push(`/ [account buttons, ${name}]: ${csp} CSP violation(s)`)
     await context.close()
   }
@@ -368,16 +369,41 @@ if (!appBuild) {
   await noJs.close()
 }
 
-// The footer wordmark prints once when it scrolls into view, and the hero's icons stay where they are when the
-// pointer moves (no tracking, no running animation). The wordmark is still under reduced motion.
+// Every section is there at the first paint (the maintainer's call): nothing below the fold starts hidden or
+// shifted waiting for a scroll, and the footer wordmark stands in full. The hero's icons stay where they are when
+// the pointer moves (no tracking, no running animation).
 await visit('/', desktop, async (page, report) => {
   interactions++
-  const before = await page.evaluate(() => document.querySelector('[data-wordmark]').dataset.print)
-  if (before !== 'go' && before !== 'armed') report(`the wordmark was not armed below the fold (data-print=${before})`)
+  const hidden = await page.evaluate(() =>
+    [...document.querySelectorAll('main *, footer *')]
+      .filter((e) => { if (e.closest('[aria-hidden="true"]')) return false; const s = getComputedStyle(e); return s.opacity === '0' || /inset\(0(px)? 0(px)? 100%/.test(s.clipPath) })
+      .map((e) => e.tagName.toLowerCase() + (e.className && typeof e.className === 'string' ? '.' + e.className.split(' ')[0] : ''))
+      .slice(0, 5),
+  )
+  if (hidden.length) report(`elements start hidden before any scroll: ${hidden.join(', ')}`)
+  const marked = await page.evaluate(() => document.querySelectorAll('[data-reveal], [data-print="armed"]').length)
+  if (marked) report(`${marked} element(s) wait for a scroll reveal`)
+  // The one exception, the closing statement: below the fold it rests readable in --muted-foreground, and once in
+  // view its words light to --foreground (and stay); its illustrations pop once and nothing keeps running.
+  const tone = () => page.evaluate(() => {
+    const p = document.querySelector('[data-statement]')
+    const probe = (v) => { const e = document.createElement('span'); e.style.color = `var(${v})`; p.append(e); const c = getComputedStyle(e).color; e.remove(); return c }
+    const words = [...p.querySelectorAll('span[style*="--d"]')].filter((e) => !e.querySelector('svg'))
+    return { light: p.dataset.light ?? null, colors: [...new Set(words.map((w) => getComputedStyle(w).color))], muted: probe('--muted-foreground'), fg: probe('--foreground'), words: words.length }
+  })
+  const rest = await tone()
+  if (rest.light !== 'rest' || rest.colors.length !== 1 || rest.colors[0] !== rest.muted || rest.words < 20) report(`the closing statement should rest in --muted-foreground below the fold: ${JSON.stringify(rest)}`)
+  await page.evaluate(() => document.querySelector('[data-statement]').scrollIntoView({ block: 'center' }))
+  await page.waitForTimeout(1200)
+  const lit = await tone()
+  if (lit.light !== 'go' || lit.colors.length !== 1 || lit.colors[0] !== lit.fg) report(`the closing statement did not light to --foreground once in view: ${JSON.stringify(lit)}`)
+  const left = await page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length)
+  if (left) report(`${left} animation(s) still running 1.2 s after the statement lit`)
+  const before = await page.evaluate(() => { const w = document.querySelector('[data-wordmark]'); return { print: w.dataset.print ?? null, clip: getComputedStyle(w).clipPath } })
   await page.evaluate(() => document.querySelector('footer').scrollIntoView({ block: 'end' }))
-  await page.waitForTimeout(1500)
-  const after = await page.evaluate(() => { const w = document.querySelector('[data-wordmark]'); return { print: w.dataset.print, clip: getComputedStyle(w).clipPath } })
-  if (after.print !== 'go' || /100%/.test(after.clip)) report(`the wordmark never printed: ${JSON.stringify(after)}`)
+  await page.waitForTimeout(300)
+  const after = await page.evaluate(() => { const w = document.querySelector('[data-wordmark]'); return { print: w.dataset.print ?? null, clip: getComputedStyle(w).clipPath } })
+  if (before.print !== null || before.clip !== 'none' || after.print !== null || after.clip !== 'none') report(`the footer wordmark is not simply there: ${JSON.stringify({ before, after })}`)
   await page.evaluate(() => scrollTo(0, 0))
   const boxes = () => page.evaluate(() => [...document.querySelectorAll('[data-hero-field] > span')].map((e) => { const r = e.getBoundingClientRect(); return `${Math.round(r.left)},${Math.round(r.top)}` }).join(' '))
   const at = await boxes()
@@ -385,6 +411,15 @@ await visit('/', desktop, async (page, report) => {
   await page.mouse.move(1300, 700, { steps: 10 })
   await page.waitForTimeout(300)
   if ((await boxes()) !== at) report('the hero icons moved with the pointer')
+  // A tap on a hero icon plays its wiggle once and returns to rest; the icons stay decorative (not focusable).
+  const icon = page.locator('[data-hero-field] > span').first()
+  await icon.click({ force: true })
+  const tapped = await icon.evaluate((m) => ({ tap: m.hasAttribute('data-tap'), anims: m.querySelector('svg').getAnimations().length }))
+  await page.waitForTimeout(500)
+  const rested = await icon.evaluate((m) => ({ tap: m.hasAttribute('data-tap'), anims: m.querySelector('svg').getAnimations().length }))
+  if (!tapped.tap || !tapped.anims || rested.tap || rested.anims) report(`a hero icon's tap wiggle did not play once and rest: ${JSON.stringify({ tapped, rested })}`)
+  const focusable = await page.evaluate(() => document.querySelectorAll('[data-hero-field] a, [data-hero-field] button, [data-hero-field] [tabindex]').length)
+  if (focusable) report(`${focusable} focusable element(s) in the decorative hero icons`)
   const running = await page.evaluate(() => document.getAnimations().filter((a) => a.effect?.getComputedTiming().iterations === Infinity).length)
   if (running) report(`${running} animation(s) run forever`)
 })
@@ -393,8 +428,8 @@ await visit('/', desktop, async (page, report) => {
   const page = await context.newPage()
   await page.goto(origin + '/', { waitUntil: 'networkidle' })
   interactions++
-  const still = await page.evaluate(() => ({ print: document.querySelector('[data-wordmark]').dataset.print ?? null, running: document.getAnimations().length }))
-  if (still.print !== null || still.running) problems.push(`/ [reduced motion]: something still moves: ${JSON.stringify(still)}`)
+  const still = await page.evaluate(() => ({ print: document.querySelector('[data-wordmark]').dataset.print ?? null, light: document.querySelector('[data-statement]').dataset.light ?? null, running: document.getAnimations().length }))
+  if (still.print !== null || still.light !== null || still.running) problems.push(`/ [reduced motion]: something still moves or waits: ${JSON.stringify(still)}`)
   await context.close()
 }
 

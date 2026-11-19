@@ -94,18 +94,16 @@
   --c-button-quiet-hover: var(--accent);
   --c-button-quiet-text: var(--foreground);
 
-  /* ---- The brand block (the hero): white at the top to #0061ff at the bottom, the same in both themes,
-     with navy type and a transparent navy-edged button. ---- */
-  --c-brand-top: var(--gradient-brand-from);
-  --c-brand-bottom: var(--gradient-brand-to);
-  --c-on-brand: #08142b;
-  /* The hero's button (the maintainer's call, 2026-11-19): transparent on the gradient, a 1px edge and its label in
-     the hero's navy, so it reads as part of the hero; a white/20 ground on hover. The same in both themes. */
-  --c-brand-button-text: var(--c-on-brand);
-  --c-brand-button-edge: var(--c-on-brand);
-  --c-brand-button-hover: oklch(1 0 0 / 0.2);
-  --c-brand-edge: oklch(0.2 0.04 260 / 0.12);
-  --c-brand-icon: oklch(0.33 0.12 262 / 0.5);
+  /* ---- The hero: an inverted card that always stands against the page (the maintainer's call, 2026-11-19,
+     replacing the gradient): near-black with white type on the light page, white with near-black type on the
+     dark one. One flip: every hero colour is one of these. --hero-icon is one mid-grey that reads at 3:1 on both.
+     The outline button is the hero's ink, with a hover ground of that ink at 9%. ---- */
+  --hero-bg: #141414;
+  --hero-fg: #fafafa;
+  --hero-muted: #c4c4c4;
+  --hero-icon: #8a8a8a;
+  --hero-border: #141414;
+  --hero-hover: color-mix(in srgb, var(--hero-fg) 9%, transparent);
 
   /* ---- Pixel-art illustrations in the closing statement: one small palette with a 1-cell outline ---- */
   --c-px-outline: #14161c;
@@ -158,10 +156,11 @@
   --surface-footer: #1d1d1b;
   --c-wordmark: #262624;
 
-  --c-on-brand: #08142b;
-  --c-brand-button-hover: oklch(1 0 0 / 0.2);
-  --c-brand-edge: oklch(1 0 0 / 0.1);
-  --c-brand-icon: oklch(0.33 0.12 262 / 0.5);
+  --hero-bg: #fafafa;
+  --hero-fg: #141414;
+  --hero-muted: #4d4d4d;
+  --hero-icon: #8a8a8a;
+  --hero-border: #fafafa;
 
   --c-px-outline: #e9e7e1;
   --c-px-blue: #4d8dff;

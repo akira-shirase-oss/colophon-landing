@@ -41,10 +41,7 @@
   gap: 0;
   padding: var(--section-card-padding);
   background: var(--surface-section);
-  transition:
-    border-color 0.15s var(--ease),
-    transform 0.4s var(--ease),
-    opacity 0.4s var(--ease);
+  transition: border-color 0.15s var(--ease);
 }
 
 .titleRow {
@@ -104,14 +101,6 @@
   }
 }
 
-/* entrance, once: set by the component's script only, so the cards are always visible without it */
-.grid[data-reveal='pending'] .card {
-  opacity: 0;
-  transform: translateY(8px);
-}
-.grid[data-reveal='shown'] .card {
-  transition-delay: 0s, calc(var(--i) * 50ms), calc(var(--i) * 50ms);
-}
 
 /* ---------- Tablet ---------- */
 @media (max-width: 1199px) {

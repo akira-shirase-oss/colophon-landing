@@ -13,15 +13,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* the Studio's card radius (--radius-card), so the brand block reads as one of the product's surfaces */
+  /* the Studio's card radius (--radius-card); inverted against the page in each theme (theme.css --hero-*) */
   border-radius: var(--radius-card);
   overflow: clip;
   isolation: isolate;
+  background: var(--hero-bg);
+  box-shadow: inset 0 0 0 1px var(--hero-border);
+  color: var(--hero-fg);
 }
 
-/* The icon field: quiet marks around the edges, navy at low opacity so they read on the white top and the blue
-   bottom alike, never in the clear zone around the words. They stand still: no loop, no pointer tracking, so an
-   idle page paints nothing. Hovering one turns and brightens it, in CSS (transform and opacity, 150ms). */
+/* The icon field: marks around the edges in one mid-grey that reads at 3:1 on the black hero and the white one
+   (--hero-icon), never in the clear zone around the words. They stand still: no loop, no pointer tracking, no
+   scroll, so an idle page paints nothing. Hovering or tapping one gives it a small wiggle, 300ms, transform only,
+   back to rest (the hero's script retriggers it on tap); reduced motion turns it off. Decorative: the field is
+   aria-hidden and nothing in it is focusable. */
 .field {
   position: absolute;
   inset: 0;
@@ -35,29 +40,34 @@
   width: var(--s);
   height: var(--s);
   margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
-  color: var(--c-brand-icon);
-  opacity: 0.5;
+  color: var(--hero-icon);
   transform: rotate(var(--r));
-  transition: opacity 0.15s var(--ease);
 }
 .mark svg {
   display: block;
   width: 100%;
   height: 100%;
-  transition: transform 0.15s var(--ease);
 }
-@media (hover: hover) {
-  .mark:hover {
-    opacity: 1;
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
   }
-  .mark:hover svg {
-    transform: rotate(10deg) scale(1.06);
+  30% {
+    transform: rotate(-10deg) scale(1.1);
+  }
+  65% {
+    transform: rotate(8deg) scale(1.05);
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .mark,
-  .mark svg {
-    transition: none;
+@media (prefers-reduced-motion: no-preference) {
+  .mark[data-tap] svg {
+    animation: wiggle 300ms var(--ease) 1;
+  }
+  @media (hover: hover) {
+    .mark:hover svg {
+      animation: wiggle 300ms var(--ease) 1;
+    }
   }
 }
 
@@ -76,7 +86,7 @@
   max-width: 100%;
 }
 .headline {
-  color: var(--c-on-brand);
+  color: var(--hero-fg);
 }
 /* The two actions: side by side, centred, 12px apart (they fit side by side at 390 too: measured) */
 .actions {
@@ -90,7 +100,7 @@
   max-width: 60ch;
   font-size: clamp(17px, 15.9px + 0.4vw, 20px);
   line-height: 1.5;
-  color: var(--c-on-brand);
+  color: var(--hero-muted);
 }
 
 @media (max-width: 1199px) {

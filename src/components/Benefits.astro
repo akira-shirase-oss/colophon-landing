@@ -57,8 +57,8 @@ const cards: { title: string; lines: [string, string]; tag: string; tone: Tone; 
 
     <ul class={styles.grid} data-why>
       {
-        cards.map((c, i) => (
-          <Card as="li" class={styles.card} style={`--i: ${i}`}>
+        cards.map((c) => (
+          <Card as="li" class={styles.card}>
             <div class={styles.titleRow}>
               <span class={styles.icon} aria-hidden="true">
                 <svg
@@ -87,22 +87,3 @@ const cards: { title: string; lines: [string, string]; tag: string; tone: Tone; 
     </ul>
   </div>
 </section>
-
-<script>
-  // Micro-interaction: cards rise in, staggered, the first time the grid scrolls into view.
-  // Without JavaScript (or with reduced motion) they are simply visible.
-  const grid = document.querySelector<HTMLElement>('[data-why]')!
-  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
-    grid.dataset.reveal = 'pending'
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          grid.dataset.reveal = 'shown'
-          io.disconnect()
-        }
-      },
-      { threshold: 0.15 },
-    )
-    io.observe(grid)
-  }
-</script>

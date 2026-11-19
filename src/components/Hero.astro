@@ -22,13 +22,18 @@ const ICONS = [
 // stays real text throughout; without this script, or with reduced motion, it is simply there.
 const PRINT_TITLE =
   "var h=document.querySelector('[data-print-title]');if(h&&!matchMedia('(prefers-reduced-motion: reduce)').matches){var s=getComputedStyle(h),n=Math.max(1,Math.round(h.offsetHeight/parseFloat(s.lineHeight)));h.style.setProperty('--print-lines',n);h.style.setProperty('--print-steps',n*parseInt(s.getPropertyValue('--print-rows')||'29'));h.dataset.print='go'}"
+
+// A tap on a hero icon replays its wiggle (hover plays it in CSS); only when motion is allowed. Click only: no
+// pointer tracking.
+const ICON_TAP =
+  "var f=document.querySelector('[data-hero-field]');if(f&&!matchMedia('(prefers-reduced-motion: reduce)').matches){f.addEventListener('click',function(e){var m=e.target.closest&&e.target.closest('[data-hero-field] > span');if(m){m.removeAttribute('data-tap');void m.offsetWidth;m.setAttribute('data-tap','')}});f.addEventListener('animationend',function(e){var m=e.target.closest&&e.target.closest('[data-hero-field] > span');if(m)m.removeAttribute('data-tap')})}"
 const place = (i: (typeof ICONS)[number]) =>
   `--x: ${i.x}%; --y: ${i.y}%; --s: ${i.s}px; --r: ${i.r}deg;` +
   (i.phone ? ` --px-x: ${i.phone.x}%; --px-y: ${i.phone.y}%;` : '')
 ---
 
 <section class={styles.hero}>
-  <div class={`brand-block ${styles.card}`}>
+  <div class={styles.card}>
     <div class={styles.field} aria-hidden="true" data-hero-field>
       {
         ICONS.map((i) => (
@@ -47,15 +52,16 @@ const place = (i: (typeof ICONS)[number]) =>
         ))
       }
     </div>
+    <script is:inline set:html={ICON_TAP} />
     <div class={styles.title}>
       <h1 class={`t-hero ${styles.headline}`} data-print-title>{hero.headline}</h1>
       <script is:inline set:html={PRINT_TITLE} />
       <p class={`t-body ${styles.sub}`}>{hero.description}</p>
       <!-- Two actions (the maintainer's call): Get started in the kit's primary, the header's blue, and See the
-           source transparent on the gradient in the hero's navy. Both take the navy focus ring the blue needs. -->
+           source transparent in the hero's ink. The kit's ring shows on both heroes (contrast table). -->
       <div class={styles.actions}>
-        <ArrowButton href={QUICK_START} size="lg" focus="onBrand">Get started</ArrowButton>
-        <ArrowButton href="https://github.com/akira-shirase-oss/colophon-cms" variant="onBrand" size="lg" focus="onBrand">See the source</ArrowButton>
+        <ArrowButton href={QUICK_START} size="lg">Get started</ArrowButton>
+        <ArrowButton href="https://github.com/akira-shirase-oss/colophon-cms" variant="onBrand" size="lg">See the source</ArrowButton>
       </div>
     </div>
   </div>
