@@ -131,6 +131,23 @@
   }
 }
 
+/* The website's section cards (benefit cards, integration tiles' panels, blog cards) keep the old site's roomier
+   padding, the maintainer's reference: 36px on a desktop, 28px on a tablet, 24px on a phone (origin/main's
+   Benefits card). The kit's --card-padding stays for anything Studio-shaped. */
+:root {
+  --section-card-padding: 36px;
+}
+@media (max-width: 1199px) {
+  :root {
+    --section-card-padding: 28px;
+  }
+}
+@media (max-width: 809px) {
+  :root {
+    --section-card-padding: 24px;
+  }
+}
+
 /* Dark: the aliases above follow tokens.css's .dark by themselves; only the site's own colours need a twin. */
 .dark {
   color-scheme: dark;
