@@ -1,4 +1,8 @@
-/* The blog: one reading column in the site's type, quiet chrome, the date stamp as the signature. */
+/* The blog: one reading column in the site's type, quiet chrome, the date stamp as the signature.
+   The D-210 skin: --foreground ink and --muted-foreground text, --border rules, code on --secondary
+   (the page's quiet ground, --c-surface, which the code-contrast check measures), links in --link,
+   the draft chip as a real status badge. */
+
 .page {
   width: 100%;
   display: flex;
@@ -17,34 +21,50 @@
   flex-direction: column;
   gap: 12px;
   padding-bottom: 40px;
-  border-bottom: 1px solid var(--c-line);
+  border-bottom: 1px solid var(--border);
+}
+.hTitle {
+  font-family: var(--font-title);
+  font-size: 52.63px;
+  line-height: 1.1;
+  font-weight: 400;
+  font-synthesis: none;
+  letter-spacing: 0;
+  color: var(--foreground);
 }
 .lede {
   max-width: 560px;
+  font-family: var(--font-sans);
+  font-size: 16px;
   line-height: 1.5;
+  font-weight: 400;
+  color: var(--muted-foreground);
 }
 .lede a {
-  color: var(--c-ink);
+  color: var(--link);
   text-decoration: underline;
-  text-decoration-color: var(--c-line);
+  text-decoration-color: var(--border);
   text-underline-offset: 3px;
+}
+.lede a:hover {
+  text-decoration-color: currentColor;
 }
 .list {
   list-style: none;
 }
 .item {
-  border-bottom: 1px solid var(--c-line);
+  border-bottom: 1px solid var(--border);
 }
 .item a {
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 28px 0;
-  color: var(--c-ink);
+  color: var(--foreground);
 }
 .item a:hover .itemTitle {
   text-decoration: underline;
-  text-decoration-color: var(--c-line);
+  text-decoration-color: var(--border);
   text-underline-offset: 4px;
 }
 .itemTitle {
@@ -53,13 +73,23 @@
   line-height: 1.2;
   font-weight: 400;
   font-synthesis: none;
+  color: var(--foreground);
   text-wrap: balance;
 }
 .itemDesc {
+  font-family: var(--font-sans);
+  font-size: 16px;
   line-height: 1.5;
+  font-weight: 400;
+  color: var(--muted-foreground);
 }
 .empty {
   padding: 40px 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: 400;
+  color: var(--muted-foreground);
 }
 
 /* the signature: a dated stamp, as on the build-log cards */
@@ -68,29 +98,25 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-text);
+  font-family: var(--font-sans);
   font-size: 14px;
   line-height: 1.4;
-  color: var(--c-text);
+  color: var(--muted-foreground);
   font-variant-numeric: tabular-nums;
-}
-.draft {
-  padding: 2px 8px;
-  border-radius: 6px;
-  background: var(--c-draft-bg);
-  color: var(--c-draft-ink);
 }
 
 /* ---------- Post ---------- */
 .back {
   display: inline-block;
   margin-bottom: 32px;
-  font-family: var(--font-text);
+  font-family: var(--font-sans);
   font-size: 14px;
-  color: var(--c-text);
+  color: var(--link);
 }
 .back:hover {
-  color: var(--c-ink);
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+  text-underline-offset: 3px;
 }
 .postHead {
   display: flex;
@@ -98,7 +124,7 @@
   gap: 16px;
   padding-bottom: 32px;
   margin-bottom: 40px;
-  border-bottom: 1px solid var(--c-line);
+  border-bottom: 1px solid var(--border);
 }
 .postTitle {
   font-family: var(--font-title);
@@ -106,15 +132,22 @@
   line-height: 1.1;
   font-weight: 400;
   font-synthesis: none;
-  color: var(--c-ink);
+  color: var(--foreground);
+}
+.desc {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--muted-foreground);
 }
 
 /* Markdown body */
 .prose {
-  font-family: var(--font-text);
+  font-family: var(--font-sans);
   font-size: 18px;
   line-height: 1.65;
-  color: var(--c-prose);
+  color: var(--foreground);
 }
 .prose :global(:where(p, ul, ol, blockquote, pre, table, figure)) {
   margin-bottom: 24px;
@@ -122,24 +155,24 @@
 }
 .prose :global(h2) {
   margin: 48px 0 16px;
-  font-family: var(--font-text);
+  font-family: var(--font-sans);
   font-size: 30px;
   line-height: 1.15;
   font-weight: 600;
-  color: var(--c-ink);
+  color: var(--foreground);
 }
 .prose :global(h3) {
   margin: 32px 0 12px;
-  font-family: var(--font-text);
+  font-family: var(--font-sans);
   font-size: 22px;
   line-height: 1.2;
   font-weight: 600;
-  color: var(--c-ink);
+  color: var(--foreground);
 }
 .prose :global(a) {
-  color: var(--c-ink);
+  color: var(--link);
   text-decoration: underline;
-  text-decoration-color: var(--c-underline);
+  text-decoration-color: var(--border);
   text-underline-offset: 3px;
 }
 .prose :global(a:hover) {
@@ -156,40 +189,37 @@
 }
 .prose :global(strong) {
   font-weight: 600;
-  color: var(--c-ink);
+  color: var(--foreground);
 }
 .prose :global(blockquote) {
   padding-left: 20px;
-  border-left: 2px solid var(--c-line);
-  color: var(--c-text);
+  border-left: 2px solid var(--border);
+  color: var(--muted-foreground);
 }
 .prose :global(code) {
-  font-family: var(--font-code);
+  font-family: var(--font-mono);
   font-size: 0.875em;
   padding: 2px 6px;
-  border-radius: 6px;
-  background: var(--c-surface);
+  border-radius: calc(var(--radius-control) - 4px);
+  background: var(--surface-section);
 }
 .prose :global(pre) {
   overflow-x: auto;
   padding: 16px 20px;
-  border-radius: 12px;
-  background: var(--c-surface);
-  color: var(--c-ink);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface-section);
+  color: var(--foreground);
   font-size: 15px;
   line-height: 1.55;
 }
 /* Each token's colour comes from the theme drawn for the surface it sits on (astro.config.mjs): the light
-   theme by default, the dark one wherever the dark tokens apply (the same two conditions as tokens.css). */
+   theme by default, the dark one wherever the dark tokens apply — .dark on <html> (Base.astro's script,
+   from the visitor's choice or the system's). */
 .prose :global(pre span) {
   color: var(--shiki-light);
 }
-@media (prefers-color-scheme: dark) {
-  :global(:root:not([data-theme='light'])) .prose :global(pre span) {
-    color: var(--shiki-dark);
-  }
-}
-:global(:root[data-theme='dark']) .prose :global(pre span) {
+:global(.dark) .prose :global(pre span) {
   color: var(--shiki-dark);
 }
 .prose :global(pre code) {
@@ -204,37 +234,46 @@
 }
 .prose :global(:where(th, td)) {
   padding: 8px 12px;
-  border-bottom: 1px solid var(--c-line);
+  border-bottom: 1px solid var(--border);
   text-align: left;
   vertical-align: top;
 }
 .prose :global(hr) {
   margin: 40px 0;
   border: 0;
-  border-top: 1px solid var(--c-line);
+  border-top: 1px solid var(--border);
 }
 
 .foot {
   margin-top: 56px;
   padding-top: 28px;
-  border-top: 1px solid var(--c-line);
+  border-top: 1px solid var(--border);
   display: flex;
   flex-wrap: wrap;
   gap: 12px 24px;
-  font-family: var(--font-text);
+  font-family: var(--font-sans);
   font-size: 14px;
 }
 .foot a {
-  color: var(--c-ink);
+  color: var(--link);
   text-decoration: underline;
-  text-decoration-color: var(--c-line);
+  text-decoration-color: var(--border);
   text-underline-offset: 3px;
 }
+.foot a:hover {
+  text-decoration-color: currentColor;
+}
 
+@media (max-width: 1199px) {
+  .hTitle {
+    font-size: 39.47px;
+  }
+}
 @media (max-width: 809px) {
   .page {
     padding-top: 120px;
   }
+  .hTitle,
   .postTitle {
     font-size: 32.9px;
   }
@@ -255,22 +294,26 @@
 /* The shared status line under a post's title (src/components/Status.astro). */
 .status {
   padding: 12px 16px;
-  border-radius: 12px;
-  background: var(--c-surface);
-  font-family: var(--font-text);
+  border-radius: var(--radius-control);
+  border: 1px solid var(--border);
+  background: var(--surface-section);
+  font-family: var(--font-sans);
   font-size: 15px;
   line-height: 1.5;
-  color: var(--c-text);
+  color: var(--muted-foreground);
 }
 .status strong {
   font-weight: 600;
-  color: var(--c-ink);
+  color: var(--foreground);
 }
 .status a {
-  color: var(--c-ink);
+  color: var(--link);
   text-decoration: underline;
-  text-decoration-color: var(--c-underline);
+  text-decoration-color: var(--border);
   text-underline-offset: 3px;
+}
+.status a:hover {
+  text-decoration-color: currentColor;
 }
 
 /* Figures in posts: inline SVG diagrams with a one-sentence caption. */
@@ -286,7 +329,7 @@
   margin-top: 12px;
   font-size: 15px;
   line-height: 1.5;
-  color: var(--c-text);
+  color: var(--muted-foreground);
 }
 /* A glossary: terms as h3 with their own anchors, definitions as plain paragraphs. */
 .prose :global(dl) {
@@ -294,11 +337,11 @@
 }
 .prose :global(dt) {
   margin-top: 28px;
-  font-family: var(--font-text);
+  font-family: var(--font-sans);
   font-size: 22px;
   line-height: 1.2;
   font-weight: 600;
-  color: var(--c-ink);
+  color: var(--foreground);
   scroll-margin-top: 120px;
 }
 .prose :global(dd) {

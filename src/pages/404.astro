@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro'
 import Nav from '../components/Nav.astro'
 import Footer from '../components/Footer.astro'
+import Badge from '../components/ui/Badge.astro'
 import styles from '../components/Blog.module.css'
 
 const title = 'Page not found | Colophon'
@@ -14,9 +15,9 @@ const description = 'There is no page at this address. The home page and the blo
     <main class={styles.page}>
       <div class={styles.column}>
         <header class={styles.head}>
-          <p class="t-badge">404</p>
-          <h1 class="t-h2">There's no page here</h1>
-          <p class={`t-body ${styles.lede}`}>
+          <Badge as="p" tone="brand">404</Badge>
+          <h1 class={styles.hTitle}>There's no page here</h1>
+          <p class={styles.lede}>
             The address may be mistyped, or the page may have moved. Try the <a href="/">home page</a> or the
             <a href="/blog/">blog</a>.
           </p>

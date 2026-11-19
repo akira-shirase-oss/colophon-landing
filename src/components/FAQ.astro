@@ -1,5 +1,6 @@
 ---
-import ArrowButton from './ui/ArrowButton.astro'
+import Badge from './ui/Badge.astro'
+import Button from './ui/Button.astro'
 import MaskIcon from './ui/MaskIcon.astro'
 import { jsonLd } from '../lib/json-ld'
 import styles from './FAQ.module.css'
@@ -35,20 +36,20 @@ const faq = {
 }
 ---
 
-<section class={`section ${styles.section}`}>
-  <div class={`container ${styles.inner}`}>
+<section class={styles.section}>
+  <div class={styles.inner}>
     <div class={styles.left}>
       <div class={styles.titleBadge}>
-        <p class="t-badge">FAQ</p>
-        <h2 class="t-h2">
+        <Badge as="p" tone="brand">FAQ</Badge>
+        <h2 class={styles.h2}>
           Questions
           <br />
           answered
         </h2>
       </div>
       <div class={styles.cta}>
-        <p class="t-body">Still curious?</p>
-        <ArrowButton href="https://github.com/akira-shirase-oss/colophon-cms/issues">Open an issue</ArrowButton>
+        <p class={styles.ctaText}>Still curious?</p>
+        <Button href="https://github.com/akira-shirase-oss/colophon-cms/issues" variant="primary">Open an issue</Button>
       </div>
     </div>
 
@@ -57,15 +58,15 @@ const faq = {
         faqs.map((f) => (
           <div class={styles.item} data-open="false">
             <button type="button" class={styles.question} aria-expanded="false">
-              <span class="t-h5">{f.q}</span>
+              <span class={styles.q}>{f.q}</span>
               <span class={styles.icon} aria-hidden="true">
-                <MaskIcon class={styles.plus} src="/icons/plus.svg" size={24} color="var(--c-ink)" />
-                <MaskIcon class={styles.close} src="/icons/close.svg" size={18} color="var(--c-ink)" />
+                <MaskIcon class={styles.plus} src="/icons/plus.svg" size={24} color="var(--foreground)" />
+                <MaskIcon class={styles.close} src="/icons/close.svg" size={18} color="var(--foreground)" />
               </span>
             </button>
             <div class={styles.answer}>
               <div>
-                <p class="t-body">{f.a}</p>
+                <p class={styles.a}>{f.a}</p>
               </div>
             </div>
           </div>
