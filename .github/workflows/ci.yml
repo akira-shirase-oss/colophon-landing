@@ -62,7 +62,7 @@ jobs:
         run: npm run check
 
   browser:
-    name: browser (real headers: no CSP violation, error or broken asset; the Lighthouse budget)
+    name: "browser (real headers: no CSP violation, error or broken asset; the Lighthouse budget)"
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
