@@ -2,13 +2,15 @@
 title: "Colophon vs Directus: an honest comparison"
 description: "Colophon and Directus compared on publish receipts, release history, review, scheduling, permissions, licensing and AI agents, with dated sources."
 pubDate: 2026-11-16
-updatedDate: 2026-11-17
+updatedDate: 2026-11-19
 tags: ["comparison", "directus", "headless cms", "self-hosted"]
 status: "Not built yet for this comparison: a Directus importer, and an adapter for a real CDN."
 draft: false
 ---
 
 I build Colophon, so read this with that in mind. The Directus facts below come from Directus's own docs, licence and site, checked on 16 November 2026 and listed under Sources at the end. The Colophon facts come from its repository, and each one is built and tested there. If anything about Directus here is wrong or out of date, tell me and I'll correct it.
+
+*Updated 19 November 2026: draft preview on your own site and images inside rich text have shipped in Colophon since this comparison was first published, and a Docker quick start replaced building from source. The rows and the list at the end say so; the other product's facts are unchanged from 16 November.*
 
 ## The short answer
 
@@ -38,12 +40,12 @@ Directus facts checked on 16 November 2026.
 | Stack | Rust server; Svelte Studio | Node.js API; Vue data studio |
 | Databases | PostgreSQL only | PostgreSQL, MySQL, MariaDB, SQLite, SQL Server, Oracle, CockroachDB |
 | Existing database | Owns its own schema | Introspects existing tables |
-| Hosting | Self-hosted only, built from source | Self-hosted, or Directus Cloud |
+| Hosting | Self-hosted only: a Docker quick start, building the image from a clone until the first release is published | Self-hosted, or Directus Cloud |
 | History | Every save, plus whole-site history by release | Per-item revisions and content versions |
 | Scheduling | Built in, with time zones and rechecks | Built with a Flow on a cron trigger |
 | Approvals | Built in; approval bound to exact content | Built from a status field and permissions |
 | Publish confirmation | Delivery receipts with site checks | Build status for Vercel and Netlify deploys; no live-site check |
-| Draft preview | Website-starter pages only; for headless sites on the roadmap | Visual editor and live preview |
+| Draft preview | On your own site: a Preview menu in the Studio and a preview API for your site | Visual editor and live preview |
 | Translations | Locales stored and published; the public API can't select one yet | Built in |
 | MCP | Built in; agents can't approve or publish | Built in, turned on in settings |
 
@@ -97,7 +99,7 @@ Directus has an extension system with a marketplace, and Flows for automation, a
 
 ## Running it yourself
 
-Colophon is one Rust binary that runs as the API, the background worker or both, beside PostgreSQL, a Valkey cache that can be lost without losing data, and S3-compatible storage for uploads. Operators get honest health checks, structured logs, encrypted backups with WAL archiving and a restore procedure rehearsed on clean infrastructure. Today you build it from source.
+Colophon is one Rust binary that runs as the API, the background worker or both, beside PostgreSQL, a Valkey cache that can be lost without losing data, and S3-compatible storage for uploads. Operators get honest health checks, structured logs, encrypted backups with WAL archiving and a restore procedure rehearsed on clean infrastructure. To try it, a Docker quick start builds the image from a clone and starts Colophon, PostgreSQL, Valkey and object storage together; published images and binaries wait on the first release.
 
 Directus runs self-hosted on any of seven SQL databases, or on Directus Cloud.
 
@@ -112,9 +114,9 @@ There's no Directus importer. Colophon imports JSONL and JSON arrays, plus Strap
 ## What to know before choosing Colophon
 
 - **It's pre-release.** Version 0.1.0-alpha.1, built in public by one person, with no users yet. The [public roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md) says what's done and what's planned.
-- **PostgreSQL only, self-hosted only.** There's no hosted version, and today you build it from source: no container image, published binaries or npm packages yet.
+- **PostgreSQL only, self-hosted only.** There's no hosted version. The Docker quick start builds the image from a clone until the first release is published; release binaries, the container image and the npm packages wait on that release.
 - **Two delivery pieces are partial.** Webhook payloads aren't signed yet, and cache clears are tested against a stand-in CDN; the adapter for a real CDN is on the roadmap.
-- **[On the roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md):** draft preview for headless sites (the Studio already previews pages of its own website starter), choosing a locale in the public content API, and images inside rich text (the editor inserts a placeholder for now).
+- **[On the roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md):** choosing a locale in the public content API (locales are stored and published today).
 - **The 24-hour soak hasn't passed yet.**
 
 To try it, the docs' [quick start](https://docs.colophon.404human.dev/quick-start/) runs Colophon with Docker, and [installation](https://docs.colophon.404human.dev/installation/) covers serving it on a domain or under systemd.

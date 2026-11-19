@@ -2,13 +2,15 @@
 title: "Colophon vs Strapi: an honest comparison"
 description: "Colophon and Strapi compared on publish receipts, release history, review, scheduling, permissions and AI agents, with dated, linked sources."
 pubDate: 2026-11-16
-updatedDate: 2026-11-17
+updatedDate: 2026-11-19
 tags: ["comparison", "strapi", "headless cms", "open source"]
 status: "Still owed for this comparison: an import tested on a real production Strapi export, and a passing 24-hour soak."
 draft: false
 ---
 
 I build Colophon, so read this with that in mind. The Strapi facts below come from Strapi's own docs and pricing pages, checked on 16 November 2026 and listed under Sources at the end. The Colophon facts come from its repository, and each one is built and tested there. If anything about Strapi here is wrong or out of date, tell me and I'll correct it.
+
+*Updated 19 November 2026: draft preview on your own site and images inside rich text have shipped in Colophon since this comparison was first published, and a Docker quick start replaced building from source. The rows and the list at the end say so; the other product's facts are unchanged from 16 November.*
 
 ## The short answer
 
@@ -36,13 +38,13 @@ Strapi facts checked on 16 November 2026.
 | Licence | MIT | MIT, with enterprise code under a separate licence |
 | Stack | Rust server; Svelte Studio | Node.js, TypeScript; React admin |
 | Databases | PostgreSQL only | PostgreSQL, MySQL, MariaDB, SQLite |
-| Hosting | Self-hosted only, built from source | Self-hosted, or Strapi Cloud |
+| Hosting | Self-hosted only: a Docker quick start, building the image from a clone until the first release is published | Self-hosted, or Strapi Cloud |
 | Version history | Every save from every path, kept | Growth and Enterprise plans; edits made in the admin only |
 | Grouped releases | Every publish; pinned exact revisions | Growth and Enterprise; latest drafts, not pinned versions |
 | Review workflows | Built in; approval bound to exact content | Enterprise |
 | Publish confirmation | Delivery receipts with site checks | Not built in |
 | Audit logs | Roles, members and tokens, append-only | Enterprise |
-| Draft preview | Website-starter pages only; for headless sites on the roadmap | Built in; Live Preview on paid plans |
+| Draft preview | On your own site: a Preview menu in the Studio and a preview API for your site | Built in; Live Preview on paid plans |
 | Locales through the API | Stored and published; the public API can't select one yet | Built in and free, through to the API |
 | MCP server | Built in; agents can't approve or publish | Built in, free |
 
@@ -96,7 +98,7 @@ Strapi is built to be extended, with a plugin marketplace and backend customisat
 
 ## Running it yourself
 
-Colophon is one Rust binary that runs as the API, the background worker or both, beside PostgreSQL, a Valkey cache that can be lost without losing data, and S3-compatible storage for uploads. Operators get health checks that report a degraded cache honestly, structured logs, encrypted backups with WAL archiving, and a restore procedure that has been rehearsed on clean infrastructure. Today you build it from source.
+Colophon is one Rust binary that runs as the API, the background worker or both, beside PostgreSQL, a Valkey cache that can be lost without losing data, and S3-compatible storage for uploads. Operators get health checks that report a degraded cache honestly, structured logs, encrypted backups with WAL archiving, and a restore procedure that has been rehearsed on clean infrastructure. To try it, a Docker quick start builds the image from a clone and starts Colophon, PostgreSQL, Valkey and object storage together; published images and binaries wait on the first release.
 
 Strapi installs with `npx create-strapi@latest`. In [my hands-on notes](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/research/strapi-vs-colophon-hands-on.md) from 28 October 2026 (Strapi 5.60.0 Community, SQLite, development mode), install took about 75 seconds with only Node. Strapi runs on several databases and has Strapi Cloud.
 
@@ -113,9 +115,9 @@ Colophon's import reads Strapi v4 and v5 export shapes. A dry run reports an out
 ## What to know before choosing Colophon
 
 - **It's pre-release.** Version 0.1.0-alpha.1, built in public by one person, with no users yet. The [public roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md) says what's done and what's planned.
-- **PostgreSQL only, self-hosted only.** There's no hosted version, and today you build it from source: no container image, published binaries or npm packages yet.
+- **PostgreSQL only, self-hosted only.** There's no hosted version. The Docker quick start builds the image from a clone until the first release is published; release binaries, the container image and the npm packages wait on that release.
 - **Two delivery pieces are partial.** Webhook payloads aren't signed yet, and cache clears are tested against a stand-in CDN; the adapter for a real CDN is on the roadmap.
-- **[On the roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md):** draft preview for headless sites (the Studio already previews pages of its own website starter), choosing a locale in the public content API (locales are stored and published today), and images inside rich text (the editor inserts a placeholder for now).
+- **[On the roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md):** choosing a locale in the public content API (locales are stored and published today).
 - **The 24-hour soak hasn't passed yet.**
 
 To try it, the docs' [quick start](https://docs.colophon.404human.dev/quick-start/) runs Colophon with Docker, and [installation](https://docs.colophon.404human.dev/installation/) covers serving it on a domain or under systemd.

@@ -2,13 +2,15 @@
 title: "Colophon vs Payload CMS: an honest comparison"
 description: "Colophon and Payload compared: schema as data or code, publish receipts, whole-site history, review, permissions and AI agents, with dated sources."
 pubDate: 2026-11-16
-updatedDate: 2026-11-17
+updatedDate: 2026-11-19
 tags: ["comparison", "payload", "headless cms", "open source"]
 status: "Not built yet for this comparison: a Payload importer and a published TypeScript SDK."
 draft: false
 ---
 
 I build Colophon, so read this with that in mind. The Payload facts below come from Payload's own docs and site, checked on 16 November 2026 and listed under Sources at the end. The Colophon facts come from its repository, and each one is built and tested there. If anything about Payload here is wrong or out of date, tell me and I'll correct it.
+
+*Updated 19 November 2026: draft preview on your own site and images inside rich text have shipped in Colophon since this comparison was first published, and a Docker quick start replaced building from source. The rows and the list at the end say so; the other product's facts are unchanged from 16 November.*
 
 ## The short answer
 
@@ -43,7 +45,7 @@ Payload facts checked on 16 November 2026.
 | Scheduling | Built in; runs in the worker | Built in; needs a job runner |
 | Outbound webhooks | Built in; payloads not signed yet | Write your own in hooks |
 | Publish confirmation | Delivery receipts with site checks | Not built in |
-| Draft preview | Website-starter pages only; for headless sites on the roadmap | Live preview |
+| Draft preview | On your own site: a Preview menu in the Studio and a preview API for your site | Live preview |
 | Localization | Locales stored and published; the public API can't select one yet | Per field, with fallbacks |
 | MCP | Built in; agents can't approve or publish | Official plugin |
 
@@ -97,7 +99,7 @@ Payload's admin can be extended with your own React components, and its access c
 
 ## Running it yourself
 
-Colophon is one Rust binary that runs as the API, the background worker or both, beside PostgreSQL, a Valkey cache that can be lost without losing data, and S3-compatible storage for uploads. Operators get honest health checks, structured logs, encrypted backups with WAL archiving and a restore procedure rehearsed on clean infrastructure. Today you build it from source.
+Colophon is one Rust binary that runs as the API, the background worker or both, beside PostgreSQL, a Valkey cache that can be lost without losing data, and S3-compatible storage for uploads. Operators get honest health checks, structured logs, encrypted backups with WAL archiving and a restore procedure rehearsed on clean infrastructure. To try it, a Docker quick start builds the image from a clone and starts Colophon, PostgreSQL, Valkey and object storage together; published images and binaries wait on the first release.
 
 Payload installs into your Next.js app and runs wherever that app runs. On hosting, Payload's site says Payload "has joined Figma", that the open-source core continues, and that on Payload Cloud "deployment of new projects is currently paused". Existing Cloud projects keep running.
 
@@ -114,9 +116,9 @@ There's no Payload importer. Colophon imports its own JSONL and JSON arrays, plu
 ## What to know before choosing Colophon
 
 - **It's pre-release.** Version 0.1.0-alpha.1, built in public by one person, with no users yet. The [public roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md) says what's done and what's planned.
-- **PostgreSQL only, self-hosted only.** There's no hosted version, and today you build it from source: no container image, published binaries or npm packages yet.
+- **PostgreSQL only, self-hosted only.** There's no hosted version. The Docker quick start builds the image from a clone until the first release is published; release binaries, the container image and the npm packages wait on that release.
 - **Two delivery pieces are partial.** Webhook payloads aren't signed yet, and cache clears are tested against a stand-in CDN; the adapter for a real CDN is on the roadmap.
-- **[On the roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md):** draft preview for headless sites (the Studio already previews pages of its own website starter), choosing a locale in the public content API, and images inside rich text (the editor inserts a placeholder for now).
+- **[On the roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md):** choosing a locale in the public content API (locales are stored and published today).
 - **The 24-hour soak hasn't passed yet.**
 
 To try it, the docs' [quick start](https://docs.colophon.404human.dev/quick-start/) runs Colophon with Docker, and [installation](https://docs.colophon.404human.dev/installation/) covers serving it on a domain or under systemd.
