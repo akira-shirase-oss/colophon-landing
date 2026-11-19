@@ -91,7 +91,7 @@ jobs:
       - name: Every page in light and dark, and the scripted interactions
         run: npm run check:browser
       # The performance budget for pages from src/content/pages (scripts/budget-config.mjs): mobile, median of
-      # three runs, LCP ≤ 2.0 s, CLS 0, TBT 0, Performance ≥ 95, SEO 100, Accessibility 100. CI runner numbers are
+      # five runs, LCP ≤ 2.0 s, CLS 0, TBT 0, Performance ≥ 95, SEO 100, Accessibility 100. CI runner numbers are
       # lab observations; a regression past a threshold fails the build.
       - name: Lighthouse budget on every page type
-        run: node scripts/lighthouse-budget.mjs --runs 3
+        run: node scripts/lighthouse-budget.mjs --runs 5

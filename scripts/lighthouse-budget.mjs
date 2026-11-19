@@ -1,10 +1,10 @@
 // Lighthouse on every page type built from src/content/pages, served with dist/_headers (the real content
-// security policy). Mobile emulation, three runs, the median of each number; any miss fails:
+// security policy). Mobile emulation, five runs, the median of each number; any miss fails:
 //
 //   LCP ≤ 2.0 s · CLS = 0 · TBT = 0 ms · Performance ≥ 95 · SEO = 100 · Accessibility = 100
 //   and at 390 and 360 px wide, nothing wider than the screen (code blocks may scroll; tables may not)
 //
-//   node scripts/lighthouse-budget.mjs [--runs 3] [--dist dist]
+//   node scripts/lighthouse-budget.mjs [--runs 5] [--dist dist]
 //
 // Lab numbers on a shared CI runner are observations, not capacity; the thresholds are there so a regression
 // past them fails the build. Lighthouse and a browser are not dependencies of the site: install them (CI does,
@@ -18,7 +18,7 @@ import { LIGHTHOUSE as THRESHOLDS, SECTIONS } from './budget-config.mjs'
 const arg = (name, fallback) => (process.argv.includes(`--${name}`) ? process.argv[process.argv.indexOf(`--${name}`) + 1] : fallback)
 const root = fileURLToPath(new URL('..', import.meta.url))
 const dist = resolve(root, arg('dist', 'dist'))
-const runs = Number(arg('runs', '3'))
+const runs = Number(arg('runs', '5'))
 
 const load = async (name, env) =>
   import(process.env[env] ? pathToFileURL(join(process.env[env], name === 'lighthouse' ? 'core/index.js' : 'index.mjs')).href : name)
@@ -101,6 +101,10 @@ for (const path of targets) {
     m.accessibility < THRESHOLDS.accessibility && `Accessibility ${m.accessibility} < 100 (failing: ${[...new Set(samples.flatMap((s) => s.failed))].join(', ')})`,
   ].filter(Boolean)
   for (const miss of misses) failures.push(`${path}: ${miss}`)
+  if (misses.length > 0) {
+    // On a miss, every run, so a single noisy run is told apart from a page that is slow every time.
+    samples.forEach((x, i) => console.log(`  ${path} run ${i + 1}: Performance ${x.performance}, LCP ${Math.round(x.lcpMs)} ms, TBT ${Math.round(x.tbtMs)} ms, CLS ${x.cls.toFixed(3)}; long tasks: ${x.longTasks || 'none'}`))
+  }
   // The machine's speed, as Lighthouse measures it, and where the main thread went: printed for every page so a
   // miss on a CI runner can be read against the hardware (Lighthouse's CPU slowdown is a fixed multiplier).
   const worst = samples.reduce((a, b) => (b.tbtMs > a.tbtMs ? b : a))

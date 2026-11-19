@@ -7,5 +7,5 @@ export const IMAGE_BUDGET = 100 * 1024
 export const MIN_LINKS = 3
 /** The sections pages from src/content/pages are served under (src/lib/pages.ts, SECTION). */
 export const SECTIONS = ['compare', 'use-cases']
-/** Lighthouse, mobile, median of three runs. */
+/** Lighthouse, mobile, median of five runs (five, not three: one noisy run on a shared CI runner can't move it). */
 export const LIGHTHOUSE = { lcpMs: 2000, cls: 0, tbtMs: 0, performance: 95, seo: 100, accessibility: 100 }
