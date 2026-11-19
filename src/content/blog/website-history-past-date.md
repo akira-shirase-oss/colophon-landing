@@ -47,7 +47,7 @@ rev=$(git rev-list -1 --before="2026-11-10 15:00:00 +0000" main)
 git show "$rev:content/pages/pricing.md"
 ```
 
-Both answer "what existed", not quite "what readers saw". A commit still had to be built and deployed, and a capture shows one URL from one crawler's point of view. If the answer matters, say which of the two you have.
+Both answer "what existed", not quite "what readers saw". A commit still had to be built and deployed, and a capture shows one URL from one crawler's point of view. If the answer matters, say which of the two you have. How a git-based CMS and a database CMS compare on history, review and permissions is in [Colophon vs Decap, Keystatic and TinaCMS](/compare/colophon-vs-git-based-cms/).
 
 ## The data model that makes it cheap
 

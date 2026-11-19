@@ -1,7 +1,7 @@
 ---
 kind: hub
 title: "Open-source alternatives to popular CMSs"
-description: "How Colophon, an open-source headless CMS you host yourself, compares with Strapi, Payload, Directus, Contentful and Sanity, with dated, linked facts."
+description: "How Colophon, an open-source headless CMS you host yourself, compares with Strapi, Payload, Directus, Contentful, Sanity and git-based CMSs, dated."
 targetQuery: "open source headless cms alternative"
 pubDate: 2026-11-19
 factsChecked: 2026-11-19
@@ -10,6 +10,10 @@ related:
     text: "Colophon vs Contentful: self-hosted or SaaS CMS"
   - href: /compare/colophon-vs-sanity/
     text: "Colophon vs Sanity: self-hosted or content lake"
+  - href: /compare/colophon-vs-storyblok/
+    text: "Colophon vs Storyblok: self-hosted or visual SaaS"
+  - href: /compare/colophon-vs-git-based-cms/
+    text: "Colophon vs Decap, Keystatic and TinaCMS"
   - href: /blog/colophon-vs-strapi/
     text: "Colophon vs Strapi: an honest comparison"
   - href: /blog/colophon-vs-payload/
@@ -46,9 +50,11 @@ pre-release, as the status line above says.
 | [Colophon vs Directus](/blog/colophon-vs-directus/) | Self-hosted, or Directus Cloud | Its own source-available licence |
 | [Colophon vs Contentful](/compare/colophon-vs-contentful/) | A hosted platform | Commercial service |
 | [Colophon vs Sanity](/compare/colophon-vs-sanity/) | Studio anywhere; content in its hosted Content Lake | Studio MIT; hosted store |
+| [Colophon vs Storyblok](/compare/colophon-vs-storyblok/) | Hosted spaces, with a visual editor | Commercial service |
+| [Colophon vs Decap, Keystatic and TinaCMS](/compare/colophon-vs-git-based-cms/) | Content as files in your git repository | MIT (Decap, Keystatic); Apache-2.0 (TinaCMS) |
 
-The Strapi, Payload and Directus facts were checked on 16 November 2026, and the Contentful and Sanity facts
-on 19 November 2026. Every row's sources are listed in its comparison.
+The Strapi, Payload and Directus facts were checked on 16 November 2026, and the Contentful, Sanity, Storyblok,
+Decap, Keystatic and TinaCMS facts on 19 November 2026. Every row's sources are listed in its comparison.
 
 ## What sets Colophon apart
 
