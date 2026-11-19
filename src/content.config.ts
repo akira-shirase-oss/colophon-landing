@@ -21,4 +21,29 @@ const blog = defineCollection({
   }),
 })
 
-export const collections = { blog }
+// Pages written for one search intent (comparisons, features, use cases, framework guides, hubs): Markdown in
+// src/content/pages, all rendered by src/layouts/SeoPage.astro with the blog's own components and styles.
+// Static HTML; the page itself adds no script. The FAQ lives in frontmatter, so the visible questions and
+// the FAQPage data can't drift apart.
+const pages = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/pages' }),
+  schema: z.object({
+    /** Decides the address: compare → /compare/<id>/. */
+    kind: z.enum(['compare']),
+    title: z.string().max(49),
+    description: z.string().min(120).max(155),
+    /** The search the page answers. Recorded, not rendered: the plan and Search Console are read against it. */
+    targetQuery: z.string().min(3),
+    pubDate: z.coerce.date(),
+    updatedDate: z.coerce.date().optional(),
+    /** Comparisons: the day every competitor fact on the page was checked against the vendor's own pages. */
+    factsChecked: z.coerce.date().optional(),
+    /** At least three pages to read next, on this site or the docs; rendered at the end. */
+    related: z.array(z.object({ href: z.string(), text: z.string() })).min(3),
+    faq: z.array(z.object({ q: z.string().min(5), a: z.string().min(20) })).default([]),
+    draft: z.boolean().default(false),
+    status: z.string().optional(),
+  }),
+})
+
+export const collections = { blog, pages }

@@ -1,0 +1,119 @@
+---
+// The one layout for every page in src/content/pages (comparisons first; features, use cases, guides and hubs
+// later). Built only from what a blog post already uses: Base, Nav, Footer, Status and the classes of
+// Blog.module.css, so it adds no visual element, no stylesheet and no script of its own. The FAQ and the
+// related links come from frontmatter and are drawn as the post prose draws headings, paragraphs and lists.
+import { render } from 'astro:content'
+import Base from './Base.astro'
+import Nav from '../components/Nav.astro'
+import Footer from '../components/Footer.astro'
+import Status from '../components/Status.astro'
+import styles from '../components/Blog.module.css'
+import { formatDate } from '../lib/posts'
+import { pathOf, type SeoPage } from '../lib/pages'
+
+type Props = { page: SeoPage }
+const { page } = Astro.props
+const { Content } = await render(page)
+const { title, description, pubDate, updatedDate, factsChecked, related, faq, draft } = page.data
+const site = Astro.site!.href
+const url = new URL(pathOf(page), site).href
+const organization = { '@id': `${site}#organization` }
+
+// Structured data, built as objects from frontmatter and serialised by Base through jsonLd().
+const article = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  datePublished: pubDate.toISOString(),
+  dateModified: (updatedDate ?? pubDate).toISOString(),
+  mainEntityOfPage: url,
+  url,
+  inLanguage: 'en',
+  image: new URL('/og.jpg', site).href,
+  author: { '@type': 'Organization', ...organization, name: 'Colophon CMS', url: site },
+  publisher: { '@type': 'Organization', ...organization, name: 'Colophon CMS', url: site },
+}
+const breadcrumbs = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Colophon', item: site },
+    { '@type': 'ListItem', position: 2, name: title },
+  ],
+}
+const faqPage =
+  faq.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faq.map(({ q, a }) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+      }
+    : undefined
+const jsonLd = [article, breadcrumbs, ...(faqPage ? [faqPage] : [])]
+---
+
+<Base
+  title={`${title} | Colophon`}
+  description={description}
+  type="article"
+  published={pubDate}
+  modified={updatedDate}
+  noindex={draft}
+  jsonLd={jsonLd}
+>
+  <div style="display: flex; flex-direction: column; align-items: center; overflow: clip;">
+    <Nav />
+    <main class={styles.page}>
+      <article class={styles.column}>
+        <a class={styles.back} href="/blog/">← All posts</a>
+        <header class={styles.postHead}>
+          <span class={styles.stamp}>
+            <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+            {
+              factsChecked && (
+                <span>
+                  · Facts checked <time datetime={factsChecked.toISOString()}>{formatDate(factsChecked)}</time>
+                </span>
+              )
+            }
+          </span>
+          <h1 class={styles.postTitle}>{title}</h1>
+          <p class={styles.desc}>{description}</p>
+          <Status note={page.data.status} />
+        </header>
+        <div class={styles.prose}>
+          <Content />
+          {
+            faq.length > 0 && (
+              <>
+                <h2 id="faq">FAQ</h2>
+                {faq.map(({ q, a }) => (
+                  <>
+                    <h3>{q}</h3>
+                    <p>{a}</p>
+                  </>
+                ))}
+              </>
+            )
+          }
+          <h2 id="read-next">Read next</h2>
+          <ul>
+            {related.map(({ href, text }) => (
+              <li>
+                <a href={href}>{text}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <footer class={styles.foot}>
+          <a href="/blog/">More posts</a>
+          <a href="https://404human.dev/colophon/">The build log</a>
+          <a href="https://github.com/akira-shirase-oss/colophon-cms">Source on GitHub</a>
+        </footer>
+      </article>
+    </main>
+    <Footer />
+  </div>
+</Base>

@@ -1,0 +1,100 @@
+// Lighthouse on every page type built from src/content/pages, served with dist/_headers (the real content
+// security policy). Mobile emulation, three runs, the median of each number; any miss fails:
+//
+//   LCP ≤ 2.0 s · CLS = 0 · TBT = 0 ms · Performance ≥ 95 · SEO = 100 · Accessibility = 100
+//
+//   node scripts/lighthouse-budget.mjs [--runs 3] [--dist dist]
+//
+// Lab numbers on a shared CI runner are observations, not capacity; the thresholds are there so a regression
+// past them fails the build. Lighthouse and a browser are not dependencies of the site: install them (CI does,
+// pinned) or point LIGHTHOUSE_MODULE / PLAYWRIGHT_MODULE at existing node_modules/<name> directories.
+import { createServer } from 'node:http'
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
+import { extname, join, normalize, resolve } from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
+import { LIGHTHOUSE as THRESHOLDS, SECTIONS } from './budget-config.mjs'
+
+const arg = (name, fallback) => (process.argv.includes(`--${name}`) ? process.argv[process.argv.indexOf(`--${name}`) + 1] : fallback)
+const root = fileURLToPath(new URL('..', import.meta.url))
+const dist = resolve(root, arg('dist', 'dist'))
+const runs = Number(arg('runs', '3'))
+
+const load = async (name, env) =>
+  import(process.env[env] ? pathToFileURL(join(process.env[env], name === 'lighthouse' ? 'core/index.js' : 'index.mjs')).href : name)
+const { default: lighthouse } = await load('lighthouse', 'LIGHTHOUSE_MODULE')
+const { chromium } = await load('playwright', 'PLAYWRIGHT_MODULE')
+const { launch } = await import(process.env.LIGHTHOUSE_MODULE ? pathToFileURL(join(process.env.LIGHTHOUSE_MODULE, '..', 'chrome-launcher', 'dist', 'index.js')).href : 'chrome-launcher')
+
+// dist/ with its _headers, as Cloudflare Pages serves it (the same rules check-csp-browser applies).
+const rules = []
+for (const line of readFileSync(join(dist, '_headers'), 'utf8').split(/\r?\n/)) {
+  const t = line.trim()
+  if (t === '' || t.startsWith('#')) continue
+  if (!/^\s/.test(line)) rules.push({ match: new RegExp(`^${t.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*')}$`), headers: [] })
+  else rules.at(-1).headers.push([t.slice(0, t.indexOf(':')), t.slice(t.indexOf(':') + 1).trim()])
+}
+const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.jpg': 'image/jpeg', '.xml': 'application/xml', '.txt': 'text/plain' }
+const server = createServer((req, res) => {
+  const path = decodeURIComponent(new URL(req.url, 'http://x').pathname)
+  let file = normalize(join(dist, path))
+  if (!file.startsWith(dist)) return void res.writeHead(400).end()
+  if (existsSync(file) && statSync(file).isDirectory()) file = join(file, 'index.html')
+  const found = existsSync(file)
+  const headers = { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream' }
+  for (const rule of rules) if (rule.match.test(path)) for (const [k, v] of rule.headers) headers[k.toLowerCase()] = v
+  res.writeHead(found ? 200 : 404, headers).end(found ? readFileSync(file) : '')
+})
+await new Promise((r) => server.listen(0, '127.0.0.1', r))
+const origin = `http://127.0.0.1:${server.address().port}`
+
+// One page of each type: the first built page in each section.
+const targets = SECTIONS.flatMap((s) => {
+  const dir = join(dist, s)
+  const first = existsSync(dir) ? readdirSync(dir).filter((n) => existsSync(join(dir, n, 'index.html'))).sort()[0] : undefined
+  return first ? [`/${s}/${first}/`] : []
+})
+
+const chrome = await launch({ chromePath: chromium.executablePath(), chromeFlags: ['--headless=new', '--no-sandbox'] })
+const median = (xs) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)]
+const failures = []
+const rows = []
+for (const path of targets) {
+  const samples = []
+  for (let i = 0; i < runs; i++) {
+    const { lhr } = await lighthouse(origin + path, { port: chrome.port, output: 'json', logLevel: 'error', onlyCategories: ['performance', 'seo', 'accessibility'] })
+    if (lhr.runtimeError) failures.push(`${path}: Lighthouse could not load the page (${lhr.runtimeError.code})`)
+    const a = lhr.audits
+    samples.push({
+      performance: Math.round(lhr.categories.performance.score * 100),
+      seo: Math.round(lhr.categories.seo.score * 100),
+      accessibility: Math.round(lhr.categories.accessibility.score * 100),
+      lcpMs: a['largest-contentful-paint'].numericValue,
+      cls: a['cumulative-layout-shift'].numericValue,
+      tbtMs: a['total-blocking-time'].numericValue,
+      failed: Object.values(a).filter((x) => x.scoreDisplayMode === 'binary' && x.score === 0).map((x) => x.id),
+    })
+  }
+  const m = Object.fromEntries(['performance', 'seo', 'accessibility', 'lcpMs', 'cls', 'tbtMs'].map((k) => [k, median(samples.map((s) => s[k]))]))
+  rows.push({ path, ...m })
+  const misses = [
+    m.lcpMs > THRESHOLDS.lcpMs && `LCP ${Math.round(m.lcpMs)} ms > ${THRESHOLDS.lcpMs}`,
+    m.cls > THRESHOLDS.cls && `CLS ${m.cls.toFixed(3)} > 0`,
+    m.tbtMs > THRESHOLDS.tbtMs && `TBT ${Math.round(m.tbtMs)} ms > 0`,
+    m.performance < THRESHOLDS.performance && `Performance ${m.performance} < ${THRESHOLDS.performance}`,
+    m.seo < THRESHOLDS.seo && `SEO ${m.seo} < 100 (failing: ${[...new Set(samples.flatMap((s) => s.failed))].join(', ')})`,
+    m.accessibility < THRESHOLDS.accessibility && `Accessibility ${m.accessibility} < 100 (failing: ${[...new Set(samples.flatMap((s) => s.failed))].join(', ')})`,
+  ].filter(Boolean)
+  for (const miss of misses) failures.push(`${path}: ${miss}`)
+}
+await chrome.kill()
+server.close()
+
+for (const r of rows) {
+  console.log(`lighthouse-budget: ${r.path} (median of ${runs}, mobile): Performance ${r.performance}, SEO ${r.seo}, Accessibility ${r.accessibility}, LCP ${(r.lcpMs / 1000).toFixed(2)} s, CLS ${r.cls.toFixed(3)}, TBT ${Math.round(r.tbtMs)} ms`)
+}
+if (targets.length === 0) failures.push(`no page under ${SECTIONS.join(', ')} was built`)
+if (failures.length > 0) {
+  console.error(`lighthouse-budget: ${failures.length} miss(es)\n${failures.map((f) => `  - ${f}`).join('\n')}`)
+  process.exit(1)
+}
+console.log('lighthouse-budget: every page type within budget')
