@@ -7,6 +7,8 @@ pubDate: 2026-11-19
 factsChecked: 2026-11-19
 status: "Sanity facts were checked on 19 November 2026 against Sanity's own pages; corrections are welcome."
 related:
+  - href: /compare/colophon-vs-storyblok/
+    text: "Colophon vs Storyblok: self-hosted or visual SaaS"
   - href: /compare/
     text: "Open-source alternatives to popular CMSs"
   - href: /compare/colophon-vs-contentful/
