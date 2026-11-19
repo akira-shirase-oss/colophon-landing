@@ -45,15 +45,8 @@
 .primary:hover {
   background: var(--primary-hover);
 }
-.onBrand {
-  background: var(--c-brand-button);
-  color: var(--c-brand-button-text);
-}
-.onBrand:hover {
-  background: var(--c-brand-button-hover);
-}
-/* On the gradient the ring's blue disappears: the edge and halo are the brand block's navy. */
-.onBrand:focus-visible {
+/* On the hero's gradient the ring's blue disappears: the focus edge and halo are the brand block's navy. */
+.focusOnBrand:focus-visible {
   border-color: var(--c-on-brand);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-on-brand) 35%, transparent);
 }

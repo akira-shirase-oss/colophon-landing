@@ -38,9 +38,12 @@
 .links {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
+/* 16px, a step over the t-label it sits on (the maintainer's call); never wraps */
 .link {
+  font-size: 16px;
+  white-space: nowrap;
   transition: color 0.3s var(--ease);
 }
 .link:hover {

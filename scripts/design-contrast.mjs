@@ -93,11 +93,14 @@ export function ground(t, name) {
 
 // What the site draws on what. A pair is here because a component draws it; adding a component that puts text
 // on a new ground means adding its pair.
-const PAGES = ['c-bg', 'c-surface', 'c-raised', 'c-raised-hover', 'card', 'popover']
+const PAGES = ['c-bg', 'c-surface', 'c-raised', 'c-raised-hover', 'card', 'popover', 'surface-section', 'surface-section-hover', 'surface-footer']
 export const TEXT = [
   // Running text, titles, the soft half of a title, captions: on the page, the panels and the cards.
   ...PAGES.flatMap((g) => [['c-ink', g], ['c-prose', g], ['c-text', g], ['c-muted', g]]),
-  ['c-link', 'c-bg'], ['c-link', 'c-surface'], ['c-link', 'card'],
+  ['c-link', 'c-bg'], ['c-link', 'c-surface'], ['c-link', 'card'], ['c-link', 'surface-section'], ['c-link', 'surface-footer'],
+  // Tags on a section card, and the footer's links.
+  ...['brand', 'live', 'changed'].map((s) => [`${s}-ink`, `${s}-soft`]),
+  ['c-ink', 'surface-footer'], ['c-muted', 'surface-footer'],
   // Buttons (ui/Button.astro): primary and its hover, secondary and ghost on their grounds and hover.
   ['primary-foreground', 'primary'], ['primary-foreground', 'primary-hover'],
   ['foreground', 'popover'], ['accent-foreground', 'accent'], ['foreground', 'c-bg'],
@@ -121,9 +124,10 @@ export const TEXT = [
 export const MARKS = [
   ['input', 'c-bg'], ['input', 'popover'], ['ring', 'c-bg'], ['ring', 'card'], ['ring', 'c-surface'],
   ['brand', 'c-bg'], ['c-focus', 'c-bg'],
-  // The hero's button against the gradient under it: its edges sit 62–77% of the way down the block (measured
-  // at 1440 and 390), so the deepest ground is checked with a margin, at 80%; and its focus edge on the blue.
-  ['c-brand-button', 'c-brand-bottom/80 over c-brand-top'], ['c-brand-button-hover', 'c-brand-bottom/80 over c-brand-top'],
+  // Not measured: the hero button's fill against the gradient. It is the kit's primary (the maintainer's call,
+  // 2026-11-19) and reads about 1.5-2:1 there, which WCAG 1.4.11 allows: a button whose text label identifies
+  // it needs no 3:1 boundary (the label is the information that identifies the component, and white on
+  // --primary is in TEXT above). Its keyboard focus edge must show on the blue, so that is measured:
   ['c-on-brand', 'c-brand-bottom/80 over c-brand-top'],
   ['live', 'c-bg'], ['changed', 'c-bg'], ['pending', 'c-bg'], ['attention', 'c-bg'], ['draft', 'c-bg'],
 ]

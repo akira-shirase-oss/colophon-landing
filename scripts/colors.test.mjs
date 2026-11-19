@@ -60,7 +60,7 @@ test("every colour of the site's own has a dark twin, and the dark block holds n
     assert.ok(at >= 0, `theme.css has no ${selector} block`)
     return css.slice(at, css.indexOf('}', at))
   }
-  const decls = (text) => Object.fromEntries([...text.matchAll(/(--c-[\w-]+)\s*:\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()]))
+  const decls = (text) => Object.fromEntries([...text.matchAll(/(--(?:c|surface)-[\w-]+)\s*:\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()]))
   const light = decls(block(':root'))
   const dark = decls(block('.dark'))
   // An alias (var(--token)) follows tokens.css's .dark by itself; a literal colour needs its own dark value.
