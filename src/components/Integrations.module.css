@@ -40,7 +40,7 @@
   align-items: center;
   gap: 12px;
 }
-/* a flat tile on the secondary ground, like the Why Colophon cards' icons */
+/* a flat tile on the section ground (the maintainer's call, theme.css --surface-section) */
 .icon {
   width: 64px;
   height: 64px;
@@ -48,8 +48,8 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-control);
-  background: var(--secondary);
-  color: var(--secondary-foreground);
+  background: var(--surface-section);
+  color: var(--foreground);
 }
 .label {
   font-family: var(--font-sans);

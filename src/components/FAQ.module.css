@@ -62,10 +62,11 @@
   flex-direction: column;
   gap: 8px;
 }
+/* the row ground is the sections' own, a grey a step off the page (theme.css --surface-section) */
 .item {
   padding: 20px;
   border-radius: var(--radius-control);
-  background: var(--secondary);
+  background: var(--surface-section);
 }
 .question {
   width: 100%;

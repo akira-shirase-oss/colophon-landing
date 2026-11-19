@@ -33,10 +33,11 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
 }
-/* the kit's card (surface, hairline, radius and the --card-spacing gap are its own); this adds the
-   left alignment, the hover edge and the reveal motion */
-.card {
+/* the kit's card shape (hairline, radius, --card-spacing gap), but filled with the section ground,
+   not the Studio's white sheet: the maintainer's call (theme.css --surface-section) */
+.grid .card {
   align-items: flex-start;
+  background: var(--surface-section);
   transition:
     border-color 0.15s var(--ease),
     transform 0.4s var(--ease),
@@ -48,6 +49,7 @@
   align-items: center;
   gap: 12px;
 }
+/* the icon tile inside a card: the Studio's sheet on the section ground, so it still reads as a tile */
 .icon {
   width: 52px;
   height: 52px;
@@ -56,8 +58,8 @@
   justify-content: center;
   flex-shrink: 0;
   border-radius: var(--radius-control);
-  background: var(--secondary);
-  color: var(--secondary-foreground);
+  background: var(--card);
+  color: var(--foreground);
 }
 .cardTitle {
   font-family: var(--font-sans);
