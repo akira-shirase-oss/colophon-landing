@@ -1,0 +1,106 @@
+/* The kit's button (packages/ui button.svelte): inline-flex, 14px medium, the control radius, a 1px edge
+   that turns the ring colour on keyboard focus with a 4px halo, a press that scales on click only. */
+.button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  font-family: var(--font-text);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  transition:
+    background-color 150ms var(--ease),
+    border-color 150ms var(--ease),
+    color 150ms var(--ease),
+    transform 150ms var(--ease);
+}
+.button:focus-visible {
+  border-color: var(--ring);
+  box-shadow: var(--focus-halo);
+}
+.button:active {
+  transform: scale(0.985);
+}
+.button[aria-disabled='true'],
+.button:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.primary:hover {
+  background: var(--primary-hover);
+}
+.onBrand {
+  background: var(--c-brand-button);
+  color: var(--c-brand-button-text);
+}
+.onBrand:hover {
+  background: var(--c-brand-button-hover);
+}
+/* On the gradient the ring's blue disappears: the edge and halo are the brand block's navy. */
+.onBrand:focus-visible {
+  border-color: var(--c-on-brand);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-on-brand) 35%, transparent);
+}
+.secondary {
+  border-color: var(--border);
+  background: var(--popover);
+  color: var(--foreground);
+}
+.secondary:hover {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+.ghost {
+  background: transparent;
+  color: var(--foreground);
+}
+.ghost:hover {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.sm {
+  height: 36px;
+  padding: 0 12px;
+  gap: 6px;
+}
+.lg {
+  height: 44px;
+  padding: 0 20px;
+  font-size: 15px;
+}
+.withArrow {
+  padding-right: 12px;
+}
+.lg.withArrow {
+  padding-right: 16px;
+}
+.block {
+  width: 100%;
+}
+
+/* The site's pixel arrow, drawn in the label's colour */
+.arrow {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  background: currentColor;
+  -webkit-mask: url('/icons/arrow.svg') center / 100% 100% no-repeat;
+  mask: url('/icons/arrow.svg') center / 100% 100% no-repeat;
+}

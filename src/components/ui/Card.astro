@@ -1,0 +1,19 @@
+---
+import styles from './Card.module.css'
+
+/**
+ * The Studio's card (packages/ui card.svelte): --card with a hairline at 70%, the card radius outside and the
+ * card padding inside, no shadow (only what floats over a page casts one). `size="sm"` for dense panels.
+ */
+type Props = {
+  as?: 'div' | 'article' | 'section' | 'li'
+  size?: 'default' | 'sm'
+  class?: string
+  [attr: string]: unknown
+}
+const { as: Tag = 'div', size = 'default', class: extra, ...rest } = Astro.props
+---
+
+<Tag class={[styles.card, size === 'sm' ? styles.sm : '', extra ?? ''].filter(Boolean).join(' ')} {...rest}>
+  <slot />
+</Tag>

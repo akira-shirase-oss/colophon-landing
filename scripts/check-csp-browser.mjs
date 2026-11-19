@@ -189,8 +189,15 @@ await visit('/', desktop, async (page, report) => {
   if (s.theme !== 'dark' || s.stored !== 'dark' || s.pressed !== 'true') report(`pressing on a light system did not store Dark: ${JSON.stringify(s)}`)
   if (!(s.vt >= 1)) report('with motion allowed, the switch did not run as a view transition')
   await page.reload({ waitUntil: 'domcontentloaded' })
-  const early = await page.evaluate(() => ({ theme: document.documentElement.dataset.theme, bg: getComputedStyle(document.documentElement).getPropertyValue('--c-bg').trim() }))
-  if (early.theme !== 'dark' || early.bg !== '#121211') report(`a stored Dark is not applied before first paint: ${JSON.stringify(early)}`)
+  // Dark is the .dark class the design tokens switch on (D-210): on <html>, with the dark ground, at DOMContentLoaded.
+  const early = await page.evaluate(() => ({
+    theme: document.documentElement.dataset.theme,
+    dark: document.documentElement.classList.contains('dark'),
+    scheme: getComputedStyle(document.documentElement).colorScheme,
+    bg: getComputedStyle(document.documentElement).getPropertyValue('--c-bg').trim(),
+    background: getComputedStyle(document.documentElement).getPropertyValue('--background').trim(),
+  }))
+  if (early.theme !== 'dark' || !early.dark || early.scheme !== 'dark' || early.bg !== early.background || early.bg === 'oklch(1.0000 0 0)') report(`a stored Dark is not applied before first paint: ${JSON.stringify(early)}`)
   await page.waitForLoadState('networkidle')
   await page.locator('[data-theme-toggle]').focus()
   await page.keyboard.press('Enter')

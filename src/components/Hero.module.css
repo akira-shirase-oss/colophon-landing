@@ -13,7 +13,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 24px;
+  /* the Studio's card radius (--radius-card), so the brand block reads as one of the product's surfaces */
+  border-radius: var(--radius-card);
   overflow: clip;
   isolation: isolate;
 }

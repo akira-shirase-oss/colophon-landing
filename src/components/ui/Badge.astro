@@ -1,0 +1,21 @@
+---
+import styles from './Badge.module.css'
+
+/**
+ * The Studio's badge (packages/ui badge.svelte): a pill, 14px medium. The status tones always carry a word
+ * (colour is never the only signal): live is green, changed is violet, pending amber, attention rose, draft
+ * grey; brand is the blue label over a section title. `dot` adds the tone's mark before the word.
+ */
+type Props = {
+  tone?: 'brand' | 'secondary' | 'outline' | 'live' | 'changed' | 'pending' | 'attention' | 'draft'
+  dot?: boolean
+  as?: 'span' | 'p'
+  class?: string
+}
+const { tone = 'secondary', dot = false, as: Tag = 'span', class: extra } = Astro.props
+---
+
+<Tag class={[styles.badge, styles[tone], extra ?? ''].filter(Boolean).join(' ')}>
+  {dot && <span class={styles.dot} aria-hidden="true" />}
+  <slot />
+</Tag>

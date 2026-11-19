@@ -1,5 +1,6 @@
 ---
 import ArrowButton from './ui/ArrowButton.astro'
+import Button from './ui/Button.astro'
 import BrandLogo from './ui/BrandLogo.astro'
 import styles from './Nav.module.css'
 import { app, DOCS_URL } from '../data/app'
@@ -56,7 +57,7 @@ const links = [
         app ? (
           <span class={styles.auth} data-auth>
             <span class={styles.signedOut}>
-              <a class={styles.signIn} href={app.signIn}>Sign in</a>
+              <Button href={app.signIn} variant="secondary">Sign in</Button>
               <ArrowButton href={app.signUp}>Sign up</ArrowButton>
             </span>
             <span class={styles.signedIn}>
@@ -65,7 +66,7 @@ const links = [
           </span>
         ) : (
           <span class={styles.auth}>
-            <ArrowButton href="https://github.com/akira-shirase-oss/colophon-cms">See the source</ArrowButton>
+            <ArrowButton href="https://github.com/akira-shirase-oss/colophon-cms" variant="secondary">See the source</ArrowButton>
           </span>
         )
       }
@@ -88,7 +89,7 @@ const links = [
           app ? (
             <span class={`${styles.auth} ${styles.authMenu}`} data-auth>
               <span class={styles.signedOut}>
-                <a class={styles.signIn} href={app.signIn}>Sign in</a>
+                <Button href={app.signIn} variant="secondary">Sign in</Button>
                 <ArrowButton href={app.signUp}>Sign up</ArrowButton>
               </span>
               <span class={styles.signedIn}>

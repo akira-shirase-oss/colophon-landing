@@ -1,4 +1,6 @@
+/* Colophon's design tokens (a byte copy of colophon-cms design/tokens.css, D-210), then the site's layer over them. */
 @import './tokens.css';
+@import './theme.css';
 
 /* ---------- Fonts: two families, self-hosted (README "Typography") ----------
    Geist Pixel names things: the hero, each page's title, the home page's section titles and post titles.
@@ -34,11 +36,11 @@
   line-gap-override: 0%;
 }
 
-/* ---------- Tokens (colours live in tokens.css) ---------- */
+/* ---------- Tokens (colours, radius, shadows and font stacks live in tokens.css and theme.css) ---------- */
 :root {
-  --font-title: 'Geist Pixel', 'Geist Pixel Fallback', sans-serif;
-  --font-text: 'Inter', 'Inter Fallback', sans-serif;
-  --font-code: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /* The font stacks are the source's (--font-sans, --font-title, --font-mono); these are the site's names for them. */
+  --font-text: var(--font-sans);
+  --font-code: var(--font-mono);
   /* Printing, like a receipt printer, row by row: the hero's title and the footer's wordmark share it.
      600ms a printed line; a line of Geist Pixel at line-height 1.1 is 29 pixel rows. */
   --print-line: 600ms;
@@ -193,12 +195,20 @@ figcaption {
   font-weight: 500;
   color: var(--c-ink);
 }
+/* The label over a section title: the Studio's brand badge (ui/Badge.astro, tone="brand"), for markup that
+   writes the class directly. */
 .t-badge {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--brand-soft);
   font-family: var(--font-text);
   font-size: 14px;
-  line-height: 1;
-  font-weight: 600;
-  color: var(--c-accent);
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--brand-ink);
 }
 .t-body {
   font-family: var(--font-text);
