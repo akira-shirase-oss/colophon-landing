@@ -28,7 +28,7 @@ const description =
     <main class={styles.page}>
       <div class={styles.column}>
         <header class={styles.head}>
-          <p class={styles.kicker}>Blog</p>
+          <Badge as="p" tone="brand">Blog</Badge>
           <h1 class={styles.hTitle}>Notes on publishing you can check</h1>
           <p class={styles.lede}>
             How Colophon works and why, written from the code that does it. The failures go in the{' '}
@@ -45,7 +45,7 @@ const description =
                   <a href={`/blog/${p.id}/`}>
                     <span class={styles.stamp}>
                       <time datetime={p.data.pubDate.toISOString()}>{formatDate(p.data.pubDate)}</time>
-                      {p.data.draft && <Badge variant="draft">Draft</Badge>}
+                      {p.data.draft && <Badge tone="draft" dot>Draft</Badge>}
                     </span>
                     <h2 class={styles.itemTitle}>{p.data.title}</h2>
                     <p class={styles.itemDesc}>{p.data.description}</p>

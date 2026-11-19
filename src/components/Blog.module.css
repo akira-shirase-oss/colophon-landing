@@ -1,13 +1,14 @@
 /* The blog: one reading column in the site's type, quiet chrome, the date stamp as the signature.
-   The D-210 skin: --foreground ink and --muted-foreground text, --border rules, code on --muted,
-   links in --link, the draft chip as a real status badge. */
+   The D-210 skin: --foreground ink and --muted-foreground text, --border rules, code on --secondary
+   (the page's quiet ground, --c-surface, which the code-contrast check measures), links in --link,
+   the draft chip as a real status badge. */
 
 .page {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 148px var(--pad-x, 20px) 96px;
+  padding: 148px var(--pad-x) 96px;
 }
 .column {
   width: 100%;
@@ -21,13 +22,6 @@
   gap: 12px;
   padding-bottom: 40px;
   border-bottom: 1px solid var(--border);
-}
-.kicker {
-  font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 1;
-  font-weight: 600;
-  color: var(--brand-ink);
 }
 .hTitle {
   font-family: var(--font-title);
@@ -206,32 +200,26 @@
   font-family: var(--font-mono);
   font-size: 0.875em;
   padding: 2px 6px;
-  border-radius: calc(var(--radius) - 10px);
-  background: var(--muted);
+  border-radius: calc(var(--radius-control) - 4px);
+  background: var(--secondary);
 }
 .prose :global(pre) {
   overflow-x: auto;
   padding: 16px 20px;
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  background: var(--muted);
+  background: var(--secondary);
   color: var(--foreground);
   font-size: 15px;
   line-height: 1.55;
 }
 /* Each token's colour comes from the theme drawn for the surface it sits on (astro.config.mjs): the light
-   theme by default, the dark one wherever the dark tokens apply — an explicit .dark or data-theme="dark",
-   or the system asking for dark when no Light choice was stored. */
+   theme by default, the dark one wherever the dark tokens apply — .dark on <html> (Base.astro's script,
+   from the visitor's choice or the system's). */
 .prose :global(pre span) {
   color: var(--shiki-light);
 }
-@media (prefers-color-scheme: dark) {
-  :global(:root:not(.light):not([data-theme='light'])) .prose :global(pre span) {
-    color: var(--shiki-dark);
-  }
-}
-:global(:root.dark) .prose :global(pre span),
-:global(:root[data-theme='dark']) .prose :global(pre span) {
+:global(.dark) .prose :global(pre span) {
   color: var(--shiki-dark);
 }
 .prose :global(pre code) {
@@ -306,9 +294,9 @@
 /* The shared status line under a post's title (src/components/Status.astro). */
 .status {
   padding: 12px 16px;
-  border-radius: calc(var(--radius) - 4px);
+  border-radius: var(--radius-control);
   border: 1px solid var(--border);
-  background: var(--muted);
+  background: var(--secondary);
   font-family: var(--font-sans);
   font-size: 15px;
   line-height: 1.5;
