@@ -4,6 +4,7 @@ import Base from '../../layouts/Base.astro'
 import Nav from '../../components/Nav.astro'
 import Footer from '../../components/Footer.astro'
 import Status from '../../components/Status.astro'
+import Badge from '../../components/ui/Badge.astro'
 import styles from '../../components/Blog.module.css'
 import { posts, formatDate, type Post } from '../../lib/posts'
 import { glossaryTerms } from '../../lib/glossary'
@@ -74,10 +75,10 @@ const termSet = {
                 </span>
               )
             }
-            {draft && <span class={styles.draft}>Draft</span>}
+            {draft && <Badge variant="draft">Draft</Badge>}
           </span>
           <h1 class={styles.postTitle}>{title}</h1>
-          <p class="t-body-lg" style="line-height: 1.5;">{description}</p>
+          <p class={styles.desc}>{description}</p>
           <Status note={post.data.status} />
         </header>
         <div class={styles.prose}>
