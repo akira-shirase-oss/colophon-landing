@@ -27,7 +27,7 @@ Colophon is for teams who want their CMS to be a service of its own, shaped by t
 
 Both are MIT-licensed. The honest cost: Colophon is pre-release, and [what to know before choosing Colophon](#what-to-know-before-choosing-colophon) spells out what that means.
 
-If you're weighing a hosted service instead, [Colophon vs Contentful](/compare/colophon-vs-contentful/) compares self-hosting with SaaS.
+If you're weighing a hosted service instead, [Colophon vs Contentful](/compare/colophon-vs-contentful/) and [Colophon vs Sanity](/compare/colophon-vs-sanity/) compare self-hosting with a hosted CMS, and [all the comparisons](/compare/) are side by side on one page.
 
 ## At a glance
 

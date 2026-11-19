@@ -2,6 +2,7 @@
 // security policy). Mobile emulation, three runs, the median of each number; any miss fails:
 //
 //   LCP ≤ 2.0 s · CLS = 0 · TBT = 0 ms · Performance ≥ 95 · SEO = 100 · Accessibility = 100
+//   and at 390 and 360 px wide, nothing wider than the screen (code blocks may scroll; tables may not)
 //
 //   node scripts/lighthouse-budget.mjs [--runs 3] [--dist dist]
 //
@@ -96,6 +97,35 @@ for (const path of targets) {
   for (const miss of misses) failures.push(`${path}: ${miss}`)
 }
 await chrome.kill()
+
+// At phone width (390 and 360), nothing is wider than the screen: no sideways page scroll, and nothing in the article
+// (a table, a code block) wider than its own box, which would cut columns off or hide them behind a scroll.
+// Every built page in the sections, not one per type: this check is cheap, and content differs page by page.
+const everyPage = SECTIONS.flatMap((s) => {
+  const dir = join(dist, s)
+  if (!existsSync(dir)) return []
+  const pages = readdirSync(dir).filter((n) => existsSync(join(dir, n, 'index.html'))).map((n) => `/${s}/${n}/`)
+  return [...(existsSync(join(dir, 'index.html')) ? [`/${s}/`] : []), ...pages]
+})
+const browser = await chromium.launch()
+for (const width of [390, 360]) {
+  const page = await browser.newPage({ viewport: { width, height: 844 } })
+  for (const path of everyPage) {
+    await page.goto(origin + path, { waitUntil: 'load' })
+    const wide = await page.evaluate(() => {
+      const out = []
+      if (document.documentElement.scrollWidth > window.innerWidth) out.push(`the page scrolls sideways by ${document.documentElement.scrollWidth - window.innerWidth}px`)
+      for (const el of document.querySelectorAll('article *')) {
+        if (el.scrollWidth > el.clientWidth + 1 && getComputedStyle(el).overflowX !== 'visible' && el.tagName !== 'PRE')
+          out.push(`<${el.tagName.toLowerCase()}> is ${el.scrollWidth}px wide in a ${el.clientWidth}px box`)
+      }
+      return out
+    })
+    for (const w of wide) failures.push(`${path} at ${width}px: ${w}`)
+  }
+  await page.close()
+}
+await browser.close()
 server.close()
 
 for (const r of rows) {

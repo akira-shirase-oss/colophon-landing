@@ -26,7 +26,7 @@ Colophon is for teams who need to know, with evidence, what their website publis
 
 The honest cost: Colophon is pre-release. What that means in practice is in [what to know before choosing Colophon](#what-to-know-before-choosing-colophon).
 
-If you're weighing a hosted service instead, [Colophon vs Contentful](/compare/colophon-vs-contentful/) compares self-hosting with SaaS.
+If you're weighing a hosted service instead, [Colophon vs Contentful](/compare/colophon-vs-contentful/) and [Colophon vs Sanity](/compare/colophon-vs-sanity/) compare self-hosting with a hosted CMS, and [all the comparisons](/compare/) are side by side on one page.
 
 ## At a glance
 
