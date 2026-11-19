@@ -4,11 +4,11 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 0 var(--content-pad, 52px);
+  padding: 0 var(--content-pad);
 }
 .inner {
   width: 100%;
-  max-width: var(--content-max, 1176px);
+  max-width: var(--content-max);
   display: flex;
   flex-direction: column;
   gap: 32px;
