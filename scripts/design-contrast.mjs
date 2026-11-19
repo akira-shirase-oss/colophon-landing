@@ -114,12 +114,17 @@ export const TEXT = [
   // The hero's brand block: navy type on the white-to-#0061ff gradient. The type sits in its top 70% (the
   // button's label is on the button), so the deepest ground it meets is the blue at 70% over the white.
   ['c-on-brand', 'c-brand-top'], ['c-on-brand', 'c-brand-bottom/70 over c-brand-top'],
+  ['c-brand-button-text', 'c-brand-button'], ['c-brand-button-text', 'c-brand-button-hover'],
   // Hover grounds on the page (secondary's tint over the page, the switch's ground).
   ['c-ink', 'c-switch-bg'], ['c-ink', 'muted/50 over c-bg'], ['c-text', 'muted/50 over c-bg'],
 ]
 export const MARKS = [
   ['input', 'c-bg'], ['input', 'popover'], ['ring', 'c-bg'], ['ring', 'card'], ['ring', 'c-surface'],
   ['brand', 'c-bg'], ['c-focus', 'c-bg'],
+  // The hero's button against the gradient under it: its edges sit 62–77% of the way down the block (measured
+  // at 1440 and 390), so the deepest ground is checked with a margin, at 80%; and its focus edge on the blue.
+  ['c-brand-button', 'c-brand-bottom/80 over c-brand-top'], ['c-brand-button-hover', 'c-brand-bottom/80 over c-brand-top'],
+  ['c-on-brand', 'c-brand-bottom/80 over c-brand-top'],
   ['live', 'c-bg'], ['changed', 'c-bg'], ['pending', 'c-bg'], ['attention', 'c-bg'], ['draft', 'c-bg'],
 ]
 

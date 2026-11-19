@@ -11,12 +11,11 @@ type Props = {
 
 /**
  * A link that goes somewhere: the Studio's button (Button.astro) with the site's pixel arrow after the label.
- * `onBrand` is the primary on the hero's brand block; it reads the same as `primary` and is kept as a name so
- * callers say where the button sits.
+ * `onBrand` is the primary on the hero's brand block, in a deeper blue so its edge reads on the gradient.
  */
 const { href, variant = 'primary', block = false, size = 'default' } = Astro.props
 ---
 
-<Button href={href} variant={variant === 'secondary' ? 'secondary' : 'primary'} size={size} block={block} arrow>
+<Button href={href} variant={variant} size={size} block={block} arrow>
   <slot />
 </Button>

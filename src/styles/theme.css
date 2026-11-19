@@ -85,11 +85,15 @@
   --c-button-quiet-text: var(--foreground);
 
   /* ---- The brand block (the hero): white at the top to #0061ff at the bottom, the same in both themes,
-     with navy type. Its button is the kit's primary. ---- */
+     with navy type. Its button is the kit's, in a deeper blue. ---- */
   --c-brand-top: var(--gradient-brand-from);
   --c-brand-bottom: var(--gradient-brand-to);
   --c-on-brand: #08142b;
-  --c-brand-button: var(--primary);
+  /* The hero's button: the brand's hue a step deeper than the theme's deepest blue (--chart-5), the same in both
+     themes like the gradient, so its edge reads at 3:1 on the blue under it (WCAG 1.4.11), with a margin;
+     --primary reads 1.5–2.0:1 there. */
+  --c-brand-button: oklch(0.3400 0.1700 263.9420);
+  --c-brand-button-hover: oklch(0.3000 0.1500 263.9420);
   --c-brand-button-text: var(--primary-foreground);
   --c-brand-edge: oklch(0.2 0.04 260 / 0.12);
   --c-brand-icon: oklch(0.33 0.12 262 / 0.5);
@@ -123,6 +127,8 @@
   color-scheme: dark;
 
   --c-on-brand: #08142b;
+  --c-brand-button: oklch(0.3400 0.1700 263.9420);
+  --c-brand-button-hover: oklch(0.3000 0.1500 263.9420);
   --c-brand-edge: oklch(1 0 0 / 0.1);
   --c-brand-icon: oklch(0.33 0.12 262 / 0.5);
 
