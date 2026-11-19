@@ -49,7 +49,7 @@
 .dot {
   width: 4px;
   height: 4px;
-  background: var(--c-ink);
+  background: var(--c-muted);
 }
 
 /* Theme toggle: the Studio's ghost icon button (36px, the control radius, a ground only on hover), set
@@ -64,14 +64,15 @@
   justify-content: center;
   flex-shrink: 0;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: var(--radius-control);
   color: var(--c-ink);
   transition:
     background-color 0.15s var(--ease),
     border-color 0.15s var(--ease);
 }
 .toggle:hover {
-  background: var(--c-switch-bg);
+  background: var(--accent);
+  color: var(--accent-foreground);
 }
 .toggle:active {
   transform: scale(0.985);
@@ -91,18 +92,11 @@
   position: absolute;
   transform: rotate(90deg) scale(0);
 }
-@media (prefers-color-scheme: dark) {
-  :global(:root:not([data-theme='light'])) .sun {
-    transform: rotate(-90deg) scale(0);
-  }
-  :global(:root:not([data-theme='light'])) .moon {
-    transform: rotate(0deg) scale(1);
-  }
-}
-:global(:root[data-theme='dark']) .sun {
+/* .dark is the theme in use, whoever chose it (Base.astro) */
+:global(.dark) .sun {
   transform: rotate(-90deg) scale(0);
 }
-:global(:root[data-theme='dark']) .moon {
+:global(.dark) .moon {
   transform: rotate(0deg) scale(1);
 }
 /* The header's buttons. With the app live, one of two sets shows: the head script decides before the first
@@ -124,27 +118,6 @@
 }
 :global(html[data-session='in']) .signedIn {
   display: flex;
-}
-/* Sign in: the quiet one, a hairline-framed text button the height of the arrow button */
-.signIn {
-  display: inline-flex;
-  align-items: center;
-  height: 44px;
-  padding: 0 14px;
-  border: 1px solid var(--c-line);
-  border-radius: 8px;
-  font-family: var(--font-text);
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--c-ink);
-  transition: background-color 0.2s var(--ease);
-}
-.signIn:hover {
-  background: var(--c-surface);
-}
-.signIn:focus-visible {
-  outline: 2px solid var(--c-focus);
-  outline-offset: 3px;
 }
 /* in the phone menu the buttons start at the left, under the links */
 .authMenu .signedOut,

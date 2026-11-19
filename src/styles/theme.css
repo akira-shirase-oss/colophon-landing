@@ -49,8 +49,8 @@
   /* ---- Cards and icon tiles: the kit's card is flat, a hairline on --card; only what floats has a shadow ---- */
   --c-card-edge: var(--border);
   --c-card-edge-hover: var(--input);
-  --c-tile-top: var(--card);
-  --c-tile-bottom: var(--card);
+  --c-tile-top: var(--secondary);
+  --c-tile-bottom: var(--secondary);
   --c-tile-ink: var(--foreground);
   --c-tile-drop: transparent;
   --c-tile-spread: transparent;
