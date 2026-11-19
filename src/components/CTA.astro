@@ -8,7 +8,7 @@ import styles from './CTA.module.css'
 
 <section class={styles.section} aria-labelledby="statement-heading">
   <div class={styles.inner}>
-    <h2 id="statement-heading" class="visually-hidden">{statement.heading}</h2>
+    <h2 id="statement-heading" class={styles.vh}>{statement.heading}</h2>
     <p class={styles.statement}>
       {
         statement.parts.map((p) => (

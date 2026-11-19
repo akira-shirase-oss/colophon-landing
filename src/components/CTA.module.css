@@ -1,25 +1,34 @@
 /* The closing statement: no card, the page's own surface, the content column. */
+
 .section {
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 0 var(--content-pad);
+  padding: 0 var(--content-pad, 52px);
 }
 .inner {
   width: 100%;
-  max-width: var(--content-max);
+  max-width: var(--content-max, 1176px);
   display: flex;
   flex-direction: column;
   gap: 32px;
 }
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
 /* about 56px at 1440 and 30px at 390 */
 .statement {
-  font-family: var(--font-text);
+  font-family: var(--font-sans);
   font-size: clamp(30px, 20.3px + 2.5vw, 56px);
   line-height: 1.18;
   font-weight: 550;
   letter-spacing: -0.02em;
-  color: var(--c-ink);
+  color: var(--foreground);
   text-wrap: pretty;
 }
 /* the word before an illustration, the illustration and its punctuation never part across a line */
@@ -28,15 +37,14 @@
 }
 .more {
   align-self: flex-start;
-  font-family: var(--font-text);
+  font-family: var(--font-sans);
   font-size: 18px;
   font-weight: 500;
-  color: var(--c-ink);
+  color: var(--link);
   text-decoration: underline;
-  text-decoration-color: var(--c-underline);
+  text-decoration-color: var(--border);
   text-underline-offset: 4px;
 }
 .more:hover {
   text-decoration-color: currentColor;
 }
-
