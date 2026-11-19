@@ -26,7 +26,7 @@
 //          scroll, wheel or touch moves. One-time effects (the title and wordmark print, the theme toggle's view
 //          transition on click) are fine.
 // app      the account buttons ship only in a build made with PUBLIC_APP_URL: without it, no page links to the
-//          app's sign-in, sign-up or dashboard (the app isn't live), and the header keeps "See the source"
+//          app's sign-in, sign-up or dashboard (the app isn't live), and the header shows "Get started"
 // fonts    the site uses exactly two webfonts: every @font-face is Geist Pixel or Inter (or their local,
 //          metric-matched fallbacks), every font file built is one of their two woff2 files, and nothing
 //          links to or preloads any other font.

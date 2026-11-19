@@ -25,11 +25,21 @@
   /* The kit's focus ring: the ring colour on the edge, a 4px halo at 25% around it. */
   --focus-halo: 0 0 0 4px color-mix(in srgb, var(--ring) 25%, transparent);
 
+  /* ---- Section and footer grounds (the maintainer's call, 2026-11-19) ----
+     --surface-section: the ground of the sections' cards and rows (benefit cards, integration tiles, FAQ rows,
+     blog cards): a grey a step off the page, the old site's card tone, so cards read as set into the page rather
+     than as the Studio's white sheets. Light #f2f2f2 and dark #1d1d1b are origin/main's --c-surface.
+     --surface-footer: the footer panel, a little deeper than the Studio's --secondary it had: in light a step
+     under the section grey, in dark the old footer's #1d1d1b. Every text pair on them is in the contrast table. */
+  --surface-section: #f2f2f2;
+  --surface-section-hover: #efefef;
+  --surface-footer: #efefef;
+
   /* ---- Page and type ---- */
   --c-bg: var(--background);
-  --c-surface: var(--secondary);
-  --c-raised: var(--card);
-  --c-raised-hover: var(--muted);
+  --c-surface: var(--surface-section);
+  --c-raised: var(--surface-section);
+  --c-raised-hover: var(--surface-section-hover);
   --c-ink: var(--foreground);
   --c-prose: var(--foreground);
   --c-text: var(--muted-foreground);
@@ -49,8 +59,8 @@
   /* ---- Cards and icon tiles: the kit's card is flat, a hairline on --card; only what floats has a shadow ---- */
   --c-card-edge: var(--border);
   --c-card-edge-hover: var(--input);
-  --c-tile-top: var(--secondary);
-  --c-tile-bottom: var(--secondary);
+  --c-tile-top: var(--surface-section);
+  --c-tile-bottom: var(--surface-section);
   --c-tile-ink: var(--foreground);
   --c-tile-drop: transparent;
   --c-tile-spread: transparent;
@@ -85,15 +95,13 @@
   --c-button-quiet-text: var(--foreground);
 
   /* ---- The brand block (the hero): white at the top to #0061ff at the bottom, the same in both themes,
-     with navy type. Its button is the kit's, in a deeper blue. ---- */
+     with navy type. Its button is the kit's primary. ---- */
   --c-brand-top: var(--gradient-brand-from);
   --c-brand-bottom: var(--gradient-brand-to);
   --c-on-brand: #08142b;
-  /* The hero's button: the brand's hue a step deeper than the theme's deepest blue (--chart-5), the same in both
-     themes like the gradient, so its edge reads at 3:1 on the blue under it (WCAG 1.4.11), with a margin;
-     --primary reads 1.5–2.0:1 there. */
-  --c-brand-button: oklch(0.3400 0.1700 263.9420);
-  --c-brand-button-hover: oklch(0.3000 0.1500 263.9420);
+  /* The hero's button is the kit's primary, the same blue as the header's (the maintainer's call). */
+  --c-brand-button: var(--primary);
+  --c-brand-button-hover: var(--primary-hover);
   --c-brand-button-text: var(--primary-foreground);
   --c-brand-edge: oklch(0.2 0.04 260 / 0.12);
   --c-brand-icon: oklch(0.33 0.12 262 / 0.5);
@@ -107,7 +115,8 @@
   --c-px-cream: #fff1d0;
 
   /* ---- The footer's oversized wordmark, the theme switch, diagrams in posts ---- */
-  --c-wordmark: var(--border);
+  /* the old wordmark tones, a faint step off --surface-footer in each theme */
+  --c-wordmark: #e3e3e3;
   --c-switch-bg: var(--accent);
   --c-figure-fill: var(--muted);
   --c-figure-ink: var(--foreground);
@@ -126,9 +135,12 @@
 .dark {
   color-scheme: dark;
 
+  --surface-section: #1d1d1b;
+  --surface-section-hover: #232321;
+  --surface-footer: #1d1d1b;
+  --c-wordmark: #262624;
+
   --c-on-brand: #08142b;
-  --c-brand-button: oklch(0.3400 0.1700 263.9420);
-  --c-brand-button-hover: oklch(0.3000 0.1500 263.9420);
   --c-brand-edge: oklch(1 0 0 / 0.1);
   --c-brand-icon: oklch(0.33 0.12 262 / 0.5);
 

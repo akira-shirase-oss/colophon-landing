@@ -286,7 +286,7 @@ for (const viewport of [desktop, phone]) {
   })
 }
 
-// The header's buttons. A build without PUBLIC_APP_URL keeps "See the source" and has no account buttons; a build
+// The header's buttons. A build without PUBLIC_APP_URL shows "Get started" (the docs' quick start) and no account buttons; a build
 // with it follows the app's hint cookie (D-200): exactly colophon_signed_in=1 shows Dashboard alone; no cookie,
 // any other value, or no JavaScript shows Sign in and Sign up. The state is decided before the first paint, so
 // the page never shifts (CLS 0) in either state.
@@ -294,8 +294,8 @@ const appBuild = readFileSync(join(dist, 'index.html'), 'utf8').includes('data-a
 if (!appBuild) {
   await visit('/', desktop, async (page, report) => {
     interactions++
-    const header = await page.evaluate(() => ({ auth: document.querySelectorAll('[data-auth]').length, source: [...document.querySelectorAll('header a')].some((a) => /See the source/.test(a.textContent)) }))
-    if (header.auth || !header.source) report(`without the app, the header should keep See the source and no account buttons: ${JSON.stringify(header)}`)
+    const header = await page.evaluate(() => ({ auth: document.querySelectorAll('[data-auth]').length, start: [...document.querySelectorAll('header a')].some((a) => /Get started/.test(a.textContent) && /\/quick-start\/$/.test(a.href)) }))
+    if (header.auth || !header.start) report(`without the app, the header should show Get started (the docs' quick start) and no account buttons: ${JSON.stringify(header)}`)
   })
 } else {
   const shown = (page) =>
