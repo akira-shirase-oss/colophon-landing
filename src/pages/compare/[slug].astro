@@ -1,0 +1,12 @@
+---
+// Comparison pages: src/content/pages with `kind: compare`, at /compare/<id>/.
+import SeoPage from '../../layouts/SeoPage.astro'
+import { seoPages } from '../../lib/pages'
+
+export async function getStaticPaths() {
+  return (await seoPages('compare')).map((page) => ({ params: { slug: page.id }, props: { page } }))
+}
+const { page } = Astro.props
+---
+
+<SeoPage page={page} />

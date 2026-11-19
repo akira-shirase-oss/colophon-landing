@@ -1,0 +1,12 @@
+---
+// Use-case pages: src/content/pages with `kind: use-case`, at /use-cases/<id>/.
+import SeoPage from '../../layouts/SeoPage.astro'
+import { seoPages } from '../../lib/pages'
+
+export async function getStaticPaths() {
+  return (await seoPages('use-case')).map((page) => ({ params: { slug: page.id }, props: { page } }))
+}
+const { page } = Astro.props
+---
+
+<SeoPage page={page} />

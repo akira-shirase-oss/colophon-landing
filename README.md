@@ -106,6 +106,25 @@ The fonts were supplied by the maintainer, originally from Google Fonts, and pro
 Both are under the SIL Open Font License 1.1: `public/fonts/OFL-GeistPixel.txt` (© 2026 The Geist Project
 Authors) and `public/fonts/OFL-Inter.txt` (© 2020 The Inter Project Authors).
 
+## Pages for search (comparisons first)
+
+Pages written for one search intent live as Markdown in `src/content/pages/` (schema in `src/content.config.ts`).
+Each page has a `kind` that decides its address (`compare` → `/compare/<id>/`), a title of at most 49 characters,
+a description of 120 to 155 characters, the query it answers, its dates, at least three related links, and its FAQ.
+One layout, `src/layouts/SeoPage.astro`, renders them all from the blog's own components and styles. It adds no
+visual element, no stylesheet and no script. The visible FAQ and the FAQPage data come from the same frontmatter.
+
+They are held to a performance budget (maintainer: "always top notch performance"; numbers in
+`scripts/budget-config.mjs`):
+
+- **`npm run check` runs `scripts/check-budget.mjs`.** Each page's HTML is at most 60 KB gzipped. Its CSS is only
+  the stylesheets a blog post already loads, within their size. It runs no script a blog post doesn't. Its images
+  are AVIF, WebP or SVG with a width and height, lazy below the first, and within the per-image budget. At least
+  three other pages link to it from their content, and it links to at least three.
+- **CI's browser job runs `scripts/lighthouse-budget.mjs`.** On one page of each type, served with
+  `dist/_headers`: mobile, the median of five runs, LCP at most 2.0 s, CLS 0, TBT at most 150 ms with the page's own script work at most 50 ms, Performance at least 95,
+  SEO 100 and Accessibility 100. CI runner numbers are lab observations; a regression past a threshold fails.
+
 ## Security headers and checks
 
 `public/_headers` holds the headers Cloudflare Pages sends with every response: a Content-Security-Policy,
@@ -150,6 +169,20 @@ is not a dependency here; see the top of `scripts/check-csp-browser.mjs`.
 (`scripts/check-workflows.mjs`), `npm ci`, `npm audit --omit=dev --audit-level=moderate`, lint, `npm test`, the
 build and `npm run check`; then, in a second job with a pinned Playwright, `check-csp-browser.mjs --mutate`
 (which must fail) and `npm run check:browser`. Dependabot proposes one grouped npm PR and one grouped Actions PR a week.
+
+## After a deploy: IndexNow
+
+Once a new build is live, `node scripts/indexnow.mjs` tells search engines which pages changed through
+[IndexNow](https://www.indexnow.org) (Bing, Yandex and others share submissions). It works out the changes since
+the merge's first parent, the previous deploy:
+
+- **A changed or deleted post or page** sends its own address and the list that shows it.
+- **A change to layouts, components, styles, data, config or `public/`** sends every address in the sitemap.
+
+It sends one request with at most 10,000 URLs and a 10-second deadline, and it never fails a deploy: every outcome
+is printed and the exit code is 0. `--dry-run` prints the URLs without sending them; `--from` and `--to` take any two
+commits. The key in `public/<key>.txt` is public by design, because IndexNow verifies a submission by fetching it
+from the site. The maintainer approved IndexNow on 19 November 2026.
 
 ## License
 

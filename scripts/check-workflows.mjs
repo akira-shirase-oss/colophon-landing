@@ -9,7 +9,12 @@
 // - every actions/checkout step sets `persist-credentials: false`
 // - Dependabot updates both npm and github-actions
 //
-// Line-based on purpose: no YAML dependency, and the rules are about text that must never appear.
+// - every workflow (and dependabot.yml) parses as YAML: a stray `: ` in a name makes GitHub reject the whole
+//   file, which no line rule can see. The parse uses Ruby's standard YAML library (on GitHub's Ubuntu and macOS
+//   images); without Ruby the check fails rather than skipping.
+//
+// The rules are line-based on purpose (no YAML dependency in the site), plus that one real parse.
+import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -23,6 +28,17 @@ const workflows = existsSync(dir) ? readdirSync(dir).filter((f) => /\.ya?ml$/.te
 if (workflows.length === 0) fail('.github/workflows', 0, 'no workflow, so nothing runs the checks')
 
 const STEP = /^\s*- (name|uses|run|id|if|with|env|shell|working-directory|timeout-minutes|continue-on-error):/
+
+/** Ruby's YAML parser on one file: undefined when it parses, else the parser's message. */
+const yamlError = (file) => {
+  const r = spawnSync('ruby', ['-ryaml', '-e', 'YAML.load_file(ARGV[0])', file], { encoding: 'utf8' })
+  if (r.error) return `can't run ruby to parse it (${r.error.code}); install Ruby, don't skip the check`
+  return r.status === 0 ? undefined : (r.stderr.split('\n').find((l) => /\(.*\):/.test(l)) ?? r.stderr.trim()).replace(/^.*?\): /, '')
+}
+for (const name of [...workflows, ...(existsSync(join(repo, '.github', 'dependabot.yml')) ? ['../dependabot.yml'] : [])]) {
+  const error = yamlError(join(dir, name))
+  if (error) fail(`.github/workflows/${name}`.replace('workflows/../', ''), 0, `isn't valid YAML, so GitHub won't run it: ${error}`)
+}
 
 for (const name of workflows) {
   const file = `.github/workflows/${name}`
