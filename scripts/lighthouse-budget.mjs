@@ -56,6 +56,9 @@ const targets = SECTIONS.flatMap((s) => {
   return [...(existsSync(join(dir, 'index.html')) ? [`/${s}/`] : []), ...(first ? [`/${s}/${first}/`] : [])]
 })
 
+// A control: one published blog post, measured the same way and printed, never gated. If it misses too on a given
+// machine, the miss is the machine's, not a new page's.
+const CONTROL = '/blog/colophon-vs-strapi/'
 const chrome = await launch({ chromePath: chromium.executablePath(), chromeFlags: ['--headless=new', '--no-sandbox'] })
 const median = (xs) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)]
 const failures = []
@@ -81,6 +84,9 @@ for (const path of targets) {
       cls: a['cumulative-layout-shift'].numericValue,
       tbtMs: a['total-blocking-time'].numericValue,
       failed: Object.values(a).filter((x) => x.scoreDisplayMode === 'binary' && x.score === 0).map((x) => x.id),
+      benchmarkIndex: lhr.environment.benchmarkIndex,
+      breakdown: (a['mainthread-work-breakdown'].details?.items ?? []).map((i) => `${i.groupLabel} ${Math.round(i.duration)} ms`).join(', '),
+      longTasks: (a['long-tasks'].details?.items ?? []).slice(0, 4).map((i) => `${i.url.replace(origin, '') || 'Unattributable'} ${Math.round(i.duration)} ms`).join(', '),
     })
   }
   if (samples.length === 0) continue
@@ -95,6 +101,17 @@ for (const path of targets) {
     m.accessibility < THRESHOLDS.accessibility && `Accessibility ${m.accessibility} < 100 (failing: ${[...new Set(samples.flatMap((s) => s.failed))].join(', ')})`,
   ].filter(Boolean)
   for (const miss of misses) failures.push(`${path}: ${miss}`)
+  // The machine's speed, as Lighthouse measures it, and where the main thread went: printed for every page so a
+  // miss on a CI runner can be read against the hardware (Lighthouse's CPU slowdown is a fixed multiplier).
+  const worst = samples.reduce((a, b) => (b.tbtMs > a.tbtMs ? b : a))
+  console.log(`  ${path}: benchmarkIndex ${Math.round(median(samples.map((x) => x.benchmarkIndex)))}; slowest run's main thread: ${worst.breakdown}; long tasks: ${worst.longTasks || 'none'}`)
+}
+{
+  const { lhr } = await lighthouse(origin + CONTROL, { port: chrome.port, output: 'json', logLevel: 'error', onlyCategories: ['performance'] })
+  if (!lhr.runtimeError) {
+    const a = lhr.audits
+    console.log(`lighthouse-budget: control ${CONTROL} (one run, not gated): Performance ${Math.round(lhr.categories.performance.score * 100)}, LCP ${(a['largest-contentful-paint'].numericValue / 1000).toFixed(2)} s, TBT ${Math.round(a['total-blocking-time'].numericValue)} ms, benchmarkIndex ${Math.round(lhr.environment.benchmarkIndex)}`)
+  }
 }
 await chrome.kill()
 
