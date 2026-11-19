@@ -6,6 +6,8 @@ targetQuery: "sveltekit headless cms"
 pubDate: 2026-11-19
 status: "The code below is from the SvelteKit demo site in Colophon's repository, run against Colophon on 19 November 2026."
 related:
+  - href: /guides/nextjs-headless-cms/
+    text: "Next.js and a headless CMS: one release a build"
   - href: /guides/
     text: "Guides: building sites on Colophon"
   - href: /blog/astro-headless-cms/

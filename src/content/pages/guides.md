@@ -1,10 +1,12 @@
 ---
 kind: hub
 title: "Guides: building sites on a headless CMS"
-description: "Step-by-step guides to building websites on Colophon with Astro and SvelteKit, each from a demo that ran: read one release, mark pages, rebuild on publish."
+description: "Guides to building sites on Colophon with Astro, SvelteKit and Next.js, each from a demo that ran: read one release, mark pages, rebuild on publish."
 targetQuery: "headless cms astro sveltekit guide"
 pubDate: 2026-11-19
 related:
+  - href: /guides/nextjs-headless-cms/
+    text: "Next.js and a headless CMS: one release a build"
   - href: /guides/sveltekit-headless-cms/
     text: "SvelteKit and a headless CMS: one release a build"
   - href: /blog/astro-headless-cms/
@@ -27,10 +29,9 @@ answer at a fixed version:
 
 | Framework | Guide | Model |
 |---|---|---|
+| Next.js | [Next.js and a headless CMS: one release a build](/guides/nextjs-headless-cms/) | Static export, rebuilt on publish |
 | SvelteKit | [SvelteKit and a headless CMS: one release a build](/guides/sveltekit-headless-cms/) | Prerendered, rebuilt on publish |
 | Astro | [Using Colophon as a headless CMS for Astro](/blog/astro-headless-cms/) | Prerendered, rebuilt on publish |
-
-A Next.js guide is planned. It will be written the same way, from a demo that has run.
 
 ## Before you start
 
