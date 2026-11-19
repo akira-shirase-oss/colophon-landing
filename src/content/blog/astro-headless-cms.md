@@ -193,3 +193,5 @@ I haven't tested specific hosts' deploy hooks, so check that yours accepts a `PO
 To see what a release pins and how to read an old one, read [how to see what your website said on a past date](/blog/website-history-past-date/). Terms such as release, receipt and site check are defined in the [headless CMS glossary](/blog/headless-cms-glossary/).
 
 Every parameter used above is in the docs: [the delivery API](https://docs.colophon.404human.dev/api/delivery/), and [website connections and receipts](https://docs.colophon.404human.dev/api/website-connections/) for the rebuild webhook.
+
+The same pattern in SvelteKit, with every page read at one release, is in [SvelteKit and a headless CMS: one release a build](/guides/sveltekit-headless-cms/), and every framework guide is listed in [the guides](/guides/).
