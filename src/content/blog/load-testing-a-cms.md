@@ -2,7 +2,7 @@
 title: "Colophon's load tests, with the caveats"
 description: "Load results for a Rust CMS server: warm and cold reads, a cache stampede, outages and a failed 24-hour run. Laptop numbers, labelled as such."
 pubDate: 2026-11-16
-updatedDate: 2026-11-20
+updatedDate: 2026-11-19
 tags: ["performance", "load testing", "reliability", "rust"]
 draft: false
 ---
@@ -34,7 +34,7 @@ A cache that hides the database can make any system look fast. So one scenario m
 - p95 137.9 ms, p99 152.6 ms; a second run on the same runner gave p95 139.1 ms, p99 153.0 ms.
 - 0 cache hits, by design. About six database transactions per request.
 
-These numbers come from a CI runner (an AMD EPYC 9V74, [the stored run](https://github.com/akira-shirase-oss/colophon-cms/actions/runs/44635083698)), not the laptop. **Correction, 20 November 2026:** the version of this section published on 16 November reported a laptop run (30,095 requests at 1,017 a second, p95 62.1 ms, p99 68.2 ms) that read fewer than a third of the corpus: the test chose entries by a counter that each simulated user keeps for itself, so all 64 users walked the same first few hundred entries, and a recount found 675 of the 2,048 read. The test now numbers reads across all users, and a fixed run reads all 2,048. Re-running the old test beside the fixed one on the same machine showed no consistent latency difference, so the earlier figure wasn't flattered by it, but it didn't measure what the section said. The new figures replace it; the machine is different too, so they aren't comparable with the laptop's.
+These numbers come from a CI runner (an AMD EPYC 9V74, [the stored run](https://github.com/akira-shirase-oss/colophon-cms/actions/runs/44635083698)), not the laptop. **Correction, 19 November 2026:** the version of this section published on 16 November reported a laptop run (30,095 requests at 1,017 a second, p95 62.1 ms, p99 68.2 ms) that read fewer than a third of the corpus: the test chose entries by a counter that each simulated user keeps for itself, so all 64 users walked the same first few hundred entries, and a recount found 675 of the 2,048 read. The test now numbers reads across all users, and a fixed run reads all 2,048. Re-running the old test beside the fixed one on the same machine showed no consistent latency difference, so the earlier figure wasn't flattered by it, but it didn't measure what the section said. The new figures replace it; the machine is different too, so they aren't comparable with the laptop's.
 
 ## A thousand readers at the moment a cache entry expires
 

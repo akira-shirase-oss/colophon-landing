@@ -2,7 +2,7 @@
 title: "Give AI agents CMS access, not the publish button"
 description: "How Colophon's MCP server lets AI agents read, draft and propose content while the API refuses any token's approval of what a token submitted."
 pubDate: 2026-11-16
-updatedDate: 2026-11-20
+updatedDate: 2026-11-19
 tags: ["ai agents", "mcp", "permissions", "automation"]
 draft: false
 ---
