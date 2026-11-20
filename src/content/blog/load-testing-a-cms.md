@@ -2,7 +2,7 @@
 title: "Colophon's load tests, with the caveats"
 description: "Load results for a Rust CMS server: warm and cold reads, a cache stampede, outages and a failed 24-hour run. Laptop numbers, labelled as such."
 pubDate: 2026-11-16
-updatedDate: 2026-11-17
+updatedDate: 2026-11-20
 tags: ["performance", "load testing", "reliability", "rust"]
 draft: false
 ---
@@ -13,7 +13,7 @@ I'm building Colophon, an open-source CMS with a Rust server and a Svelte editor
 
 ## The machine, and why it matters
 
-Every run here was on one laptop: an Apple M2 Pro with 12 cores and 32 GB of memory. The release-built server, PostgreSQL 18, the Valkey cache and the S3-compatible object store (all in Docker), and the k6 load generator shared those 12 cores, along with whatever else the laptop was doing.
+Every run here was on one laptop, except the cold reads below, which come from a CI runner. The laptop is an Apple M2 Pro with 12 cores and 32 GB of memory. The release-built server, PostgreSQL 18, the Valkey cache and the S3-compatible object store (all in Docker), and the k6 load generator shared those 12 cores, along with whatever else the laptop was doing.
 
 That makes these numbers evidence about the code's behaviour, not a capacity claim. A production deployment on separate machines would draw different curves, better or worse, and nothing here predicts them. The proper reference setup, with a separate database host and load generator, hasn't been run yet.
 
@@ -30,9 +30,11 @@ The baseline case is anonymous readers hitting published content that's already 
 
 A cache that hides the database can make any system look fast. So one scenario makes every read unique: 30,000 reads across a 2,048-entry corpus, each one a real PostgreSQL fill.
 
-- 30,095 requests at about 1,017 a second, 0 errors.
-- p95 62.1 ms, p99 68.2 ms.
-- 0 cache hits, by design. About three database transactions per request.
+- 30,091 requests at about 505 a second, 0 errors.
+- p95 137.9 ms, p99 152.6 ms; a second run on the same runner gave p95 139.1 ms, p99 153.0 ms.
+- 0 cache hits, by design. About six database transactions per request.
+
+These numbers come from a CI runner (an AMD EPYC 9V74, [the stored run](https://github.com/akira-shirase-oss/colophon-cms/actions/runs/44635083698)), not the laptop. **Correction, 20 November 2026:** the version of this section published on 16 November reported a laptop run (30,095 requests at 1,017 a second, p95 62.1 ms, p99 68.2 ms) that read fewer than a third of the corpus: the test chose entries by a counter that each simulated user keeps for itself, so all 64 users walked the same first few hundred entries, and a recount found 675 of the 2,048 read. The test now numbers reads across all users, and a fixed run reads all 2,048. Re-running the old test beside the fixed one on the same machine showed no consistent latency difference, so the earlier figure wasn't flattered by it, but it didn't measure what the section said. The new figures replace it; the machine is different too, so they aren't comparable with the laptop's.
 
 ## A thousand readers at the moment a cache entry expires
 
