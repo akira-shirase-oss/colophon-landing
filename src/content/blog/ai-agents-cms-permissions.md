@@ -2,7 +2,7 @@
 title: "Give AI agents CMS access, not the publish button"
 description: "How Colophon's MCP server lets AI agents read, draft and propose content while the API refuses any token's approval of what a token submitted."
 pubDate: 2026-11-16
-updatedDate: 2026-11-17
+updatedDate: 2026-11-19
 tags: ["ai agents", "mcp", "permissions", "automation"]
 draft: false
 ---
@@ -49,7 +49,7 @@ A few more properties that matter when a token leaks:
 
 A token can carry ceilings: documents per day, concurrent jobs, requests per minute, and provider tokens and cost per day for future AI features. Work allowances are reserved in PostgreSQL inside the transaction that accepts the work, before anything starts, so parallel requests can't race past them. Over the limit, the work is refused with a `403` before it starts. The per-minute cap works differently, as a rate limiter checked before the request does any work, because reserving a database row for every request would cost a write per request. Over it, the answer is `429` with a `Retry-After` header.
 
-The load test for this runs normal editorial traffic, then adds a token capped at 60 requests a minute that tries about 600 a second. 99.7% of its attempts were refused with `429`, and editors' p95 latency stayed at 1.83 times their own baseline. More numbers like that are in [Colophon's load tests, with the caveats](/blog/load-testing-a-cms/).
+The load test for this runs normal editorial traffic, then adds a token capped at 60 requests a minute that tries about 600 a second. 99.7% of its attempts were refused with `429`, and editors' p95 latency stayed at 1.83 times their own baseline (a laptop run: an Apple M2 Pro, with the server, database and load generator on one machine). More numbers like that are in [Colophon's load tests, with the caveats](/blog/load-testing-a-cms/).
 
 ## Retries that can't double-write
 
@@ -82,3 +82,5 @@ There's no model in the suite on purpose. The cases are deterministic attacks on
 Roles for people work the same way and are covered in [field-level permissions](/blog/field-level-permissions/). How a CMS should answer for every publish, whoever proposed it, is in [six publishing questions a CMS should answer](/blog/headless-cms-publishing-checklist/).
 
 To connect an agent, the docs cover [the MCP server](https://docs.colophon.404human.dev/mcp/) and [making and scoping API tokens](https://docs.colophon.404human.dev/api/authentication/).
+
+What Colophon's MCP server offers, and its limits per agent, is on the [AI agents through MCP](/features/ai-agents-mcp/) feature page.
