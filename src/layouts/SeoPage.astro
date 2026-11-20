@@ -42,6 +42,7 @@ const breadcrumbs = {
     { name: 'Colophon', item: site },
     ...(page.data.kind === 'compare' ? [{ name: 'Comparisons', item: new URL('/compare/', site).href }] : []),
     ...(page.data.kind === 'feature' ? [{ name: 'Features', item: new URL('/features/', site).href }] : []),
+    ...(page.data.kind === 'guide' ? [{ name: 'Guides', item: new URL('/guides/', site).href }] : []),
     { name: title },
   ].map((crumb, i) => ({ '@type': 'ListItem', position: i + 1, ...crumb })),
 }
@@ -74,6 +75,8 @@ const jsonLd = [article, breadcrumbs, ...(faqPage ? [faqPage] : [])]
             <a class={styles.back} href="/compare/">← All comparisons</a>
           ) : page.data.kind === 'feature' ? (
             <a class={styles.back} href="/features/">← All features</a>
+          ) : page.data.kind === 'guide' ? (
+            <a class={styles.back} href="/guides/">← All guides</a>
           ) : (
             <a class={styles.back} href="/blog/">← All posts</a>
           )

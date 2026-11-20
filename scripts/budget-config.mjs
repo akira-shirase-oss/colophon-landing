@@ -6,7 +6,7 @@ export const CSS_BUDGET_GZ = 6796 // a blog post's two stylesheets plus its inli
 export const IMAGE_BUDGET = 100 * 1024
 export const MIN_LINKS = 3
 /** The sections pages from src/content/pages are served under (src/lib/pages.ts, SECTION). */
-export const SECTIONS = ['compare', 'use-cases', 'features']
+export const SECTIONS = ['compare', 'use-cases', 'features', 'guides']
 /** Lighthouse, mobile, median of five runs (five, not three: one noisy run on a shared CI runner can't move it).
  *
  *  ownScriptMs is the strict part: the main-thread work the page itself causes (Script Evaluation plus Script

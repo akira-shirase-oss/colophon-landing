@@ -1,0 +1,12 @@
+---
+// Framework guides: src/content/pages with `kind: guide`, at /guides/<id>/.
+import SeoPage from '../../layouts/SeoPage.astro'
+import { seoPages } from '../../lib/pages'
+
+export async function getStaticPaths() {
+  return (await seoPages('guide')).map((page) => ({ params: { slug: page.id }, props: { page } }))
+}
+const { page } = Astro.props
+---
+
+<SeoPage page={page} />

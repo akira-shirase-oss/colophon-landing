@@ -7,6 +7,12 @@ pubDate: 2026-11-19
 related:
   - href: /features/publish-receipts/
     text: "Publish receipts: proof of what readers see"
+  - href: /guides/nextjs-headless-cms/
+    text: "Next.js and a headless CMS: one release a build"
+  - href: /guides/
+    text: "Guides: building sites on a headless CMS"
+  - href: /guides/sveltekit-headless-cms/
+    text: "SvelteKit and a headless CMS: one release a build"
   - href: /use-cases/audited-publishing/
     text: "A CMS with an audit trail for every publish"
   - href: /use-cases/ai-agents-draft-people-publish/
