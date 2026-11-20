@@ -16,6 +16,8 @@ export async function getStaticPaths() {
 const { post } = Astro.props as { post: Post }
 const { Content } = await render(post)
 const { title, description, pubDate, updatedDate, draft, tags } = post.data
+// Shown as "Last updated" and sent as dateModified: one value, so the label and the structured data agree.
+const modified = updatedDate ?? pubDate
 const url = new URL(`/blog/${post.id}/`, Astro.site).href
 const posting = {
   '@context': 'https://schema.org',
@@ -23,7 +25,7 @@ const posting = {
   headline: title,
   description,
   datePublished: pubDate.toISOString(),
-  dateModified: (updatedDate ?? pubDate).toISOString(),
+  dateModified: modified.toISOString(),
   mainEntityOfPage: url,
   url,
   inLanguage: 'en',
@@ -56,7 +58,7 @@ const termSet = {
   description={description}
   type="article"
   published={pubDate}
-  modified={updatedDate}
+  modified={modified}
   noindex={draft}
   jsonLd={terms.length > 0 ? [posting, termSet] : posting}
 >
@@ -67,14 +69,8 @@ const termSet = {
         <a class={styles.back} href="/blog/">← All posts</a>
         <header class={styles.postHead}>
           <span class={styles.stamp}>
-            <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
-            {
-              updatedDate && (
-                <span>
-                  · Updated <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time>
-                </span>
-              )
-            }
+            Published <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time> · Last updated{' '}
+            <time datetime={modified.toISOString()}>{formatDate(modified)}</time>
             {draft && <Badge tone="draft" dot>Draft</Badge>}
           </span>
           <h1 class={styles.postTitle}>{title}</h1>

@@ -5,7 +5,8 @@ import BrandLogo from './ui/BrandLogo.astro'
 import BrandWordmark from './ui/BrandWordmark.astro'
 import styles from './Footer.module.css'
 
-// No public demo, contact address, privacy or terms page exists yet, so the footer links only to what does.
+// No public demo, privacy or terms page exists yet, so the footer links only to what does. Contact is the
+// community page: GitHub issues, private security advisories and the docs (no phone, address or personal email).
 const REPO = 'https://github.com/akira-shirase-oss/colophon-cms'
 const columns = [
   {
@@ -22,6 +23,7 @@ const columns = [
       { label: 'Build log', href: 'https://404human.dev/colophon/' },
       { label: 'Source code', href: REPO },
       { label: 'Open an issue', href: `${REPO}/issues` },
+      { label: 'Community and security', href: '/community/' },
     ],
   },
 ]

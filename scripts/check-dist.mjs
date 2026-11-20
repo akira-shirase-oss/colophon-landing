@@ -37,11 +37,21 @@
 //          path that is no longer built to a built page, never to another rule's source; a retired post
 //          address has a rule for both spellings (with and without the trailing slash); and no page, the
 //          sitemap or the feed still links to a retired address.
+// dates    every article (a blog post or a page from src/content/pages) shows "Published <date>" and "Last updated
+//          <date>", each in a <time datetime>, and those two are exactly its datePublished and dateModified.
+// back     every page in a section (/compare/, /use-cases/, /features/, /guides/, /blog/) links back to that
+//          section's index, and a section index back to the home page.
+// llms     /llms.txt lists exactly the pages in the sitemap, each once.
+// security /.well-known/security.txt (RFC 9116) has Contact, Expires, Preferred-Languages, Canonical and Policy,
+//          names no email address, and expires more than 30 days and less than a year from the build.
+// robots   /robots.txt is exactly what src/data/robots.mjs builds: every crawler, and each AI crawler by name,
+//          allowed everything, then the sitemap.
 //
 // Exits 1 and lists every failure, or prints one line per check that passed.
 import { themes, ratio as measure } from './design-contrast.mjs'
 import { createHash } from 'node:crypto'
 import { ANALYTICS, scriptKind } from './csp-rules.mjs'
+import { AI_CRAWLERS, robots } from '../src/data/robots.mjs'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { homedir, userInfo } from 'node:os'
 import { extname, join, relative, resolve, sep } from 'node:path'
@@ -757,6 +767,82 @@ function checkLight() {
 
 // ---------------------------------------------------------------------------------------------
 
+
+// ---------------------------------------------------------------------------------------------
+// dates, back, llms, security, robots
+
+function checkArticles() {
+  let articles = 0
+  let sections = 0
+  for (const page of html) {
+    const path = urlOf(page.file)
+    const data = scriptsOf(page.text)
+      .filter((sc) => sc.attrs.get('type') === 'application/ld+json')
+      .flatMap((sc) => { try { const d = JSON.parse(sc.body); return Array.isArray(d) ? d : [d] } catch { return [] } })
+      .find((d) => d['@type'] === 'BlogPosting' || d['@type'] === 'Article')
+    if (data) {
+      articles += 1
+      const published = page.text.match(/Published\s*<time datetime="([^"]+)"/)
+      const updated = page.text.match(/Last updated\s*<time datetime="([^"]+)"/)
+      if (!published) fail('dates', `${path}: no "Published <time datetime>" label`)
+      else if (published[1] !== data.datePublished) fail('dates', `${path}: Published says ${published[1]}, datePublished is ${data.datePublished}`)
+      if (!updated) fail('dates', `${path}: no "Last updated <time datetime>" label`)
+      else if (updated[1] !== data.dateModified) fail('dates', `${path}: Last updated says ${updated[1]}, dateModified is ${data.dateModified}`)
+    }
+    const section = path.match(/^\/(compare|use-cases|features|guides|blog)\/(?:([^/]+)\/)?$/)
+    // The blog index lists posts and has no back link of its own.
+    if (section && !(section[1] === 'blog' && !section[2])) {
+      sections += 1
+      const want = section[2] ? `/${section[1]}/` : '/'
+      const back = tagsOf(page.text).find((t) => t.name === 'a' && /\bback\b|_back_/.test(t.attrs.get('class') ?? ''))
+      if (!back) fail('back', `${path}: no back link`)
+      else if (back.attrs.get('href') !== want) fail('back', `${path}: the back link goes to ${back.attrs.get('href')} (want ${want})`)
+    }
+  }
+  return { articles, sections }
+}
+
+function checkLlms() {
+  const read = (name) => (existsSync(join(dist, name)) ? readFileSync(join(dist, name), 'utf8') : '')
+  const locs = [...read('sitemap.xml').matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => decode(m[1]))
+  const llms = read('llms.txt')
+  if (!llms.startsWith('# Colophon\n')) fail('llms', 'llms.txt is missing or doesn\'t start with its "# Colophon" title')
+  const listed = [...llms.matchAll(/\]\((https:\/\/[^)]+)\)/g)].map((m) => m[1]).filter((u) => u.startsWith(`${site}/`))
+  for (const loc of locs) if (!listed.includes(loc)) fail('llms', `llms.txt leaves out ${loc}, which the sitemap lists`)
+  for (const url of listed) if (!locs.includes(url)) fail('llms', `llms.txt lists ${url}, which the sitemap doesn't`)
+  if (new Set(listed).size !== listed.length) fail('llms', 'llms.txt lists a page twice')
+  return listed.length
+}
+
+function checkSecurityTxt() {
+  const file = join(dist, '.well-known', 'security.txt')
+  if (!existsSync(file)) return fail('security', '.well-known/security.txt is missing')
+  const fields = new Map()
+  for (const line of readFileSync(file, 'utf8').split('\n')) {
+    const m = line.match(/^([A-Za-z-]+):\s*(.+)$/)
+    if (m && !line.startsWith('#')) fields.set(m[1].toLowerCase(), m[2].trim())
+  }
+  for (const key of ['contact', 'expires', 'preferred-languages', 'canonical', 'policy']) {
+    if (!fields.has(key)) fail('security', `security.txt has no ${key} field`)
+  }
+  if (fields.has('contact') && !fields.get('contact').startsWith('https://')) fail('security', 'security.txt Contact must be an https URL (no email addresses)')
+  if (/[\w.+-]+@[\w-]+\.[\w.]+/.test(readFileSync(file, 'utf8'))) fail('security', 'security.txt names an email address')
+  if (fields.get('canonical') !== `${site}/.well-known/security.txt`) fail('security', `security.txt Canonical is ${fields.get('canonical')}`)
+  const expires = Date.parse(fields.get('expires') ?? '')
+  const days = (expires - Date.now()) / 86_400_000
+  if (Number.isNaN(expires)) fail('security', 'security.txt Expires isn\'t a date')
+  else if (days < 30) fail('security', `security.txt expires in ${Math.round(days)} days: set Expires up to a year ahead`)
+  else if (days > 366) fail('security', `security.txt expires in ${Math.round(days)} days: RFC 9116 asks for less than a year`)
+  return Math.round(days)
+}
+
+function checkRobots() {
+  const file = join(dist, 'robots.txt')
+  const text = existsSync(file) ? readFileSync(file, 'utf8') : ''
+  if (text !== robots(`${site}/sitemap.xml`)) fail('robots', 'robots.txt isn\'t what src/data/robots.mjs builds')
+  return AI_CRAWLERS.length
+}
+
 checkHeaders()
 const namesScanned = checkLeaks()
 const draftCount = checkDrafts()
@@ -771,6 +857,10 @@ const appCheck = checkApp()
 const lightChecked = checkLight()
 const heroLinks = checkHero()
 const revealScanned = checkReveal()
+const articleCheck = checkArticles()
+const llmsListed = checkLlms()
+const securityDays = checkSecurityTxt()
+const crawlers = checkRobots()
 
 if (failures.length) {
   console.error(`check-dist: ${failures.length} failure(s) in ${dist}\n`)
@@ -791,3 +881,8 @@ console.log(`  reveal   ok: ${revealScanned} pages, stylesheets and scripts: not
 console.log(`  hero     ok: ${heroLinks} actions, Get started (the docs' quick start) then See the source`)
 console.log(`  fonts    ok: ${fontFaces} @font-face rules, all Geist Pixel or Inter; no other font file or preload`)
 console.log(`  redirects ok: ${redirectRules} permanent redirects to built pages; nothing links to a retired address`)
+console.log(`  dates    ok: ${articleCheck.articles} articles show Published and Last updated, matching their datePublished and dateModified`)
+console.log(`  back     ok: ${articleCheck.sections} section pages link back to their section's index (an index to the home page)`)
+console.log(`  llms     ok: llms.txt lists the sitemap's ${llmsListed} pages, each once`)
+console.log(`  security ok: .well-known/security.txt has every field, no email address, and expires in ${securityDays} days`)
+console.log(`  robots   ok: every crawler allowed, ${crawlers} AI crawlers by name, then the sitemap`)
