@@ -176,6 +176,8 @@ Undoing a release is the other half of history. A rollback in Colophon doesn't m
 
 In the docs: reading at a past release with [the delivery API](https://docs.colophon.404human.dev/api/delivery/), and one entry's versions in [history and restore](https://docs.colophon.404human.dev/studio/history/).
 
+Colophon's numbered releases are described on the [releases and rollback](/features/releases-and-rollback/) feature page.
+
 ## How other CMSs handle this
 
 Some CMSs are moving in this direction at the record level. In June 2026 DatoCMS [added publication ranges to record versions](https://www.datocms.com/product-updates/see-exactly-when-each-version-of-a-record-was-live), with `published_from` and `published_until` metadata (checked 16 November 2026). Their announcement documents two limits: a version republished without edits "reflects its latest interval rather than a full multi-interval log", and intervals aren't reconstructed for versions that were already live when the feature shipped. It is still per-record history. Strapi, Payload and Directus also keep history per entry or per item, not per release of the whole site; the comparisons with [Strapi](/blog/colophon-vs-strapi/), [Payload](/blog/colophon-vs-payload/) and [Directus](/blog/colophon-vs-directus/) have the details and sources. Git-based CMSs get whole-site history from git itself, with the gap between a commit and a deploy described above.

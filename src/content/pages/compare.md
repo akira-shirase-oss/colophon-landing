@@ -6,6 +6,8 @@ targetQuery: "open source headless cms alternative"
 pubDate: 2026-11-19
 factsChecked: 2026-11-19
 related:
+  - href: /features/
+    text: "Colophon's features, one page each"
   - href: /compare/colophon-vs-contentful/
     text: "Colophon vs Contentful: self-hosted or SaaS CMS"
   - href: /compare/colophon-vs-sanity/
@@ -57,6 +59,8 @@ The Strapi, Payload and Directus facts were checked on 16 November 2026, and the
 Decap, Keystatic and TinaCMS facts on 19 November 2026. Every row's sources are listed in its comparison.
 
 ## What sets Colophon apart
+
+Each of these has a page of its own under [features](/features/).
 
 - **A release of the whole site on every publish.** Any past release can be read by its number, so "what
   did the site say last Tuesday?" has an exact answer. See

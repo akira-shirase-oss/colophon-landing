@@ -32,7 +32,7 @@ export function keyOf(publicDir = join(root, 'public')) {
 }
 
 const kindOf = (text) => text.match(/^kind:\s*["']?([\w-]+)/m)?.[1]
-const SECTION = { compare: 'compare', 'use-case': 'use-cases' }
+const SECTION = { compare: 'compare', 'use-case': 'use-cases', feature: 'features' }
 
 /**
  * The addresses a set of changed files affects.
