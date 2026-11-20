@@ -1,0 +1,88 @@
+---
+// /community/: where to ask, report a bug or a security problem, and follow changes. Built only from what a blog
+// post already uses (Base, Nav, Footer and Blog.module.css), so it adds no visual element, stylesheet or script.
+// Colophon is an open-source project, not a business with an office: there is no phone number, postal address or
+// personal email here, by design (the security policy says why).
+import Base from '../layouts/Base.astro'
+import Nav from '../components/Nav.astro'
+import Footer from '../components/Footer.astro'
+import styles from '../components/Blog.module.css'
+import { DOCS_URL, QUICK_START } from '../data/app'
+import { COMMUNITY } from '../lib/site-map'
+
+const REPO = 'https://github.com/akira-shirase-oss/colophon-cms'
+const { title, description } = COMMUNITY
+const site = Astro.site!.href
+const contactPage = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  name: title,
+  description,
+  url: new URL(COMMUNITY.path, site).href,
+  inLanguage: 'en',
+  about: { '@id': `${site}#organization` },
+}
+---
+
+<Base title={title} description={description} jsonLd={contactPage}>
+  <div style="display: flex; flex-direction: column; align-items: center; overflow: clip;">
+    <Nav />
+    <main class={styles.page}>
+      <article class={styles.column}>
+        <a class={styles.back} href="/">← Colophon home</a>
+        <header class={styles.postHead}>
+          <h1 class={styles.postTitle}>Community, support and security</h1>
+          <p class={styles.desc}>
+            Colophon is an open-source project with one maintainer. Everything about it happens in the open, on
+            GitHub, except security reports, which stay private until a fix ships.
+          </p>
+        </header>
+        <div class={styles.prose}>
+          <h2 id="questions-and-bugs">Questions, bugs and ideas</h2>
+          <p>
+            Open an issue in <a href={`${REPO}/issues`}>Colophon's issue tracker</a>. A bug report is most useful with
+            the version you run (<code>colophon --version</code> or <code>GET /version</code> says which build it
+            is), what you did, what you expected and what happened instead. Search the open issues first: someone may
+            have asked already.
+          </p>
+          <p>
+            Colophon is pre-release, so read <a href={`${REPO}/blob/main/docs/ROADMAP.md`}>what's built and what's
+            next</a> before you build on it. It's maintained by one person, so an answer can take a few days.
+          </p>
+
+          <h2 id="security">Reporting a security problem</h2>
+          <p>
+            Please don't open a public issue for anything that could be exploited. Report it privately through a{' '}
+            <a href={`${REPO}/security/advisories/new`}>GitHub security advisory</a> instead: the thread stays
+            private until a fix ships, and reporters are credited unless they ask not to be.
+          </p>
+          <p>
+            <a href={`${REPO}/blob/main/SECURITY.md`}>The security policy</a> says which versions get fixes, what a
+            useful report includes and what to expect after you send one. The same contact is in this site's{' '}
+            <a href="/.well-known/security.txt">security.txt</a>.
+          </p>
+
+          <h2 id="docs-and-changes">The docs and what changes</h2>
+          <ul>
+            <li><a href={DOCS_URL}>The documentation</a>: installing, the Studio, the API and API tokens.</li>
+            <li><a href={QUICK_START}>The quick start</a>: run Colophon on your machine with Docker.</li>
+            <li><a href={`${DOCS_URL}/changelog/`}>The changelog</a>: what changed in each release.</li>
+            <li><a href="https://404human.dev/colophon/">The build log</a>: how it's being built, week by week.</li>
+          </ul>
+
+          <h2 id="contributing">Contributing</h2>
+          <p>
+            The code is MIT-licensed and <a href={REPO}>on GitHub</a>. For anything bigger than a small fix, open an
+            issue first, so the change can be agreed before you spend time on it.
+          </p>
+        </div>
+        <footer class={styles.foot}>
+          <a href="/blog/">The blog</a>
+          <a href="https://404human.dev/colophon/">The build log</a>
+          <a href={REPO}>Source on GitHub</a>
+        </footer>
+      </article>
+    </main>
+    <Footer />
+  </div>
+</Base>

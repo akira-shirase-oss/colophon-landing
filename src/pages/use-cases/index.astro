@@ -1,0 +1,10 @@
+---
+// The use-cases hub, /use-cases/: src/content/pages/use-cases.md (`kind: hub`), in the same layout as every page.
+import { getEntry } from 'astro:content'
+import SeoPage from '../../layouts/SeoPage.astro'
+
+const page = await getEntry('pages', 'use-cases')
+if (!page || page.data.kind !== 'hub') throw new Error('src/content/pages/use-cases.md must exist with kind: hub')
+---
+
+<SeoPage page={page} />

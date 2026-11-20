@@ -1,0 +1,7 @@
+# Colophon's security contact (RFC 9116). Report a vulnerability privately through a GitHub security advisory;
+# the policy, what's in scope and how long a fix takes are in SECURITY.md.
+Contact: https://github.com/akira-shirase-oss/colophon-cms/security/advisories/new
+Expires: 2027-05-20T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://colophon.404human.dev/.well-known/security.txt
+Policy: https://github.com/akira-shirase-oss/colophon-cms/blob/main/SECURITY.md
