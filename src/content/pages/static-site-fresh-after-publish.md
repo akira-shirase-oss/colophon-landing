@@ -5,6 +5,8 @@ description: "Rebuilding a static site when CMS content changes: at-least-once w
 targetQuery: "rebuild static site on cms publish webhook"
 pubDate: 2026-11-19
 related:
+  - href: /features/publish-receipts/
+    text: "Publish receipts: proof of what readers see"
   - href: /use-cases/audited-publishing/
     text: "A CMS with an audit trail for every publish"
   - href: /use-cases/ai-agents-draft-people-publish/

@@ -195,6 +195,8 @@ Colophon's own API answers carry the headers from step 1: `Cache-Control: public
 
 Setting up the webhook, the CDN purge and the site checks is in the docs: [website connections and receipts](https://docs.colophon.404human.dev/api/website-connections/).
 
+How receipts are set up and what each label means is on the [publish receipts](/features/publish-receipts/) feature page.
+
 ## What no check can prove
 
 - **A check sees one URL, at one moment, from one place.** Colophon runs one worker by default, so its receipts say "verified at 1 location". Another edge in another region may still hold an old copy until it expires or the purge reaches it.

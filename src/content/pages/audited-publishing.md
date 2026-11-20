@@ -5,6 +5,8 @@ description: "What an auditor asks of a website: what was live, who approved it,
 targetQuery: "cms audit trail publishing approval"
 pubDate: 2026-11-19
 related:
+  - href: /features/releases-and-rollback/
+    text: "Releases and rollback in a headless CMS"
   - href: /use-cases/ai-agents-draft-people-publish/
     text: "Let AI agents draft content, and people publish"
   - href: /use-cases/members-only-content/

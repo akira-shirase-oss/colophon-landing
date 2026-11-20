@@ -5,6 +5,8 @@ description: "Connecting an AI agent to a CMS through MCP without giving it the 
 targetQuery: "ai agent cms draft human approval mcp"
 pubDate: 2026-11-19
 related:
+  - href: /features/ai-agents-mcp/
+    text: "MCP for AI agents: drafts, never publishes"
   - href: /use-cases/audited-publishing/
     text: "A CMS with an audit trail for every publish"
   - href: /use-cases/members-only-content/

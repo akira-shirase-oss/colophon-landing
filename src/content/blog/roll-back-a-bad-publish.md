@@ -73,6 +73,8 @@ Images have one known gap. Every uploaded version of an image is kept and can be
 
 The steps in the Studio are in the docs: [rollback](https://docs.colophon.404human.dev/studio/rollback/) and [publishing and review](https://docs.colophon.404human.dev/studio/publishing/).
 
+What Colophon's releases and rollback do, step by step, is on the [releases and rollback](/features/releases-and-rollback/) feature page.
+
 ## How other CMSs handle rollback
 
 Other CMSs document their own approaches. Contentstack, for example, can [roll back a deployed release](https://www.contentstack.com/docs/headless-cms/roll-back-a-release). Its docs describe restoring each item to its previous published state, or unpublishing it if no prior version existed, and note that a rollback changes publish state rather than deleting or restoring content versions. A rollback release there must be deployed manually and can't be scheduled. Strapi's Releases, on its paid plans, take a different line again: its docs say a published release "cannot be edited or published again", and restoring an older version goes through per-entry [Content History](https://docs.strapi.io/cms/features/content-history), which replaces the current draft ([Strapi Releases docs](https://docs.strapi.io/cms/features/releases), checked 16 November 2026; more in [Colophon vs Strapi](/blog/colophon-vs-strapi/)). Different design goals lead to different answers. Colophon's is to treat the rollback as one more reviewed change.
