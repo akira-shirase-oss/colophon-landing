@@ -706,9 +706,12 @@ function checkHero() {
   const at = home.text.indexOf('data-print-title')
   const section = at < 0 ? '' : home.text.slice(at, home.text.indexOf('</section>', at))
   const links = [...section.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)].map((m) => [m[1], m[2].replace(/<[^>]+>/g, '').trim()])
-  const want = [[/\/quick-start\/$/, 'Get started'], [/^https:\/\/github\.com\/akira-shirase-oss\/colophon-cms$/, 'See the source']]
+  // With the app live (PUBLIC_APP_URL), Get started opens the app's sign-up; without it, the docs' quick start.
+  const appUrl = process.env.PUBLIC_APP_URL?.trim().replace(/\/+$/, '')
+  const start = appUrl ? new RegExp(`^${appUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/studio/signup$`) : /\/quick-start\/$/
+  const want = [[start, 'Get started'], [/^https:\/\/github\.com\/akira-shirase-oss\/colophon-cms$/, 'See the source']]
   if (links.length !== 2 || !want.every(([href, label], i) => href.test(links[i][0]) && links[i][1] === label))
-    fail('hero', `the hero's actions should be Get started (quick start) then See the source (repository): ${JSON.stringify(links)}`)
+    fail('hero', `the hero's actions should be Get started (${appUrl ? 'sign-up' : 'quick start'}) then See the source (repository): ${JSON.stringify(links)}`)
   return links.length
 }
 

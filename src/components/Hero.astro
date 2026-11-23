@@ -1,7 +1,7 @@
 ---
 import ArrowButton from './ui/ArrowButton.astro'
 import { hero } from '../data/hero'
-import { QUICK_START } from '../data/app'
+import { app, QUICK_START } from '../data/app'
 import styles from './Hero.module.css'
 
 // Eight Colophon ideas as quiet line icons around the edges (lucide, stroke 1.5), placed outside the clear zone
@@ -58,9 +58,10 @@ const place = (i: (typeof ICONS)[number]) =>
       <script is:inline set:html={PRINT_TITLE} />
       <p class={`t-body ${styles.sub}`}>{hero.description}</p>
       <!-- Two actions (the maintainer's call): Get started in the kit's primary, the header's blue, and See the
-           source transparent in the hero's ink. The kit's ring shows on both heroes (contrast table). -->
+           source transparent in the hero's ink. The kit's ring shows on both heroes (contrast table). With the app
+           live (PUBLIC_APP_URL set at build), Get started opens the app's sign-up; without it, the docs' quick start. -->
       <div class={styles.actions}>
-        <ArrowButton href={QUICK_START} size="lg">Get started</ArrowButton>
+        <ArrowButton href={app ? app.signUp : QUICK_START} size="lg">Get started</ArrowButton>
         <ArrowButton href="https://github.com/akira-shirase-oss/colophon-cms" variant="onBrand" size="lg">See the source</ArrowButton>
       </div>
     </div>
