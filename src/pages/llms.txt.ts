@@ -16,7 +16,7 @@ export const GET: APIRoute = async ({ site }) => {
   }).filter(Boolean)
   const text = `# Colophon
 
-> Colophon is an open-source (MIT) headless CMS in Rust and Svelte, self-hosted with PostgreSQL. Every publish is a numbered release with a receipt, rollbacks are reviewed like any change, roles reach single fields, and AI agents can draft through MCP but never publish. It is pre-release.
+> Colophon is an open-source (MIT) headless CMS in Rust and Svelte, hosted or self-hosted with PostgreSQL. Every publish is a numbered release with a receipt, rollbacks are reviewed like any change, roles reach single fields, and AI agents connect through MCP by signing in and ask before they publish. It is live in alpha (0.1.0-alpha.7), with open sign-up at https://colophonapp.404human.dev.
 
 ## Docs
 

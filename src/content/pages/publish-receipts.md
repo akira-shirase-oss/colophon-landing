@@ -73,4 +73,4 @@ The setup, with the API calls, is in the docs'
   them, and they are tested against a stand-in CDN. Hosted CMSs such as Contentful run their own CDN for you,
   which is less to set up.
 - **Announcements aren't signed yet.** Put a long random secret in the build hook's address.
-- **It's pre-release,** and nobody runs it in production yet.
+- **It's in alpha** (0.1.0-alpha.7), and v0.1's stability promises aren't made yet.

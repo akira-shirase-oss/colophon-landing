@@ -1,7 +1,7 @@
 ---
 kind: hub
 title: "Open-source alternatives to popular CMSs"
-description: "How Colophon, an open-source headless CMS you host yourself, compares with Strapi, Payload, Directus, Contentful, Sanity and git-based CMSs, dated."
+description: "How Colophon, an open-source headless CMS you can host yourself, compares with Strapi, Payload, Directus, Contentful, Sanity and git-based CMSs, dated."
 targetQuery: "open source headless cms alternative"
 pubDate: 2026-11-19
 factsChecked: 2026-11-19
@@ -26,7 +26,7 @@ related:
     text: "Six publishing questions a headless CMS should answer"
 faq:
   - q: "Is Colophon ready to replace my current CMS?"
-    a: "Not for production yet. It is pre-release, run by one maintainer, with no users so far. It is ready to try with Docker, to read, and to judge against the comparisons on this page."
+    a: "It is in alpha: live, with open sign-up on the hosted service, built in public by one maintainer. The stability promises of v0.1 aren't made yet, so try it, read it and judge it against the comparisons on this page before you move a production site."
   - q: "Why do these comparisons only describe competitors neutrally?"
     a: "Each comparison says what Colophon does and why it matters, states every competitor fact with a link to that vendor's own page and the date it was checked, and ends with what to know before choosing Colophon. If a fact is wrong or out of date, open an issue and it gets corrected with a dated note."
 ---
@@ -37,11 +37,11 @@ what to know before choosing Colophon.
 
 ## Who Colophon is for
 
-Colophon is an open-source headless CMS, under the MIT licence, that you run on your own servers with
-PostgreSQL. It is built for a team that wants every publish to leave a record it can check: a numbered
+Colophon is an open-source headless CMS, under the MIT licence, that you can use on its hosted service or
+run on your own servers with PostgreSQL. It is built for a team that wants every publish to leave a record it can check: a numbered
 release of the whole site, a receipt that says whether readers can see it, a rollback that is reviewed like
-any other change, roles down to a single field, and AI agents that can draft but never approve. It is
-pre-release, as the status line above says.
+any other change, roles down to a single field, and AI agents that act with your role and ask before they publish. It is in alpha, as the status line above
+says.
 
 ## The comparisons
 
@@ -71,14 +71,16 @@ Each of these has a page of its own under [features](/features/).
   was taken down. See [how to roll back a bad CMS publish](/blog/roll-back-a-bad-publish/).
 - **Roles down to a field,** with an append-only log of who changed access. See
   [field-level permissions in a headless CMS](/blog/field-level-permissions/).
-- **Agents draft; people approve.** The server refuses any token's approval of what a token submitted. See
+- **Agents ask first.** Connected by signing in, an AI app acts with your role and asks before anything that
+  publishes; the server refuses any token's approval of what a token submitted. See
   [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
 
 ## What to know before choosing Colophon
 
-- **It's pre-release.** The first version, 0.1.0-alpha.1, is tagged, and its npm packages aren't published
-  yet. Nobody runs it in production.
-- **There's no hosted option,** no plugin system that runs your code, and PostgreSQL is the only database.
+- **It's in alpha.** Version 0.1.0-alpha.7 is live, with open sign-up on the hosted service, and its npm
+  packages aren't published yet. v0.1's stability promises aren't made yet.
+- **The hosted service is new, and in alpha.** There's no plugin system that runs your code, and PostgreSQL is
+  the only database.
 - **The public delivery API has no language parameter yet,** webhooks aren't signed yet, and there's no
   adapter for a real CDN.
 - **The 24-hour soak test hasn't passed yet.** The load results that exist are laptop numbers, labelled as such.

@@ -70,7 +70,7 @@ anything tells you. Look at a live page and ask which version of the content it 
 
 ## What to know before choosing Colophon
 
-- **It's pre-release,** with no users yet.
+- **It's in alpha** (0.1.0-alpha.7), and v0.1's stability promises aren't made yet.
 - **Announcements aren't signed yet;** use a secret in the URL and treat it as visible to anyone who can read the
   project's website connections.
 - **There's no adapter for a real CDN yet.** Purge-by-tag jobs are built and tested against a stand-in.

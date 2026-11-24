@@ -39,7 +39,7 @@ editing Markdown is your case, a git-based CMS is a natural fit.
 Colophon is a database CMS that copies git's best idea: every publish is a numbered release of the whole site,
 kept forever and readable later, and a rollback is a reviewed change, like a revert commit. On top of that it
 adds what a repository can't do on its own: content types you change at runtime, roles down to a single field,
-scheduled publishing, a query API, and a receipt that checks the live site. Colophon is pre-release, as the
+scheduled publishing, a query API, and a receipt that checks the live site. Colophon is in alpha, as the
 status line above says.
 
 ## At a glance
@@ -53,7 +53,7 @@ Checked on 19 November 2026.
 | Whole-site history | Numbered releases, each readable later | Git history |
 | Permissions | Roles down to a field or an editor's own entries | Your git host's repository access |
 | Scheduling | A local time in a named time zone, rechecked when due | Not built in |
-| Server | A Rust server and PostgreSQL that you run | None, or an optional hosted backend |
+| Server | A Rust server and PostgreSQL, hosted (alpha) or run by you | None, or an optional hosted backend |
 
 The three git-based CMSs:
 
@@ -63,7 +63,7 @@ The three git-based CMSs:
 | Keystatic | Local files, GitHub, or both; Keystatic Cloud is optional ([docs](https://keystatic.com/docs/introduction)) | MIT ([repository](https://github.com/Thinkmill/keystatic)) |
 | TinaCMS | Your repository; Tina Cloud, or a backend you host ([docs](https://tina.io/docs)) | Apache-2.0 ([repository](https://github.com/tinacms/tinacms)) |
 
-All three are established open-source projects; Colophon is pre-release, with one maintainer.
+All three are established open-source projects; Colophon is in alpha, with one maintainer.
 
 "Not built in" means the project's own docs describe no scheduler; a scheduled build or a dated merge can do the
 job outside the CMS.
@@ -96,10 +96,10 @@ reviewed and landing as a new release, and a takedown stays down. See
 
 ## What to know before choosing Colophon
 
-- **It's pre-release.** The first version is tagged, and its npm packages aren't published yet. Nobody runs it
-  in production.
-- **You run a server and a database.** A git-based CMS needs neither; Colophon needs PostgreSQL, backups and
-  upgrades.
+- **It's in alpha.** Version 0.1.0-alpha.7 is live, with open sign-up on the hosted service, and its npm
+  packages aren't published yet. v0.1's stability promises aren't made yet.
+- **There's a server and a database.** A git-based CMS needs neither. Colophon's hosted service (alpha) runs
+  them for you; self-hosted, you run PostgreSQL, backups and upgrades.
 - **Content isn't in your repository.** No Markdown files, no content in pull requests, and no review in your git
   host's tools.
 - **The public delivery API has no language parameter yet,** and webhooks aren't signed yet.

@@ -27,7 +27,7 @@ Colophon is for teams who want their CMS to be a service of its own, shaped by t
 - **No user code running in the server**, so a smaller attack surface.
 - **Measured behaviour**: stored load results, failures included, labelled as laptop numbers.
 
-Both are MIT-licensed. The honest cost: Colophon is pre-release, and [what to know before choosing Colophon](#what-to-know-before-choosing-colophon) spells out what that means.
+Both are MIT-licensed. The honest cost: Colophon is in alpha, and [what to know before choosing Colophon](#what-to-know-before-choosing-colophon) spells out what that means.
 
 If you're weighing a hosted service instead, [Colophon vs Contentful](/compare/colophon-vs-contentful/) and [Colophon vs Sanity](/compare/colophon-vs-sanity/) compare self-hosting with a hosted CMS, and [all the comparisons](/compare/) are side by side on one page.
 
@@ -37,7 +37,7 @@ Payload facts checked on 16 November 2026.
 
 | | Colophon | Payload 3 |
 |---|---|---|
-| Status | Pre-release, 0.1.0-alpha.1, no users | Stable; v3.93.0 released 4 November 2026; v4 in beta |
+| Status | Alpha (0.1.0-alpha.7), live with open sign-up | Stable; v3.93.0 released 4 November 2026; v4 in beta |
 | Licence | MIT | MIT |
 | Stack | Rust server; Svelte Studio | TypeScript; React admin on the Next.js App Router |
 | Databases | PostgreSQL only | MongoDB, PostgreSQL, SQLite |
@@ -49,7 +49,7 @@ Payload facts checked on 16 November 2026.
 | Publish confirmation | Delivery receipts with site checks | Not built in |
 | Draft preview | On your own site: a Preview menu in the Studio and a preview API for your site | Live preview |
 | Localization | Locales stored and published; the public API can't select one yet | Per field, with fallbacks |
-| MCP | Built in; agents can't approve or publish | Official plugin |
+| MCP | Built in; connect by signing in, it acts with your role and asks before it publishes | Official plugin |
 
 ## Every publish leaves a receipt
 
@@ -89,7 +89,7 @@ Payload's access control is functions: "There are three main types of Access Con
 
 ## AI agents
 
-Colophon's MCP server lets an agent read, draft, propose a publish request and ask for review. No tool approves or publishes, and the API refuses any API token's approval of something an API token submitted. Tokens carry ceilings, such as documents per day and requests per minute, and a stored evaluation run against the real API recorded zero unauthorized actions. Details: [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
+Colophon's MCP server is connected by signing in: an AI app acts as you, with your role in each of your projects, and anything that publishes, deletes, revokes or changes access does nothing until you say yes. Scripts and CI can use a project API token instead, and the API refuses any API token's approval of something an API token submitted. Tokens carry ceilings, such as documents per day and requests per minute, and a stored evaluation run against the real API recorded zero unauthorized actions. Details: [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
 
 Payload has an official MCP plugin with per-API-key permissions, and its v4 beta reworks MCP further.
 
@@ -117,8 +117,8 @@ There's no Payload importer. Colophon imports its own JSONL and JSON arrays, plu
 
 ## What to know before choosing Colophon
 
-- **It's pre-release.** Version 0.1.0-alpha.1, built in public by one person, with no users yet. The [public roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md) says what's done and what's planned.
-- **PostgreSQL only, self-hosted only.** There's no hosted version. The Docker quick start builds the image from a clone until the first release is published; release binaries, the container image and the npm packages wait on that release.
+- **It's alpha.** Version 0.1.0-alpha.7, live with open sign-up, built in public by one person. v0.1's stability promises (a stable public delivery API, breaking-change checks and upgrade guides) aren't made yet. The [public roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md) says what's done and what's planned.
+- **PostgreSQL only.** Use the [hosted service](https://colophonapp.404human.dev), in alpha with open sign-up and up to 3 projects per account, or self-host with the Docker quick start, which builds the image from a clone. The npm packages aren't published yet.
 - **Two delivery pieces are partial.** Webhook payloads aren't signed yet, and cache clears are tested against a stand-in CDN; the adapter for a real CDN is on the roadmap.
 - **[On the roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md):** choosing a locale in the public content API (locales are stored and published today).
 - **The 24-hour soak hasn't passed yet.**

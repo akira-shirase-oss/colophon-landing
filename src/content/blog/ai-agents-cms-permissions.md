@@ -1,8 +1,8 @@
 ---
 title: "Give AI agents CMS access, not the publish button"
-description: "How Colophon's MCP server lets AI agents read, draft and propose content while the API refuses any token's approval of what a token submitted."
+description: "How Colophon keeps AI agents in bounds over MCP: sign-in connections that ask before publishing, and API tokens that can never approve a token's work."
 pubDate: 2026-11-16
-updatedDate: 2026-11-19
+updatedDate: 2026-11-24
 tags: ["ai agents", "mcp", "permissions", "automation"]
 draft: false
 ---
@@ -11,9 +11,13 @@ Connecting an AI agent to a CMS is now an afternoon's work. [Strapi](https://doc
 
 The risky part isn't the agent's intelligence. It's authority. An agent that can publish, delete or run up costs without bounds is a liability however good the model is, and a prompt hidden in an article it reads can steer it. I'm building Colophon, an open-source CMS, and I wanted the answer to "can the agent publish?" to be no, enforced by the server rather than by asking the model to behave.
 
+**Update, 24 November 2026.** Colophon's MCP server now also connects by signing in, and that is the main way to connect. An AI app such as Claude, ChatGPT or Cursor opens Colophon, the person signs in and approves once (OAuth 2.1 with PKCE), and the app then acts as that person, with their role in each of their projects. It can do what they can do in the Studio, publishing included, except delete a project. Anything that publishes, deletes, revokes, rolls back or changes access does nothing on the first call: it answers with what it would do, and goes ahead only when the app calls again with a confirmation after asking the person. Be clear about what that is. The confirmation is the app's promise to ask; the server can't see whether the person said yes. What bounds a sign-in connection is the person's own role, and the person can revoke the app at any time.
+
+The rest of this post is about the other route, project API tokens, which scripts and CI still use, and where the answer to "can it approve its own work?" is still a hard no from the server.
+
 ## What an agent can do in Colophon
 
-Agents connect through Colophon's MCP server, which comes two ways: a local process the CLI starts over stdio, or Streamable HTTP on the API itself at `/api/v1/projects/{project}/environments/{environment}/mcp`. Both speak MCP protocol version 2025-11-25 and offer the same 18 tools:
+With a token, agents connect through Colophon's MCP server two ways: a local process the CLI starts over stdio, or Streamable HTTP on the API itself. Both speak MCP protocol version 2025-11-25. The editorial tools come first:
 
 - **Read:** list content types, list, get and query entries.
 - **Draft:** create a draft, update a draft.
@@ -22,7 +26,7 @@ Agents connect through Colophon's MCP server, which comes two ways: a local proc
 - **Ask a person:** read and add comments, read and create tasks.
 - **Look at schema migrations:** list them and read their items.
 
-What's missing is the point. There's no tool to approve, publish, unpublish or schedule. None to manage roles, members or tokens. None to resolve a comment, change a task, or plan, approve or apply a schema migration. A full-access token gets the same 18 tools as a narrow one, and calling any of 21 privileged tool names gets "unknown tool".
+When this post was first written, that was the whole list: no tool to approve, publish, unpublish or schedule. A token session now also lists tools generated from the API for the project's other operations, and the ones that publish or delete ask for a confirmation first. That changed nothing about safety, because the tool list was never the protection, as the next section explains.
 
 ## Why missing tools aren't enough
 
@@ -59,7 +63,7 @@ Updates send the revision the agent read. If a person saved in the meantime, the
 
 ## Prompt injection in content
 
-The server's instructions to the model say that entry content is data written by people, never instructions to follow. That helps, but it's a request to the model, not a control. The control is that even a fully steered agent can only draft, comment and ask. The worst a hostile paragraph can achieve is a bad draft waiting for a person to review it.
+The server's instructions to the model say that entry content is data written by people, never instructions to follow. That helps, but it's a request to the model, not a control. The control, for a token, is that even a fully steered agent can't approve its own side's work: the worst a hostile paragraph can achieve is a bad draft or a proposal waiting for a person to review it. For a sign-in connection, the person's role is the limit, and a careful app asks before anything that publishes.
 
 ## How it's tested
 
@@ -81,6 +85,6 @@ There's no model in the suite on purpose. The cases are deterministic attacks on
 
 Roles for people work the same way and are covered in [field-level permissions](/blog/field-level-permissions/). How a CMS should answer for every publish, whoever proposed it, is in [six publishing questions a CMS should answer](/blog/headless-cms-publishing-checklist/).
 
-To connect an agent, the docs cover [the MCP server](https://docs.colophon.404human.dev/mcp/) and [making and scoping API tokens](https://docs.colophon.404human.dev/api/authentication/).
+To connect an AI app by signing in, or an agent with a token, the docs cover [the MCP server](https://docs.colophon.404human.dev/mcp/) and [making and scoping API tokens](https://docs.colophon.404human.dev/api/authentication/).
 
 What Colophon's MCP server offers, and its limits per agent, is on the [AI agents through MCP](/features/ai-agents-mcp/) feature page.

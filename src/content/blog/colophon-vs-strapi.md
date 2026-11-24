@@ -26,7 +26,7 @@ Colophon is for teams who need to know, with evidence, what their website publis
 - **MIT, with no enterprise tier.** Every feature in this post is in the same MIT-licensed code.
 - **Measured behaviour.** Load results are stored with their failures, and labelled as laptop numbers.
 
-The honest cost: Colophon is pre-release. What that means in practice is in [what to know before choosing Colophon](#what-to-know-before-choosing-colophon).
+The honest cost: Colophon is in alpha. What that means in practice is in [what to know before choosing Colophon](#what-to-know-before-choosing-colophon).
 
 If you're weighing a hosted service instead, [Colophon vs Contentful](/compare/colophon-vs-contentful/) and [Colophon vs Sanity](/compare/colophon-vs-sanity/) compare self-hosting with a hosted CMS, and [all the comparisons](/compare/) are side by side on one page.
 
@@ -36,11 +36,11 @@ Strapi facts checked on 16 November 2026.
 
 | | Colophon | Strapi 5 |
 |---|---|---|
-| Status | Pre-release, 0.1.0-alpha.1, no users | Stable; v5.62.0 released 12 November 2026 |
+| Status | Alpha (0.1.0-alpha.7), live with open sign-up | Stable; v5.62.0 released 12 November 2026 |
 | Licence | MIT | MIT, with enterprise code under a separate licence |
 | Stack | Rust server; Svelte Studio | Node.js, TypeScript; React admin |
 | Databases | PostgreSQL only | PostgreSQL, MySQL, MariaDB, SQLite |
-| Hosting | Self-hosted only: a Docker quick start, building the image from a clone until the first release is published | Self-hosted, or Strapi Cloud |
+| Hosting | The hosted service (alpha, open sign-up), or self-hosted with a Docker quick start that builds the image from a clone | Self-hosted, or Strapi Cloud |
 | Version history | Every save from every path, kept | Growth and Enterprise plans; edits made in the admin only |
 | Grouped releases | Every publish; pinned exact revisions | Growth and Enterprise; latest drafts, not pinned versions |
 | Review workflows | Built in; approval bound to exact content | Enterprise |
@@ -48,7 +48,7 @@ Strapi facts checked on 16 November 2026.
 | Audit logs | Roles, members and tokens, append-only | Enterprise |
 | Draft preview | On your own site: a Preview menu in the Studio and a preview API for your site | Built in; Live Preview on paid plans |
 | Locales through the API | Stored and published; the public API can't select one yet | Built in and free, through to the API |
-| MCP server | Built in; agents can't approve or publish | Built in, free |
+| MCP server | Built in; connect by signing in, it acts with your role and asks before it publishes | Built in, free |
 
 ## Every publish leaves a receipt
 
@@ -88,7 +88,7 @@ Strapi is strong here too. Its RBAC is a free feature with custom roles, per-fie
 
 ## AI agents
 
-Colophon's MCP server lets an agent read, draft, propose a publish request and ask for review. No tool approves or publishes, and the API itself refuses any API token's approval of something an API token submitted, so minting a second token doesn't get around it. Tokens can carry ceilings, such as documents per day, concurrent jobs and requests per minute, and work allowances are reserved in PostgreSQL before the work starts, so parallel requests can't race past them. A stored evaluation run against the real API recorded zero unauthorized actions. Details: [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
+Colophon's MCP server is connected by signing in: an AI app acts as you, with your role in each of your projects, and anything that publishes, deletes, revokes or changes access does nothing until you say yes. Scripts and CI can use a project API token instead, and the API itself refuses any API token's approval of something an API token submitted, so minting a second token doesn't get around it. Tokens can carry ceilings, such as documents per day, concurrent jobs and requests per minute, and work allowances are reserved in PostgreSQL before the work starts, so parallel requests can't race past them. A stored evaluation run against the real API recorded zero unauthorized actions. Details: [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
 
 Strapi has a built-in MCP server, free, scoped by an admin token's permissions. Strapi AI needs a paid plan: it is included in Growth and a paid add-on on Enterprise, and the schema assistant needs Growth.
 
@@ -116,8 +116,8 @@ Colophon's import reads Strapi v4 and v5 export shapes. A dry run reports an out
 
 ## What to know before choosing Colophon
 
-- **It's pre-release.** Version 0.1.0-alpha.1, built in public by one person, with no users yet. The [public roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md) says what's done and what's planned.
-- **PostgreSQL only, self-hosted only.** There's no hosted version. The Docker quick start builds the image from a clone until the first release is published; release binaries, the container image and the npm packages wait on that release.
+- **It's alpha.** Version 0.1.0-alpha.7, live with open sign-up, built in public by one person. v0.1's stability promises (a stable public delivery API, breaking-change checks and upgrade guides) aren't made yet. The [public roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md) says what's done and what's planned.
+- **PostgreSQL only.** Use the [hosted service](https://colophonapp.404human.dev), in alpha with open sign-up and up to 3 projects per account, or self-host with the Docker quick start, which builds the image from a clone. The npm packages aren't published yet.
 - **Two delivery pieces are partial.** Webhook payloads aren't signed yet, and cache clears are tested against a stand-in CDN; the adapter for a real CDN is on the roadmap.
 - **[On the roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md):** choosing a locale in the public content API (locales are stored and published today).
 - **The 24-hour soak hasn't passed yet.**

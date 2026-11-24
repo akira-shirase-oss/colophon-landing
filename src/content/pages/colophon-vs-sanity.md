@@ -42,7 +42,7 @@ receipt that says whether readers can see it, and a rollback that is reviewed li
 
 Sanity splits the CMS in two. Its Studio is an open-source React app you customise in code and can host
 anywhere. Your content lives in Sanity's hosted Content Lake, queried with GROQ. It is an established product
-with a large ecosystem. Colophon is pre-release and run by one person, as the status line above says.
+with a large ecosystem. Colophon is in alpha and run by one person, as the status line above says.
 
 ## At a glance
 
@@ -50,7 +50,7 @@ Checked on 19 November 2026.
 
 | | Colophon | Sanity |
 |---|---|---|
-| Where content lives | In your PostgreSQL, on servers you run | In Sanity's hosted Content Lake ([pricing](https://www.sanity.io/pricing)) |
+| Where content lives | In PostgreSQL: on Colophon's hosted service (alpha), or on servers you run | In Sanity's hosted Content Lake ([pricing](https://www.sanity.io/pricing)) |
 | Editing app | The Studio, served by the same Rust server | Sanity Studio, MIT-licensed, a React app you configure in code ([repository](https://github.com/sanity-io/sanity)) |
 | Licence | MIT | Studio: MIT; the Content Lake is a hosted service |
 | Price | Free; you pay for your own servers | Free plan (20 seats, 2 roles, 10k documents); Growth at $15 per seat a month; Enterprise priced on request ([pricing](https://www.sanity.io/pricing)) |
@@ -58,9 +58,9 @@ Checked on 19 November 2026.
 | History | Every saved revision is kept, and whole-site history is the list of releases | Drafts history kept 3 days on Free, 90 on Growth, 365 on Enterprise ([pricing](https://www.sanity.io/pricing)) |
 | Schedules | A local time in a named time zone, an explicit choice when the clocks change, and a full recheck when it runs | Scheduled drafts on Growth and Enterprise ([pricing](https://www.sanity.io/pricing)) |
 | Roles | Roles down to a single field or an editor's own entries; access changes go to an append-only audit log | Free: 2 roles; Growth: 5; custom roles and an audit log on Enterprise ([pricing](https://www.sanity.io/pricing)) |
-| AI agents | An MCP server: agents draft and ask for review with a scoped token; budgets and quotas per token | A hosted MCP server; tool calls run with the permissions of the token or signed-in user ([docs](https://www.sanity.io/docs/mcp)) |
+| AI agents | An MCP server you connect by signing in: it acts with your role and asks before it publishes, removes or changes access; API tokens for scripts, with budgets and quotas | A hosted MCP server; tool calls run with the permissions of the token or signed-in user ([docs](https://www.sanity.io/docs/mcp)) |
 | Querying | REST with a bounded query document; read-only GraphQL on the signed-in API | GROQ and GraphQL ([docs](https://www.sanity.io/docs/content-lake)) |
-| Maturity | Pre-release, one maintainer, no users yet | An established hosted product |
+| Maturity | Alpha (0.1.0-alpha.7), live with open sign-up, one maintainer | An established hosted product |
 
 ## What Colophon does, and why it matters
 
@@ -95,13 +95,13 @@ as a new release, and something taken down since stays down. Sanity's Studio can
 revision and revert a content release. See [how to roll back a bad CMS publish](/blog/roll-back-a-bad-publish/)
 for what any rollback should and shouldn't bring back.
 
-### Agents draft; the server decides who approves
+### Agents act with your role, and ask first
 
-Sanity's MCP server runs tool calls with the permissions of the token or the signed-in user. Colophon's rule is
-enforced by the server itself: an agent's token can draft and submit a change for review, but no token can
-approve what a token submitted, and budgets and request quotas are reserved per token in the database. An
-adversarial test run with no model in the loop recorded zero unauthorised actions (a stored run, 4 November
-2026). The questions to ask any CMS's MCP server are in
+Sanity's MCP server runs tool calls with the permissions of the token or the signed-in user. Colophon's is
+connected by signing in too: an app acts as you, with your role, and anything that publishes, deletes or
+changes access waits until you say yes. For scripts, the server refuses any API token's approval of what a
+token submitted, and budgets and request quotas are reserved per token in the database. An adversarial test of
+the token route, with no model in the loop, recorded zero unauthorised actions (a stored run, 4 November 2026). The questions to ask any CMS's MCP server are in
 [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
 
 ## Moving from Sanity
@@ -115,9 +115,10 @@ conversion; Colophon stores rich text in its own JSON format, not Portable Text.
 
 ## What to know before choosing Colophon
 
-- **It's pre-release.** The first version, 0.1.0-alpha.1, is tagged, and its npm packages aren't published
-  yet. Nobody runs it in production.
-- **There's no hosted option.** You run PostgreSQL, backups and upgrades yourself.
+- **It's in alpha.** Version 0.1.0-alpha.7 is live, with open sign-up on the hosted service, and its npm
+  packages aren't published yet. v0.1's stability promises aren't made yet.
+- **The hosted service is new, and in alpha.** It runs at [colophonapp.404human.dev](https://colophonapp.404human.dev) with open
+  sign-up and up to 3 projects per account. Self-hosted, you run PostgreSQL, backups and upgrades yourself.
 - **The Studio isn't a framework.** You configure content types in the Studio or through the API; you don't
   write the editing app in code the way you can with Sanity Studio, and there is no plugin system that runs
   your code.

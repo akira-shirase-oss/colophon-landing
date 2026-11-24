@@ -74,7 +74,7 @@ A refused change isn't a dead end. It can become a migration plan:
 3. **Resolve.** For entries no rule can fix, a person supplies the corrected content, validated against the new definition like any save.
 4. **Approve and apply.** The plan is approved against its own hash, so a plan that changed after approval needs approving again. A background worker then applies it entry by entry. If the worker is killed partway, the run resumes.
 
-Every step is an API call that the Studio, the CLI and scripts share. Agents can read migration plans through the MCP server, but planning, approving and applying stay with people ([why agents get no approval tools](/blog/ai-agents-cms-permissions/)).
+Every step is an API call that the Studio, the CLI and scripts share. An AI app connected through the MCP server can plan, approve or apply a migration only if its person's role allows it, and asks the person before it approves or applies one ([how agents are kept in bounds](/blog/ai-agents-cms-permissions/)).
 
 ## Locales
 

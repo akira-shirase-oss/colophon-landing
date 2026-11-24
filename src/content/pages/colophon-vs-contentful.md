@@ -40,14 +40,13 @@ and I'll correct it with a dated note.
 
 ## The short answer
 
-Colophon is for a team that wants to run its CMS itself, under the MIT licence, and wants every publish to
+Colophon is for a team that wants an open-source CMS, under the MIT licence, hosted or run itself, and wants every publish to
 leave a record it can check: a numbered release of the whole site, a receipt that says whether readers can
-see it, and a rollback that is reviewed like any other change. AI agents can draft and ask for review, and
-the server refuses to let one token approve what another token submitted.
+see it, and a rollback that is reviewed like any other change. AI apps connect by signing in and ask before they publish, and the server refuses to let one token approve
+what another token submitted.
 
 Contentful is a hosted content platform. It runs the servers, the content delivery network and the scaling,
-so there is nothing to install or operate, and it is an established commercial product. Colophon is
-pre-release and run by one person, as the status line above says.
+so there is nothing to install or operate, and it is an established commercial product. Colophon is in alpha and run by one person, as the status line above says.
 
 ## At a glance
 
@@ -55,15 +54,15 @@ Checked on 19 November 2026.
 
 | | Colophon | Contentful |
 |---|---|---|
-| Where it runs | On your own servers: Docker, or a binary under systemd, with PostgreSQL | Hosted by Contentful; plans are hosted spaces ([pricing](https://www.contentful.com/pricing/)) |
+| Where it runs | Colophon's hosted service (alpha), or your own servers: Docker, or a binary under systemd, with PostgreSQL | Hosted by Contentful; plans are hosted spaces ([pricing](https://www.contentful.com/pricing/)) |
 | Licence | MIT | A commercial service; its [MCP server](https://www.contentful.com/developers/docs/tools/mcp-server/) is open source |
 | Price | Free; you pay for your own servers | Free plan with 10 users, 2 roles, 2 locales and 100K API calls a month; Lite at $300 a month; Enterprise priced on request ([pricing](https://www.contentful.com/pricing/)) |
 | Releases | Every publish is a numbered release of the whole site, and any past release can be read by its number | [Releases](https://www.contentful.com/help/content-releases-eap/) group entries and assets so one action publishes or unpublishes them together, and can be scheduled |
 | Going back | A rollback is a publish request, reviewed like any other, that lands as a new release | [Environment aliases](https://www.contentful.com/developers/docs/tutorials/general/deploying-changes-with-environment-aliases/) let you point production back at a previous environment, mainly for content-model changes |
 | Schedules | A local time in a named time zone, an explicit choice when the clocks change, and a full recheck when it runs | On Lite and above ([pricing](https://www.contentful.com/pricing/)); up to 200 pending scheduled entries per environment ([help](https://www.contentful.com/help/scheduled-publishing/)) |
 | Roles | Roles down to a single field or an editor's own entries; access changes go to an append-only audit log | Free: 2 roles; Lite: 3; Enterprise: custom ([pricing](https://www.contentful.com/pricing/)) |
-| AI agents | An MCP server: agents draft and ask for review with a scoped token; budgets and quotas per token | An official MCP server, hosted or local; tools include publishing entries ([docs](https://www.contentful.com/developers/docs/tools/mcp-server/)) |
-| Maturity | Pre-release, one maintainer, no users yet | An established hosted product |
+| AI agents | An MCP server you connect by signing in: it acts with your role and asks before it publishes, removes or changes access; API tokens for scripts, with budgets and quotas | An official MCP server, hosted or local; tools include publishing entries ([docs](https://www.contentful.com/developers/docs/tools/mcp-server/)) |
+| Maturity | Alpha (0.1.0-alpha.7), live with open sign-up, one maintainer | An established hosted product |
 
 ## What Colophon does, and why it matters
 
@@ -97,24 +96,26 @@ offers a different kind of going back: an environment alias can be pointed back 
 which suits a content-model change that went wrong. What to do in the first minutes after a bad publish, on
 any CMS, is in [how to roll back a bad CMS publish](/blog/roll-back-a-bad-publish/).
 
-### Agents draft; the server decides who approves
+### Agents act with your role, and ask first
 
 Both products let AI agents work through MCP. Contentful's hosted server acts as the signed-in user, and an
 administrator can allow each group of tools per environment, read-only or read and write. Its local server
 runs with the permissions of a personal access token, and its docs say to treat that token as the security
-boundary ([docs](https://www.contentful.com/developers/docs/tools/mcp-server/)). Colophon's rule is enforced
-by the server rather than by which tools are offered: an agent's token can draft and submit a change for
-review, but no token can approve what a token submitted. Budgets and request quotas are reserved per token
-in the database. An adversarial test run with no model in the loop recorded zero unauthorised actions
-(a stored run, 4 November 2026). The questions to ask any CMS's MCP server are in
+boundary ([docs](https://www.contentful.com/developers/docs/tools/mcp-server/)). Colophon's server
+is connected by signing in too: an app acts as you, with your role in each project, and anything that
+publishes, deletes or changes access waits until you say yes. A script's API token is its own identity, and
+the server refuses any token's approval of what a token submitted, whatever tools are offered. Budgets and
+request quotas are reserved per token in the database. An adversarial test of the token route, with no model
+in the loop, recorded zero unauthorised actions (a stored run, 4 November 2026). The questions to ask any CMS's MCP server are in
 [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
 
 ### You run it, and you keep it
 
 Colophon runs on infrastructure you control: one Rust server that serves the API and the Studio, backed by
 PostgreSQL, with encrypted backups and a staged restore that has been rehearsed on clean infrastructure.
-That is the reason to choose it over a hosted service, and also its cost: you operate it. Contentful takes all
-of that off your hands, which is the main reason teams choose a hosted CMS.
+That is the reason to run it yourself, and also its cost: you operate it. Contentful takes all of that off
+your hands, which is the main reason teams choose a hosted CMS. Colophon's own hosted service does too, but
+it is new and in alpha.
 
 ## Moving from Contentful
 
@@ -127,9 +128,10 @@ to 512 items per request. Imported entries land as drafts and go live through a 
 
 ## What to know before choosing Colophon
 
-- **It's pre-release.** The first version, 0.1.0-alpha.1, is tagged, and its npm packages aren't published
-  yet. Nobody runs it in production.
-- **There's no hosted option.** You run PostgreSQL, backups and upgrades yourself.
+- **It's in alpha.** Version 0.1.0-alpha.7 is live, with open sign-up on the hosted service, and its npm
+  packages aren't published yet. v0.1's stability promises aren't made yet.
+- **The hosted service is new, and in alpha.** It runs at [colophonapp.404human.dev](https://colophonapp.404human.dev) with open
+  sign-up and up to 3 projects per account. Self-hosted, you run PostgreSQL, backups and upgrades yourself.
 - **The public delivery API has no language parameter yet.** Languages are stored and published.
 - **Webhooks aren't signed yet,** and there's no adapter for a real CDN; purging is tested against a
   stand-in.

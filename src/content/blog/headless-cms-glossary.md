@@ -165,7 +165,7 @@ A language and region a piece of content is written for, such as `en-GB` or `fr`
 
 The Model Context Protocol, a standard way for AI agents to discover and call tools in other systems. A CMS's MCP server decides what an agent can do in it, so the question is what its tools allow, and what the API behind them refuses.
 
-**In Colophon:** the MCP server offers 18 tools to read, draft and propose; none approves or publishes. Read more: [giving AI agents CMS access without the publish button](/blog/ai-agents-cms-permissions/).
+**In Colophon:** an AI app connects to the MCP server by signing in and acts with the person's role; anything that publishes, deletes or changes access waits for the person's yes. A script's API token can never approve what a token submitted. Read more: [giving AI agents CMS access without the publish button](/blog/ai-agents-cms-permissions/).
 
 <h3 id="migration-plan">Migration plan</h3>
 
