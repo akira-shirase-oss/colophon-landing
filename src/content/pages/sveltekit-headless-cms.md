@@ -200,7 +200,7 @@ Colophon's live update stream. That's The Draft's model, in Astro, and this demo
 
 ## What to know before choosing Colophon
 
-- **It's pre-release.** The first version, 0.1.0-alpha.1, is tagged, and its npm packages, the rich-text
+- **It's in alpha** (0.1.0-alpha.7), and its npm packages, the rich-text
   renderer included, aren't published yet.
 - **Webhooks aren't signed yet.** Put a long random secret in the build hook's address.
 - **The public delivery API has no language parameter yet.**

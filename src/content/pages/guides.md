@@ -35,7 +35,8 @@ answer at a fixed version:
 
 ## Before you start
 
-You need a running Colophon with published content; the docs'
-[quick start](https://docs.colophon.404human.dev/quick-start/) runs one with Docker. Colophon is pre-release, so
+You need a Colophon project with published content: sign up for the [hosted service](https://colophonapp.404human.dev), or
+run one with Docker from the docs' [quick start](https://docs.colophon.404human.dev/quick-start/). Colophon is
+in alpha, so
 read [what's built](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md) before you build
 on it.

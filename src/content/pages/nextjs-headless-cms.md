@@ -156,7 +156,7 @@ This guide doesn't cover Next's revalidation, which depends on where you host.
 
 ## What to know before choosing Colophon
 
-- **It's pre-release.** The first version, 0.1.0-alpha.1, is tagged, and its npm packages, the rich-text renderer
+- **It's in alpha** (0.1.0-alpha.7), and its npm packages, the rich-text renderer
   included, aren't published yet.
 - **Webhooks aren't signed yet.** Put a long random secret in the build hook's address.
 - **The public delivery API has no language parameter yet.**

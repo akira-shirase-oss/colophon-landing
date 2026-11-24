@@ -69,8 +69,7 @@ three.
 
 ## What to know before choosing Colophon
 
-- **It's pre-release,** with no users yet: there's no compliance certification or third-party audit of Colophon
-  itself.
+- **It's in alpha,** and there's no compliance certification or third-party audit of Colophon itself.
 - **The activity log covers access, not every content edit;** the content trail is revisions, publish requests and
   releases.
 - **You run it,** so retention, backups and access to the database are your controls to set.

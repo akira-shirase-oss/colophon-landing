@@ -1,7 +1,7 @@
 ---
 kind: hub
 title: "Features of an open-source headless CMS"
-description: "What Colophon does: publish receipts, releases with reviewed rollback, and an MCP server where AI agents draft but never publish. A page for each."
+description: "What Colophon does: publish receipts, releases with reviewed rollback, and an MCP server where AI agents ask before they publish. A page for each."
 targetQuery: "open source headless cms features"
 pubDate: 2026-11-19
 related:
@@ -10,14 +10,14 @@ related:
   - href: /features/releases-and-rollback/
     text: "Releases and rollback in a headless CMS"
   - href: /features/ai-agents-mcp/
-    text: "MCP for AI agents: drafts, never publishes"
+    text: "MCP for AI agents: it asks before it publishes"
   - href: /compare/
     text: "Open-source alternatives to popular CMSs"
 ---
 
-Colophon is an open-source headless CMS, under the MIT licence, that you run on your own servers with
-PostgreSQL. Each page below answers one question, "does it do this, and how?", with the details from the docs.
-It is pre-release, as the status line above says.
+Colophon is an open-source headless CMS, under the MIT licence, that you can use on its hosted service or run
+on your own servers with PostgreSQL. Each page below answers one question, "does it do this, and how?", with the details from the docs.
+It is in alpha, as the status line above says.
 
 ## Publish receipts
 
@@ -33,9 +33,9 @@ publish request like any other, reviewed, and it lands as a new release; an entr
 
 ## AI agents through MCP
 
-An MCP server lets agents read content, write drafts and ask for review with a token of their own, under
-per-token limits. Approving and publishing stay with people, and the server refuses any token's approval of a
-token's work. [How the MCP server works](/features/ai-agents-mcp/).
+An MCP server lets an AI app work in your projects once you sign in: it acts with your role, and anything that
+publishes, deletes or changes access waits for your yes. Scripts can use a token of their own, under per-token
+limits, and the server refuses any token's approval of a token's work. [How the MCP server works](/features/ai-agents-mcp/).
 
 ## Coming next
 

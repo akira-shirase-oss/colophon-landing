@@ -27,7 +27,7 @@ If your job is publishing a website and your question is "what exactly did we pu
 - **MIT-licensed**, where Directus uses its own source-available licence.
 - **Measured behaviour**: stored load results, failures included, labelled as laptop numbers.
 
-The honest cost: Colophon is pre-release, and [what to know before choosing Colophon](#what-to-know-before-choosing-colophon) spells out what that means.
+The honest cost: Colophon is in alpha, and [what to know before choosing Colophon](#what-to-know-before-choosing-colophon) spells out what that means.
 
 If you're weighing a hosted service instead, [Colophon vs Contentful](/compare/colophon-vs-contentful/) and [Colophon vs Sanity](/compare/colophon-vs-sanity/) compare self-hosting with a hosted CMS, and [all the comparisons](/compare/) are side by side on one page.
 
@@ -37,19 +37,19 @@ Directus facts checked on 16 November 2026.
 
 | | Colophon | Directus 12 |
 |---|---|---|
-| Status | Pre-release, 0.1.0-alpha.1, no users | Stable; v12.6.1 released 4 November 2026 |
+| Status | Alpha (0.1.0-alpha.7), live with open sign-up | Stable; v12.6.1 released 4 November 2026 |
 | Licence | MIT | Monospace Sustainable Core License (MSCL) |
 | Stack | Rust server; Svelte Studio | Node.js API; Vue data studio |
 | Databases | PostgreSQL only | PostgreSQL, MySQL, MariaDB, SQLite, SQL Server, Oracle, CockroachDB |
 | Existing database | Owns its own schema | Introspects existing tables |
-| Hosting | Self-hosted only: a Docker quick start, building the image from a clone until the first release is published | Self-hosted, or Directus Cloud |
+| Hosting | The hosted service (alpha, open sign-up), or self-hosted with a Docker quick start that builds the image from a clone | Self-hosted, or Directus Cloud |
 | History | Every save, plus whole-site history by release | Per-item revisions and content versions |
 | Scheduling | Built in, with time zones and rechecks | Built with a Flow on a cron trigger |
 | Approvals | Built in; approval bound to exact content | Built from a status field and permissions |
 | Publish confirmation | Delivery receipts with site checks | Build status for Vercel and Netlify deploys; no live-site check |
 | Draft preview | On your own site: a Preview menu in the Studio and a preview API for your site | Visual editor and live preview |
 | Translations | Locales stored and published; the public API can't select one yet | Built in |
-| MCP | Built in; agents can't approve or publish | Built in, turned on in settings |
+| MCP | Built in; connect by signing in, it acts with your role and asks before it publishes | Built in, turned on in settings |
 
 ## Every publish leaves a receipt
 
@@ -89,7 +89,7 @@ Directus works the other way round. "When Directus is connected to an existing d
 
 ## AI agents
 
-Colophon's MCP server lets an agent read, draft, propose a publish request and ask for review. No tool approves or publishes, and the API refuses any API token's approval of something an API token submitted. Tokens carry ceilings, such as documents per day and requests per minute, and a stored evaluation run against the real API recorded zero unauthorized actions. Details: [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
+Colophon's MCP server is connected by signing in: an AI app acts as you, with your role in each of your projects, and anything that publishes, deletes, revokes or changes access does nothing until you say yes. Scripts and CI can use a project API token instead, and the API refuses any API token's approval of something an API token submitted. Tokens carry ceilings, such as documents per day and requests per minute, and a stored evaluation run against the real API recorded zero unauthorized actions. Details: [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
 
 Directus has a built-in MCP server, turned on in Settings, that "operates through your existing Directus permissions", from v11.12.
 
@@ -115,8 +115,8 @@ There's no Directus importer. Colophon imports JSONL and JSON arrays, plus Strap
 
 ## What to know before choosing Colophon
 
-- **It's pre-release.** Version 0.1.0-alpha.1, built in public by one person, with no users yet. The [public roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md) says what's done and what's planned.
-- **PostgreSQL only, self-hosted only.** There's no hosted version. The Docker quick start builds the image from a clone until the first release is published; release binaries, the container image and the npm packages wait on that release.
+- **It's alpha.** Version 0.1.0-alpha.7, live with open sign-up, built in public by one person. v0.1's stability promises (a stable public delivery API, breaking-change checks and upgrade guides) aren't made yet. The [public roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md) says what's done and what's planned.
+- **PostgreSQL only.** Use the [hosted service](https://colophonapp.404human.dev), in alpha with open sign-up and up to 3 projects per account, or self-host with the Docker quick start, which builds the image from a clone. The npm packages aren't published yet.
 - **Two delivery pieces are partial.** Webhook payloads aren't signed yet, and cache clears are tested against a stand-in CDN; the adapter for a real CDN is on the roadmap.
 - **[On the roadmap](https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md):** choosing a locale in the public content API (locales are stored and published today).
 - **The 24-hour soak hasn't passed yet.**

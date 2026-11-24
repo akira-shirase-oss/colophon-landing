@@ -57,7 +57,7 @@ was live. A takedown is a decision; undoing it should be its own decision.
 
 - **Rollback is reviewed, so it isn't instant.** A team that wants a one-click revert with no second person may
   find this slower. On a team of one, your own approval is recorded and shown as such.
-- **It's pre-release,** and nobody runs it in production yet.
+- **It's in alpha** (0.1.0-alpha.7), and v0.1's stability promises aren't made yet.
 
 The steps, with screenshots, are in the docs' [rollback](https://docs.colophon.404human.dev/studio/rollback/)
 and [history](https://docs.colophon.404human.dev/studio/history/) pages.

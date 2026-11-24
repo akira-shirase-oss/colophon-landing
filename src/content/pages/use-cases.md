@@ -1,7 +1,7 @@
 ---
 kind: hub
 title: "Headless CMS use cases: publishing you can check"
-description: "Four jobs Colophon was built for: AI agents that draft but never publish, an audit trail for every publish, members-only content and fresh static sites."
+description: "Four jobs Colophon was built for: AI agents that draft while people publish, an audit trail for every publish, members-only content and fresh static sites."
 targetQuery: "headless cms use cases"
 pubDate: 2026-11-20
 related:
@@ -18,7 +18,7 @@ related:
 ---
 
 Each page below starts from a job a team needs a CMS to do, says where the usual way of doing it goes wrong on
-any CMS, and then shows how Colophon does it, with the details from the docs. Colophon is pre-release, as the
+any CMS, and then shows how Colophon does it, with the details from the docs. Colophon is in alpha, as the
 status line above says.
 
 ## The use cases

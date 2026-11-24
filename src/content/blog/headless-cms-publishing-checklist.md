@@ -52,7 +52,7 @@ Rolling back in Colophon builds an ordinary changeset that restores what was liv
 
 Roles are data: owners, developers, editors and publishers by default, plus roles you define, narrowed down to single fields or to entries a person created. Project API tokens are identities of their own, so what a script wrote names the token. Changes to roles, members, invitations and tokens go in an append-only audit log: the server's database login can only add to it and read it, and triggers refuse edits and deletes apart from the retention sweep and whole-project deletion.
 
-AI agents work through those same tokens. Colophon's MCP adapter lets them read, draft and propose, but no tool approves or publishes, and the API refuses a token's approval of anything a token submitted. Details: [field-level permissions](/blog/field-level-permissions/) and [giving AI agents CMS access without the publish button](/blog/ai-agents-cms-permissions/).
+Scripts and agents with a token get the same rule: the API refuses a token's approval of anything a token submitted. An AI app connected to Colophon's MCP server by signing in acts with its person's role instead, and asks before anything that publishes. Details: [field-level permissions](/blog/field-level-permissions/) and [giving AI agents CMS access without the publish button](/blog/ai-agents-cms-permissions/).
 
 ## What Colophon can't prove yet
 

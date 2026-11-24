@@ -9,7 +9,7 @@ draft: false
 
 Astro and a headless CMS fit well: the CMS holds content, Astro reads it at build time and ships plain HTML. This guide shows how to do that with Colophon, an open-source CMS I'm building, using only its public delivery API. It's the same approach the five Astro demo sites in Colophon's repository use.
 
-First, an honest prerequisite. Colophon is pre-release (0.1.0-alpha.1) and isn't published to npm or any package registry yet, so to follow along you run Colophon from its [repository](https://github.com/akira-shirase-oss/colophon-cms) on your own machine, as its README describes. Nothing below needs Colophon's SDK; it's plain `fetch`.
+First, an honest prerequisite. Colophon is in alpha (0.1.0-alpha.7) and isn't published to npm or any package registry yet. To follow along, sign up for the [hosted service](https://colophonapp.404human.dev) and create a project, or run Colophon from its [repository](https://github.com/akira-shirase-oss/colophon-cms) on your own machine, as its README describes. Nothing below needs Colophon's SDK; it's plain `fetch`.
 
 ## The delivery API in one paragraph
 

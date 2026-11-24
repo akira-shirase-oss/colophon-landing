@@ -20,8 +20,8 @@ faq:
     a: "With a password, or with a magic link sent by email to an address on a list of approved sites. Each site user gets an audience role, managed under Audience in the Studio."
   - q: "Can I gate content by plan or tier?"
     a: "Yes, through audience roles: an entry can be visible to everyone, to any signed-in site user, or to one named role. Payments aren't part of Colophon; your site or billing system decides which role a member has."
-  - q: "Is anyone using this in production?"
-    a: "No. The audience feature is built and tested, and one of the demo sites uses it end to end, but Colophon has no users yet."
+  - q: "Is the audience feature ready for production?"
+    a: "It is built and tested, and one of the demo sites uses it end to end, but Colophon is in alpha: the stability promises of v0.1 aren't made yet."
 ---
 
 Putting some articles behind a sign-in looks like a login problem. Most leaks happen elsewhere: a shared cache
@@ -55,7 +55,6 @@ Check the response headers for `private`. Search and list the collection while s
 
 ## What to know before choosing Colophon
 
-- **It's pre-release, and the audience feature has no users yet.** It's built, tested, and used end to end by one of
-  the demo sites.
+- **It's in alpha.** The audience feature is built, tested, and used end to end by one of the demo sites.
 - **There's no billing.** Colophon decides who may read; who pays is up to your site.
 - **The public delivery API has no language parameter yet,** so a multilingual members' area needs care today.

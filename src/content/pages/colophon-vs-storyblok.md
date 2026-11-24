@@ -39,7 +39,7 @@ same open-source code rather than in a higher plan.
 
 Storyblok is a hosted CMS built around its Visual Editor, where editors build pages from nested blocks and
 see them on the page as they work. It runs the infrastructure for you and is an established commercial
-product. Colophon is pre-release and run by one person, as the status line above says.
+product. Colophon is in alpha and run by one person, as the status line above says.
 
 ## At a glance
 
@@ -47,7 +47,7 @@ Checked on 19 November 2026.
 
 | | Colophon | Storyblok |
 |---|---|---|
-| Where it runs | On your own servers, with PostgreSQL | Hosted spaces, with uptime SLAs on paid plans ([pricing](https://www.storyblok.com/pricing)) |
+| Where it runs | Colophon's hosted service (alpha), or your own servers, with PostgreSQL | Hosted spaces, with uptime SLAs on paid plans ([pricing](https://www.storyblok.com/pricing)) |
 | Licence | MIT | A commercial service |
 | Price | Free; you pay for your own servers | Starter free (1 seat); Growth $99 a month; Growth Plus $349 a month; Premium and Elite priced on request ([pricing](https://www.storyblok.com/pricing)) |
 | Editing | Structured fields and page-builder blocks; preview on your own site | The Visual Editor, on every plan ([pricing](https://www.storyblok.com/pricing)) |
@@ -55,8 +55,8 @@ Checked on 19 November 2026.
 | Schedules | A local time in a named time zone, an explicit choice when the clocks change, a recheck when due | 2 scheduled stories on Growth; 100 on Premium and Elite ([pricing](https://www.storyblok.com/pricing)) |
 | Roles | Roles down to a single field or an editor's own entries | Custom roles on Premium and Elite ([pricing](https://www.storyblok.com/pricing)) |
 | Activity record | Access changes in an append-only log; every release kept | An activity log on every plan ([pricing](https://www.storyblok.com/pricing)) |
-| AI agents | An MCP server: agents draft and ask for review; a token can't approve a token's work | A hosted MCP server over the Management API ([docs](https://www.storyblok.com/docs/libraries/mcp-server)) |
-| Maturity | Pre-release, one maintainer, no users yet | An established hosted product |
+| AI agents | An MCP server you connect by signing in: it acts with your role and asks before it publishes; a token can't approve a token's work | A hosted MCP server over the Management API ([docs](https://www.storyblok.com/docs/libraries/mcp-server)) |
+| Maturity | Alpha (0.1.0-alpha.7), live with open sign-up, one maintainer | An established hosted product |
 
 ## What Colophon does, and why it matters
 
@@ -79,19 +79,21 @@ Each release gets a receipt that is **verified at N locations** only once a chec
 it. Storyblok delivers content quickly through its own API; whether your site rebuilt is up to your build and
 hosting. See [why your site shows old content after publishing](/blog/website-not-updating-after-publish/).
 
-### Agents draft; the server decides who approves
+### Agents act with your role, and ask first
 
 Storyblok's hosted MCP server exposes its Management API, and its docs advise limiting the connection to the
-spaces and permissions the client needs. Colophon enforces the rule in the server: an agent's token can draft
-and submit for review, but no token can approve what a token submitted, and budgets are reserved per token. See
+spaces and permissions the client needs. Colophon's is connected by signing in: an app acts as you, with your role, and anything that publishes,
+deletes or changes access waits until you say yes. For scripts, the server refuses any API token's approval of
+what a token submitted, and budgets are reserved per token. See
 [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
 
 ## What to know before choosing Colophon
 
-- **It's pre-release.** The first version, 0.1.0-alpha.1, is tagged, and its npm packages aren't published
-  yet. Nobody runs it in production.
+- **It's in alpha.** Version 0.1.0-alpha.7 is live, with open sign-up on the hosted service, and its npm
+  packages aren't published yet. v0.1's stability promises aren't made yet.
 - **There's no in-page visual editing.** Editors work in fields and preview on your site; they can't click a
   block on the page to edit it.
-- **There's no hosted option.** You run PostgreSQL, backups and upgrades yourself.
+- **The hosted service is new, and in alpha.** It runs at [colophonapp.404human.dev](https://colophonapp.404human.dev) with open
+  sign-up and up to 3 projects per account. Self-hosted, you run PostgreSQL, backups and upgrades yourself.
 - **The public delivery API has no language parameter yet,** webhooks aren't signed yet, and there's no
   adapter for a real CDN.

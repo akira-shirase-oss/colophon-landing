@@ -49,7 +49,7 @@ No. A rollback request needs the same approval as any other publish request.
 
 An approval in Colophon is tied to the exact contents of a request, identified by a hash of every pinned entry and revision. If the request changes after approval, the approval no longer counts. Approvals also expire after seven days. Reviewing a rollback means reviewing precisely what will be restored, not a description of it.
 
-Who may approve is a role question. By default, publishers and owners can review and publish; editors can create and edit content and ask for review. An agent can never approve its own proposal. So a script or AI assistant connected to Colophon can propose a rollback, but a person has to approve it; why is in [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
+Who may approve is a role question. By default, publishers and owners can review and publish; editors can create and edit content and ask for review. A script's API token can never approve a token's proposal, so a script can propose a rollback, but a person has to approve it. An AI app connected by signing in acts with its person's role, so it can approve one only if that person could, and only after asking them; why is in [give AI agents CMS access, not the publish button](/blog/ai-agents-cms-permissions/).
 
 ## What a reviewed rollback costs
 
