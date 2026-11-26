@@ -12,7 +12,7 @@
 //
 // `onDemand` lists the path prefixes a route may opt out of prerendering under. A route outside them fails the
 // build: a page that should be static can't become a server route by accident.
-import { readFile, readdir, writeFile } from 'node:fs/promises'
+import { readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { passthroughImageService } from 'astro/config'
 
@@ -96,7 +96,10 @@ export default function pages({ onDemand = [] } = {}) {
         })
       },
       'astro:build:done': async () => {
-        if (served.length === 0) return
+        // With an adapter Astro always writes a server (its image endpoint is a route of its own). When none of
+        // the site's routes renders on demand there is nothing for it to do, and without _routes.json Pages
+        // would run it for every request: remove it, and the build is the plain static one.
+        if (served.length === 0) return void (await rm(serverDir, { recursive: true, force: true }))
         // Astro's manifest names the build's own directories, and keys each component's scripts by its source
         // file's absolute path. Nothing reads a file at run time, but the worker would carry the build
         // machine's paths. Every one becomes the same path under a fixed root, so the keys still match.
