@@ -30,3 +30,6 @@ dist-ssr
 # Astro
 .astro
 .scratch/
+
+# Wrangler (local runs of the Pages worker)
+.wrangler
