@@ -53,4 +53,8 @@ export const site = {
   status_checked: '2026-11-24',
   /** The one shared line. Plain words: what Colophon is today, honestly. */
   status_line: 'Colophon is live, in alpha (0.1.0-alpha.7): anyone can sign up for the hosted service. I build it in public, on my own.',
+  /** The blog index (/blog/): its title and description, as search results show them. */
+  blog_title: 'Colophon blog: publishing, releases and proof',
+  blog_description:
+    'How Colophon proves what it published: releases, receipts, reviewed rollbacks and safe automation, explained from the code that does it.',
 }

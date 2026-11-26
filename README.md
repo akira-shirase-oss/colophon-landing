@@ -140,8 +140,13 @@ from the public delivery API (no credential) and prints plain HTML, as before.
 | **Blog posts** | `posts` | `/blog/<URL name>/`, the blog index and the feed |
 | **Pages** | `pages` | comparisons, features, use cases, guides and each section's index, by **Kind** |
 | **Home page** | `home` (one entry) | the title and description, the hero, the benefit cards, the questions, the closing statement |
-| **Site settings** | `site` (one entry) | the status line under every post's title |
+| **Site settings** | `site` (one entry) | the status line under every post's title; the blog index's title and description |
 
+- **Search engines read what the entries say.** The sitemap, the feed and `llms.txt` list exactly the published
+  entries; each page's title, description, dates, `Article`/`BlogPosting`, `BreadcrumbList`, `FAQPage` (from the
+  entry's questions) and a glossary's `DefinedTermSet` are built from its entry, so none of them is typed twice.
+  `npm run check` fails the build when a page lacks one. A page's "Last updated" and its sitemap `lastmod` are
+  the entry's **Last updated** date, set by hand: the delivery API doesn't say when a version went live.
 - `cms/content-types.json` holds the four content types; `scripts/cms-seed.mjs` creates them and one draft per
   entry in an empty project (it only creates, and never publishes).
 - `src/lib/colophon.ts` reads the delivery API: every read of one build names the same release, a failed read
@@ -158,9 +163,14 @@ from the public delivery API (no credential) and prints plain HTML, as before.
   `src/data/home.ts` are the copy the project was seeded from on 26 November 2026: nothing reads them unless a
   build sets `COLOPHON_PROJECT=` (empty), which builds from them and prints no marker. Edit the site in the
   Studio, not there.
-- A deploy is a build, the checks and an upload, with the app's address so the header links to it:
+- **Deploys** are `.github/workflows/deploy.yml`: on every push to `main`, and every five minutes when the
+  project has a release the live site wasn't built from (`scripts/deploy-needed.mjs` compares the live page's
+  marker with the project's newest release), so publishing in the Studio reaches the site without anyone
+  running a command. It builds with the app's address, runs `npm run check`, and uploads `dist/` to the Pages
+  project; a failing check uploads nothing. It needs the repository secrets `CLOUDFLARE_API_TOKEN` (Pages:
+  Edit) and `CLOUDFLARE_ACCOUNT_ID`. By hand, the same thing is
   `PUBLIC_APP_URL=https://colophonapp.404human.dev npm run build`, `npm run check` with the same variable,
-  then `wrangler pages deploy dist`. Publishing in the Studio doesn't rebuild the site by itself yet.
+  then `wrangler pages deploy dist --project-name colophon-landing --branch main`.
 
 ## Draft preview
 

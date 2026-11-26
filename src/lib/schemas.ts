@@ -88,7 +88,16 @@ export const homeSchema = z.object({
 })
 
 // The status line under every post's title.
-export const siteSchema = z.object({ name: line, version: line.max(40), status_checked: z.coerce.date(), status_line: line.max(300) })
+export const siteSchema = z.object({
+  name: line,
+  version: line.max(40),
+  status_checked: z.coerce.date(),
+  status_line: line.max(300),
+  // The blog index's title and description. Unset (an entry published before the fields existed) falls back to
+  // the words in src/data/home.ts.
+  blog_title: line.max(60).nullish(),
+  blog_description: z.string().min(120).max(155).nullish(),
+})
 
 export type PostData = z.infer<typeof postSchema>
 export type PageData = z.infer<typeof pageSchema>

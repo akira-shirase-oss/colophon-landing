@@ -4,6 +4,10 @@
 //   node scripts/indexnow.mjs                      # changes since the merge's first parent (the last deploy)
 //   node scripts/indexnow.mjs --from <sha> --to <sha>
 //   node scripts/indexnow.mjs --dry-run            # print the URLs, send nothing
+//   node scripts/indexnow.mjs --urls-file <file>   # exactly these addresses, one a line (the deploy workflow:
+//                                                  # scripts/changed-pages.mjs wrote them before the upload, by
+//                                                  # comparing the build with the live site, so a publish in the
+//                                                  # Studio, which changes no file here, is seen too)
 //
 // Which URLs: a changed post or page sends its own address (a deleted one too, so engines see its 404 or 301),
 // plus the lists that show it (the blog index, the comparisons hub). A change to anything else that shapes the
@@ -57,6 +61,11 @@ export function urlsFor(changed, everything) {
   return [...urls].sort()
 }
 
+/** The addresses in a list file: one a line, only this site's own, each once. Anything else is left out. */
+export function urlsOf(text) {
+  return [...new Set(text.split('\n').map((line) => line.trim()).filter((line) => line === SITE || line.startsWith(`${SITE}/`)))].sort()
+}
+
 const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim()
 
 async function main() {
@@ -72,12 +81,23 @@ async function main() {
     process.exit(2)
   }
   const everything = [...readFileSync(sitemap, 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1])
-  const changed = git('diff', '--name-only', `${from}..${to}`)
-    .split('\n')
-    .filter(Boolean)
-    .map((path) => ({ path, text: existsSync(join(root, path)) ? readFileSync(join(root, path), 'utf8') : undefined }))
-  const urls = urlsFor(changed, everything).slice(0, MAX_URLS)
-  if (urls.length === 0) return console.log(`indexnow: nothing that search engines see changed between ${from} and ${to}`)
+  const listed = opt('urls-file')
+  let urls
+  if (args.includes('--urls-file')) {
+    if (!listed || !existsSync(listed)) {
+      console.error('indexnow: --urls-file takes a file of addresses, one a line')
+      process.exit(2)
+    }
+    urls = urlsOf(readFileSync(listed, 'utf8')).slice(0, MAX_URLS)
+    if (urls.length === 0) return console.log('indexnow: no page differs from the live site; nothing to send')
+  } else {
+    const changed = git('diff', '--name-only', `${from}..${to}`)
+      .split('\n')
+      .filter(Boolean)
+      .map((path) => ({ path, text: existsSync(join(root, path)) ? readFileSync(join(root, path), 'utf8') : undefined }))
+    urls = urlsFor(changed, everything).slice(0, MAX_URLS)
+    if (urls.length === 0) return console.log(`indexnow: nothing that search engines see changed between ${from} and ${to}`)
+  }
 
   const key = keyOf()
   const body = { host: new URL(SITE).host, key, keyLocation: `${SITE}/${key}.txt`, urlList: urls }

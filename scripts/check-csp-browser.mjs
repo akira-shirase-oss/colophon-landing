@@ -243,15 +243,16 @@ await visit('/', desktop, async (page, report) => {
 }, 'dark')
 
 // The hero title prints at load but is real text from the first moment: in the accessibility tree at once,
-// fully revealed by 1.5 s, and still when motion is reduced.
+// fully revealed by 1.5 s however many lines it wraps to (its words are the Colophon project's, so the check
+// reads them from the page instead of knowing them), and still when motion is reduced.
 {
   const context = await browser.newContext({ viewport: phone })
   const page = await context.newPage()
   await page.goto(origin + '/', { waitUntil: 'domcontentloaded' })
   const tree = await page.locator('h1').ariaSnapshot()
-  const early = await page.evaluate(() => { const h = document.querySelector('h1'); return { print: h.dataset.print, lines: getComputedStyle(h).getPropertyValue('--print-lines') } })
+  const early = await page.evaluate(() => { const h = document.querySelector('h1'); return { print: h.dataset.print, lines: getComputedStyle(h).getPropertyValue('--print-lines'), text: h.textContent.trim() } })
   interactions++
-  if (!/Know exactly what went live/.test(tree)) problems.push(`/ [hero title]: not in the accessibility tree at load (${tree})`)
+  if (early.text.length < 3 || !tree.includes(`heading ${JSON.stringify(early.text)} [level=1]`)) problems.push(`/ [hero title]: not in the accessibility tree at load (${tree})`)
   if (early.print !== 'go') problems.push(`/ [hero title]: the print was not armed (${JSON.stringify(early)})`)
   await page.waitForTimeout(1500)
   const later = await page.evaluate(() => getComputedStyle(document.querySelector('h1')).clipPath)
