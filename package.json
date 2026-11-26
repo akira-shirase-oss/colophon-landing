@@ -10,7 +10,7 @@
     "lint": "oxlint",
     "test": "node --test scripts/*.test.mjs",
     "check": "node scripts/check-dist.mjs && node scripts/check-literals.mjs && node scripts/check-budget.mjs && node scripts/check-preview.mjs",
-    "check:browser": "node scripts/check-csp-browser.mjs && node scripts/check-preview-browser.mjs",
+    "check:browser": "node scripts/check-csp-browser.mjs; pages=$?; node scripts/check-preview-browser.mjs; preview=$?; exit $((pages | preview))",
     "check:app": "PUBLIC_APP_URL=https://app.example.test sh -c 'astro build --outDir dist-app && node scripts/check-dist.mjs dist-app && node scripts/check-csp-browser.mjs --dist dist-app'"
   },
   "dependencies": {

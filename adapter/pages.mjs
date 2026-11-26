@@ -21,7 +21,11 @@ const NAME = 'colophon-pages'
 /** What the build machine's project folder is called inside the worker (see astro:build:done below). */
 export const BUILD_ROOT = 'file:///site/'
 
-/** The `_routes.json` patterns for the on-demand routes: a static route as itself, a dynamic one as its prefix. */
+/**
+ * The `_routes.json` patterns for the on-demand routes: a static route as itself, a dynamic one as its prefix.
+ * @param {string[]} patterns
+ * @returns {string[]}
+ */
 export function routePatterns(patterns) {
   const out = new Set()
   for (const pattern of patterns) {
@@ -39,6 +43,10 @@ export function routePatterns(patterns) {
   return all.filter((p) => !all.some((w) => w !== p && w.endsWith('*') && p.startsWith(w.slice(0, -1)))).sort()
 }
 
+/**
+ * @param {{ onDemand?: string[] }} [options] `onDemand`: the path prefixes a route may render on demand under.
+ * @returns {import('astro').AstroIntegration}
+ */
 export default function pages({ onDemand = [] } = {}) {
   /** @type {string[]} */
   let served = []
@@ -64,7 +72,9 @@ export default function pages({ onDemand = [] } = {}) {
             ...(command === 'build' ? { endpoint: { route: '/_image', entrypoint: fileURLToPath(new URL('./no-image.mjs', import.meta.url)) } } : {}),
           },
           vite: {
-            ssr: { noExternal: true },
+            // The worker carries everything it imports: Pages has no node_modules. (In `astro dev` the routes
+            // run in Node, where bundling every dependency would break the ones written as CommonJS.)
+            ...(command === 'build' ? { ssr: { noExternal: true } } : {}),
             // Astro's runtime asks `process.env.NODE_ENV` in places, and a Pages Function has no `process`
             // unless the project turns on Node compatibility. An empty one answers the question (Astro's own
             // Cloudflare adapter does the same), so the worker needs no setting in the Cloudflare dashboard.
