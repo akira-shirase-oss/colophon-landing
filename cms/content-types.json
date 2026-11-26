@@ -17,7 +17,8 @@
         "type": "slug",
         "required": true,
         "source": "title",
-        "description": "The post's address: /blog/<URL name>/. Changing it changes the address."
+        "description": "The post's address: /blog/<URL name>/. Changing it changes the address.",
+        "index": true
       },
       {
         "id": "description",
@@ -105,7 +106,8 @@
         "label": "URL name",
         "type": "slug",
         "required": true,
-        "source": "title"
+        "source": "title",
+        "index": true
       },
       {
         "id": "description",
