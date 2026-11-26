@@ -1,0 +1,17 @@
+---
+// GET /api/preview?code=…&path=/preview/<collection>/<id>: the address the Studio's Preview button opens
+// (the project's preview target). It trades the one-time code for a token with Colophon, keeps the token in
+// this site's own HttpOnly cookie and goes to `path`; anything else is said in plain words on a page of the
+// site, and no cookie is set (src/lib/preview/routes.ts).
+import PreviewNotice from '../../layouts/PreviewNotice.astro'
+import { answerWith, here } from '../../lib/preview/here.ts'
+import { enter } from '../../lib/preview/routes.ts'
+
+export const prerender = false
+
+const answer = await enter(here(Astro.locals), Astro.request)
+if (answer instanceof Response) return answer
+answerWith(Astro.response, answer)
+---
+
+<PreviewNotice notice={answer.notice} />

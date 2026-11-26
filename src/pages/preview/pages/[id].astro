@@ -1,0 +1,34 @@
+---
+// GET /preview/pages/<entry id>: the draft of a comparison, feature, use case, guide or section hub in the
+// layout its section's pages use (src/layouts/Page.astro). Without a preview session it says the preview has
+// ended, and nothing else.
+import PreviewBar from '../../../components/PreviewBar.astro'
+import PageLayout from '../../../layouts/Page.astro'
+import PreviewNotice from '../../../layouts/PreviewNotice.astro'
+import { pageDraft, siteDraft, UNBUILDABLE } from '../../../lib/preview/draft.ts'
+import { answerWith, here } from '../../../lib/preview/here.ts'
+import { open } from '../../../lib/preview/routes.ts'
+import { pagePath } from '../../../lib/sections.ts'
+
+export const prerender = false
+
+const answer = await open(here(Astro.locals), Astro.request, 'pages', Astro.params.id)
+const draft = answer.kind === 'draft' ? pageDraft(answer.entry) : null
+answerWith(Astro.response, draft && !draft.ok ? { ...answer, status: UNBUILDABLE.status } : answer)
+const settings = answer.kind === 'draft' && answer.settings ? siteDraft(answer.settings) : null
+---
+
+{
+  answer.kind === 'notice' ? (
+    <PreviewNotice notice={answer.notice} handshake={answer.studioOrigin ? { studioOrigin: answer.studioOrigin, previewing: false } : undefined} />
+  ) : draft && !draft.ok ? (
+    <PreviewNotice notice={UNBUILDABLE} problems={draft.problems} handshake={{ studioOrigin: answer.studioOrigin, previewing: true }} />
+  ) : (
+    draft && (
+      <PageLayout id={draft.value.id} data={draft.value.data} statusLine={settings?.ok ? settings.value.status_line : undefined} imageAlt="Colophon" generation={0} noindex>
+        <PreviewBar slot="bar" source={answer.entry.preview.source} exitTo={pagePath(draft.value.data.kind, draft.value.id)} studioOrigin={answer.studioOrigin} />
+        <Fragment set:html={draft.value.html} />
+      </PageLayout>
+    )
+  )
+}

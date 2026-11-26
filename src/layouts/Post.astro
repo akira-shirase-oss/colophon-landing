@@ -21,8 +21,8 @@ type Props = {
   data: PostData
   /** The body's Markdown source: a glossary post's terms are read from it. */
   source: string
-  /** The `site` entry's status line, shown under the title. */
-  statusLine: string
+  /** The `site` entry's status line, shown under the title. A preview whose reader can't see it has none. */
+  statusLine?: string
   imageAlt: string
   generation: number
   /** Keep the page out of search results whatever the post says (a draft preview). */
@@ -93,7 +93,7 @@ const termSet = {
           </span>
           <h1 class={styles.postTitle}>{title}</h1>
           <p class={styles.desc}>{description}</p>
-          <Status line={statusLine} note={data.status} />
+          {statusLine !== undefined && <Status line={statusLine} note={data.status} />}
         </header>
         <div class={styles.prose}>
           <slot />

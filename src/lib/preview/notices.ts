@@ -42,6 +42,17 @@ export const NO_SUCH_PAGE: Notice = {
   reason: 'not_a_preview_page',
 }
 
+/**
+ * "Exit preview" pressed inside the Studio's frame: the cookie is cleared, and this page stays in the frame.
+ * The site's public pages refuse to be framed, so the frame can't follow the link to one.
+ */
+export const LEFT: Notice = {
+  status: 200,
+  title: 'You have left the preview',
+  text: `The preview session in this frame has ended. ${AGAIN}`,
+  reason: 'left_preview',
+}
+
 const HANDLER: Record<Refusal['reason'], Pick<Notice, 'title' | 'text'>> = {
   method_not_allowed: { title: 'Preview links are opened, not posted', text: AGAIN },
   prefetch: { title: 'Preview links are opened, not prefetched', text: 'A preview link works once, so the browser may not load it ahead of time. Open it from the Studio.' },

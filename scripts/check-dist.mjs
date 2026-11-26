@@ -45,13 +45,19 @@
 // security /.well-known/security.txt (RFC 9116) has Contact, Expires, Preferred-Languages, Canonical and Policy,
 //          names no email address, and expires more than 30 days and less than a year from the build.
 // robots   /robots.txt is exactly what src/data/robots.mjs builds: every crawler, and each AI crawler by name,
-//          allowed everything, then the sitemap.
+//          allowed every page and kept off the draft-preview routes, then the sitemap.
+// preview  draft preview stays where it belongs: dist/_routes.json sends exactly the preview routes to the
+//          worker and nothing else; the worker (dist/_worker.js/) imports nothing a Pages Function lacks; no
+//          preview page was built as a file; the sitemap, the feed and llms.txt name no preview address; and
+//          no rule in _headers but `/*` sets, repeats or removes a security header. What the routes answer
+//          is scripts/check-preview.mjs's job.
 //
 // Exits 1 and lists every failure, or prints one line per check that passed.
 import { themes, ratio as measure } from './design-contrast.mjs'
 import { createHash } from 'node:crypto'
 import { ANALYTICS, scriptKind } from './csp-rules.mjs'
 import { AI_CRAWLERS, robots } from '../src/data/robots.mjs'
+import { BUILD_ROOT } from '../adapter/pages.mjs'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { homedir, userInfo } from 'node:os'
 import { extname, join, relative, resolve, sep } from 'node:path'
@@ -78,6 +84,9 @@ const files = (function walk(dir) {
   )
 })(dist)
 const rel = (file) => relative(dist, file)
+/** The Pages worker's own files (adapter/pages.mjs): code that runs on Cloudflare and is never sent to a browser. */
+const WORKER = '_worker.js'
+const inWorker = (file) => rel(file).split(sep)[0] === WORKER
 const html = files.filter((f) => extname(f) === '.html').map((f) => ({ file: rel(f), text: readFileSync(f, 'utf8') }))
 const css = files.filter((f) => extname(f) === '.css').map((f) => ({ file: rel(f), text: readFileSync(f, 'utf8') }))
 
@@ -356,7 +365,9 @@ function checkLeaks() {
 
   for (const path of files) {
     const file = rel(path)
-    const bytes = readFileSync(path).toString('latin1')
+    // The worker names the build's folders under one fixed, made-up root (adapter/pages.mjs writes it in place
+    // of the build machine's own path). That exact root is not a leak; any other file:// URL in it still is.
+    const bytes = inWorker(path) ? readFileSync(path).toString('latin1').replaceAll(BUILD_ROOT, '') : readFileSync(path).toString('latin1')
     for (const [pattern, what] of everywhere) if (pattern.test(bytes)) fail('leaks', `${file} contains ${what}`)
     for (const hit of nameHits(bytes)) fail('leaks', `${file} contains a private name (${hit.length} characters, not printed)`)
     if (!TEXT.has(extname(file)) && !file.endsWith('_headers')) continue
@@ -731,7 +742,9 @@ function checkReveal() {
     scanned++
     if (/\[data-reveal|data-print=["']?armed/.test(sheet.text)) fail('reveal', `${sheet.file} styles a scroll-reveal start state`)
   }
-  for (const file of files.filter((f) => extname(f) === '.js')) {
+  // Scripts a browser loads. The worker's files are server code: what it sends to a browser is checked on its
+  // rendered pages (scripts/check-preview.mjs holds every script there to the ones the built pages run).
+  for (const file of files.filter((f) => extname(f) === '.js' && !inWorker(f))) {
     scanned++
     if (/IntersectionObserver/.test(readFileSync(file, 'utf8'))) fail('reveal', `${rel(file)} observes the viewport (IntersectionObserver): sections must not wait for a scroll`)
   }
@@ -749,7 +762,7 @@ function checkLight() {
       ...[...page.text.matchAll(/\sstyle="([^"]*)"/g)].map((m) => ({ file: page.file, text: m[1], kind: 'css' })),
       ...[...page.text.matchAll(/<script(?![^>]*application\/ld\+json)[^>]*>([\s\S]*?)<\/script>/g)].map((m) => ({ file: page.file, text: m[1], kind: 'js' })),
     ]),
-    ...files.filter((f) => extname(f) === '.js').map((f) => ({ file: rel(f), text: readFileSync(f, 'utf8'), kind: 'js' })),
+    ...files.filter((f) => extname(f) === '.js' && !inWorker(f)).map((f) => ({ file: rel(f), text: readFileSync(f, 'utf8'), kind: 'js' })),
   ]
   let checked = 0
   for (const { file, text, kind } of sources) {
@@ -843,6 +856,85 @@ function checkRobots() {
   return AI_CRAWLERS.length
 }
 
+// ---------------------------------------------------------------------------------------------
+// preview: the draft-preview routes are the only code that runs, and nothing public names them
+
+/** The paths that reach the worker: the preview handler, its exit, and one preview page per collection. */
+const PREVIEW_ROUTES = ['/api/preview', '/api/preview/', '/api/preview/exit', '/api/preview/exit/', '/preview/home/*', '/preview/pages/*', '/preview/posts/*', '/preview/site/*']
+const SECURITY_HEADERS = ['content-security-policy', 'x-frame-options', 'strict-transport-security', 'x-content-type-options', 'referrer-policy', 'permissions-policy', 'cross-origin-opener-policy']
+
+function checkPreview() {
+  const worker = files.filter(inWorker)
+  const routesFile = join(dist, '_routes.json')
+  if (worker.length === 0 && !existsSync(routesFile)) return { routes: 0, modules: 0 }
+  if (!existsSync(join(dist, WORKER, 'index.js'))) fail('preview', `${WORKER}/index.js is missing, so Cloudflare Pages has no worker to run`)
+
+  // Without _routes.json every request would run the worker, and every page would stop being a static file.
+  let routes
+  try {
+    routes = JSON.parse(readFileSync(routesFile, 'utf8'))
+  } catch {
+    return void fail('preview', '_routes.json is missing or not JSON: every request would run the worker')
+  }
+  if (routes.version !== 1) fail('preview', `_routes.json has version ${routes.version} (want 1)`)
+  if (JSON.stringify(routes.include) !== JSON.stringify(PREVIEW_ROUTES)) {
+    fail('preview', `_routes.json sends ${JSON.stringify(routes.include)} to the worker (want exactly ${JSON.stringify(PREVIEW_ROUTES)})`)
+  }
+  if (!Array.isArray(routes.exclude) || routes.exclude.length > 0) fail('preview', '_routes.json has an exclude list; the include list alone says what runs')
+
+  // A Pages Function without Node compatibility has only the web platform: any built-in import fails at load.
+  for (const file of worker) {
+    if (!/\.m?js$/.test(file)) fail('preview', `${rel(file)} is not a module: the worker ships only JavaScript`)
+    else {
+      const text = readFileSync(file, 'utf8')
+      // Import statements start a line in the bundle; the same words inside an error message's text don't.
+      const imported = [
+        ...text.matchAll(/^(?:import|export)\b[^"'\n]*?\bfrom\s*["']([^"']+)["']/gm),
+        ...text.matchAll(/^import\s*["']([^"']+)["']/gm),
+        ...text.matchAll(/\b(?:import|require)\s*\(\s*["']([^"']+)["']\s*\)/g),
+      ].map((m) => m[1])
+      for (const name of imported) {
+        if (!/^\.{1,2}\//.test(name)) fail('preview', `${rel(file)} imports "${name}", which a Pages Function can't load: only its own files`)
+      }
+    }
+  }
+
+  // A preview page is rendered per request, behind the cookie. A built one would be public.
+  for (const page of html) {
+    if (/^(?:preview|api)(?:[\\/]|$)/.test(page.file)) fail('preview', `${page.file} was built as a file; preview routes render on demand only`)
+  }
+  for (const name of ['sitemap.xml', 'rss.xml', 'llms.txt']) {
+    const file = join(dist, name)
+    if (existsSync(file) && /\/(?:api\/preview|preview\/)/.test(readFileSync(file, 'utf8'))) fail('preview', `${name} names a preview address`)
+  }
+  for (const page of html) {
+    for (const tag of tagsOf(page.text)) {
+      const href = tag.name === 'a' || tag.name === 'link' ? tag.attrs.get('href') : undefined
+      if (href && sameOrigin(href) && /^\/(?:api\/preview|preview\/)/.test(new URL(href, `${site}${urlOf(page.file)}`).pathname)) {
+        fail('preview', `${page.file} links to the preview route ${href}`)
+      }
+    }
+  }
+
+  // The preview routes send their own headers (Pages never applies _headers to a Function's response), so
+  // _headers needs no rule for them, and a rule for any path but /* may not touch a security header:
+  // a second rule's value is joined to the first, and a `! Name` line removes it.
+  const headersFile = join(dist, '_headers')
+  if (existsSync(headersFile)) {
+    let path = ''
+    for (const line of readFileSync(headersFile, 'utf8').split(/\r?\n/)) {
+      const t = line.trim()
+      if (t === '' || t.startsWith('#')) continue
+      if (!/^\s/.test(line)) path = t
+      else if (path !== '/*') {
+        const name = t.replace(/^!\s*/, '').split(':')[0].trim().toLowerCase()
+        if (SECURITY_HEADERS.includes(name)) fail('preview', `_headers: the rule for ${path} touches ${name}; only /* sets the security headers`)
+      } else if (t.startsWith('!')) fail('preview', `_headers: the /* rule removes a header (${t})`)
+    }
+  }
+  return { routes: routes.include?.length ?? 0, modules: worker.length }
+}
+
 checkHeaders()
 const namesScanned = checkLeaks()
 const draftCount = checkDrafts()
@@ -861,6 +953,7 @@ const articleCheck = checkArticles()
 const llmsListed = checkLlms()
 const securityDays = checkSecurityTxt()
 const crawlers = checkRobots()
+const previewCheck = checkPreview()
 
 if (failures.length) {
   console.error(`check-dist: ${failures.length} failure(s) in ${dist}\n`)
@@ -885,4 +978,9 @@ console.log(`  dates    ok: ${articleCheck.articles} articles show Published and
 console.log(`  back     ok: ${articleCheck.sections} section pages link back to their section's index (an index to the home page)`)
 console.log(`  llms     ok: llms.txt lists the sitemap's ${llmsListed} pages, each once`)
 console.log(`  security ok: .well-known/security.txt has every field, no email address, and expires in ${securityDays} days`)
-console.log(`  robots   ok: every crawler allowed, ${crawlers} AI crawlers by name, then the sitemap`)
+console.log(`  robots   ok: every crawler allowed every page and kept off the preview routes, ${crawlers} AI crawlers by name, then the sitemap`)
+console.log(
+  previewCheck.routes
+    ? `  preview  ok: ${previewCheck.routes} paths reach the worker (${previewCheck.modules} modules, no built-in imports); no preview page built, listed or linked`
+    : '  preview  ok: no worker in this build',
+)

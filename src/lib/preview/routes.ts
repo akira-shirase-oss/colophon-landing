@@ -4,8 +4,8 @@
 //
 //   enter   GET /api/preview?code=…&path=…    exchange the code, keep the token in the cookie, go to `path`
 //   open    GET /preview/<collection>/<id>    the draft of one entry, or why there is none to show
-//   leave   GET /api/preview/exit             clear the cookie and go to a public page
-import { ENDED, NOT_CONFIGURED, NO_SUCH_PAGE, readNotice, refusalNotice, type Notice } from './notices.ts'
+//   leave   GET /api/preview/exit             clear the cookie and go to a public page (in a frame: say so, and stay)
+import { ENDED, LEFT, NOT_CONFIGURED, NO_SUCH_PAGE, readNotice, refusalNotice, type Notice } from './notices.ts'
 import { previewRouteHeaders } from './policy.ts'
 import { createPreviewHandler, exitPreviewHandler, handlerHeaders, previewClient, previewCookie, previewTokenFromRequest, type PreviewEntry } from './sdk.ts'
 import { isCollection, isEntryId, isPreviewPath, isPublicPath, type Collection, type PreviewSource } from './site.ts'
@@ -34,6 +34,8 @@ export interface NoticeAnswer {
   cookies: string[]
   /** The Studio's origin, for the page's handshake script; `null` when there is no project to preview. */
   studioOrigin: string | null
+  /** A public page of the site to offer in a new tab (after "Exit preview" inside a frame). */
+  link?: string
 }
 
 /** A draft (or, for an entry outside the preview's scope, its published version) and its response headers. */
@@ -109,12 +111,19 @@ export async function open(site: Site, request: Request, collection: string | un
   }
 }
 
-/** `GET /api/preview/exit`: clears the cookie and goes to `?path=` when it is a public page that exists, else `/`. */
-export async function leave(site: Site, request: Request): Promise<Response> {
+/**
+ * `GET /api/preview/exit`: clears the cookie and goes to `?path=` when it is a public page that exists, else `/`.
+ * Inside a frame (the Studio's preview pane) it stays put and says so instead: the site's public pages refuse
+ * to be framed, so a redirect to one would leave the pane blank.
+ */
+export async function leave(site: Site, request: Request): Promise<Response | NoticeAnswer> {
   let outcome = exitPreviewHandler({ isAllowedPath: isPublicPath })(request)
   const target = outcome.headers.get('location') ?? '/'
   if (target !== '/' && site.exists && !(await site.exists(target).catch(() => false))) {
     outcome = exitPreviewHandler()(new Request(new URL('/api/preview/exit', request.url)))
+  }
+  if (/^(?:iframe|frame|embed|object)$/.test(request.headers.get('sec-fetch-dest') ?? '')) {
+    return { ...noticeAnswer(site, 'handler', LEFT), cookies: outcome.headers.getSetCookie(), link: outcome.headers.get('location') ?? '/' }
   }
   const headers = new Headers(outcome.headers)
   for (const [name, value] of Object.entries(headersOf(site, 'handler'))) if (!headers.has(name)) headers.set(name, value)

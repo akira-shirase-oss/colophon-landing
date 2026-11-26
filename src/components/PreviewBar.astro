@@ -1,0 +1,34 @@
+---
+// The strip above a page drawn from a draft: it says the page isn't published and offers the way out. Only
+// the preview routes render it (through the layouts' `bar` slot); no built page imports it. It scrolls away
+// with the page, so it never covers the header it sits above.
+import Badge from './ui/Badge.astro'
+import Button from './ui/Button.astro'
+import PreviewListen from './PreviewListen.astro'
+import styles from './PreviewBar.module.css'
+
+type Props = {
+  /** Where the words on the page came from, as Colophon says it. */
+  source: 'draft' | 'changeset' | 'published'
+  /** The page "Exit preview" goes to once the cookie is cleared: the entry's public address. */
+  exitTo: string
+  studioOrigin: string
+}
+const { source, exitTo, studioOrigin } = Astro.props
+const SAYS = {
+  draft: { label: 'Draft preview', text: 'not published' },
+  changeset: { label: 'Publish request preview', text: 'not published' },
+  // An entry outside the preview's scope is shown as readers see it, and the bar says so.
+  published: { label: 'Preview', text: 'this entry has no draft in this preview; these are its published words' },
+} as const
+const exit = `/api/preview/exit?path=${encodeURIComponent(exitTo)}`
+---
+
+<aside class={styles.bar} aria-label="Draft preview" data-preview-source={source}>
+  <p class={styles.says}>
+    <Badge tone={source === 'published' ? 'live' : 'draft'} dot>{SAYS[source].label}</Badge>
+    <span class={styles.text}>{SAYS[source].text}</span>
+  </p>
+  <Button href={exit} variant="secondary" size="sm" rel="nofollow">Exit preview</Button>
+</aside>
+<PreviewListen studioOrigin={studioOrigin} previewing />

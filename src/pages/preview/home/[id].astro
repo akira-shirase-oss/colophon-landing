@@ -1,0 +1,30 @@
+---
+// GET /preview/home/<entry id>: the draft of the home page's words in the home page's own layout
+// (src/layouts/Home.astro). Without a preview session it says the preview has ended, and nothing else.
+import PreviewBar from '../../../components/PreviewBar.astro'
+import HomeLayout from '../../../layouts/Home.astro'
+import PreviewNotice from '../../../layouts/PreviewNotice.astro'
+import { homeDraft, UNBUILDABLE } from '../../../lib/preview/draft.ts'
+import { answerWith, here } from '../../../lib/preview/here.ts'
+import { open } from '../../../lib/preview/routes.ts'
+
+export const prerender = false
+
+const answer = await open(here(Astro.locals), Astro.request, 'home', Astro.params.id)
+const draft = answer.kind === 'draft' ? homeDraft(answer.entry) : null
+answerWith(Astro.response, draft && !draft.ok ? { ...answer, status: UNBUILDABLE.status } : answer)
+---
+
+{
+  answer.kind === 'notice' ? (
+    <PreviewNotice notice={answer.notice} handshake={answer.studioOrigin ? { studioOrigin: answer.studioOrigin, previewing: false } : undefined} />
+  ) : draft && !draft.ok ? (
+    <PreviewNotice notice={UNBUILDABLE} problems={draft.problems} handshake={{ studioOrigin: answer.studioOrigin, previewing: true }} />
+  ) : (
+    draft && (
+      <HomeLayout copy={draft.value} generation={0} noindex>
+        <PreviewBar slot="bar" source={answer.entry.preview.source} exitTo="/" studioOrigin={answer.studioOrigin} />
+      </HomeLayout>
+    )
+  )
+}

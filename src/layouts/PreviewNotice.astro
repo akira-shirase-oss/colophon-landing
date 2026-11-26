@@ -1,0 +1,66 @@
+---
+// What a preview route shows when it has no draft to draw: why, in a sentence, and what to do next. The same
+// frame as the "page not found" page (Document, Nav, Footer and the blog's classes), so it adds no stylesheet.
+// It is never a draft and never the published page; the response is noindex and no-store like every preview
+// answer (src/lib/preview/routes.ts).
+import Document from './Document.astro'
+import Nav from '../components/Nav.astro'
+import Footer from '../components/Footer.astro'
+import PreviewListen from '../components/PreviewListen.astro'
+import Badge from '../components/ui/Badge.astro'
+import styles from '../components/Blog.module.css'
+import type { Problem } from '../lib/preview/draft.ts'
+import type { Notice } from '../lib/preview/notices.ts'
+
+type Props = {
+  notice: Pick<Notice, 'title' | 'text' | 'reason'>
+  /** What the build would refuse in the draft, field by field. */
+  problems?: Problem[]
+  /** On a page at a preview address: the Studio's origin and whether this request held a preview session, for
+   *  the handshake. The handler's own notices send none. */
+  handshake?: { studioOrigin: string; previewing: boolean }
+  /** A public page to offer in a new tab: this page may sit in a frame that page refuses to load in. */
+  link?: { href: string; text: string }
+}
+const { notice, problems = [], handshake, link } = Astro.props
+---
+
+<Document title={`${notice.title} | Colophon`} description={notice.text} noindex imageAlt="Colophon" generation={0}>
+  <div style="display: flex; flex-direction: column; align-items: center; overflow: clip;">
+    <Nav />
+    <main class={styles.page}>
+      <div class={styles.column}>
+        <header class={styles.head}>
+          <Badge as="p" tone="draft" dot>Draft preview</Badge>
+          <h1 class={styles.hTitle}>{notice.title}</h1>
+          <p class={styles.lede}>{notice.text}</p>
+          {
+            link && (
+              <p class={styles.lede}>
+                <a href={link.href} target="_blank" rel="noopener noreferrer">
+                  {link.text}
+                </a>
+              </p>
+            )
+          }
+          <p class={styles.lede} data-preview-reason={notice.reason}>Reason: <code>{notice.reason}</code></p>
+        </header>
+        {
+          problems.length > 0 && (
+            <div class={styles.prose}>
+              <ul>
+                {problems.map((problem) => (
+                  <li>
+                    <strong>{problem.field}</strong> {problem.message}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </div>
+    </main>
+    <Footer />
+  </div>
+  {handshake && <PreviewListen studioOrigin={handshake.studioOrigin} previewing={handshake.previewing} />}
+</Document>

@@ -1,0 +1,16 @@
+---
+// GET /api/preview/exit?path=…: clears the preview cookie and goes to the entry's public page, or to the home
+// page when it has none yet. Inside the Studio's frame it stays and says the preview was left, with the public
+// page as a link for a new tab: the site's public pages refuse to be framed.
+import PreviewNotice from '../../../layouts/PreviewNotice.astro'
+import { answerWith, here } from '../../../lib/preview/here.ts'
+import { leave } from '../../../lib/preview/routes.ts'
+
+export const prerender = false
+
+const answer = await leave(here(Astro.locals), Astro.request)
+if (answer instanceof Response) return answer
+answerWith(Astro.response, answer)
+---
+
+<PreviewNotice notice={answer.notice} link={answer.link ? { href: answer.link, text: 'Open the site in a new tab' } : undefined} />

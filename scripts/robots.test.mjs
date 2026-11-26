@@ -1,9 +1,10 @@
-// robots.txt allows every crawler, and each AI crawler named in it has a group of its own that allows it.
+// robots.txt allows every crawler, and each AI crawler named in it has a group of its own that allows it;
+// no crawler, named or not, may fetch the draft-preview routes.
 // The parser follows RFC 9309: a crawler obeys the one group whose user-agent matches its name (case-
 // insensitively), else the `*` group; within a group the longest matching rule wins, Allow on a tie.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { AI_CRAWLERS, robots } from '../src/data/robots.mjs'
+import { AI_CRAWLERS, PREVIEW_PATHS, robots } from '../src/data/robots.mjs'
 
 /** Groups as { agents, rules: [{ allow, path }] }, plus the Sitemap lines. */
 function parse(text) {
@@ -53,8 +54,19 @@ test('each AI crawler has a group naming it, and that group allows every page', 
   for (const bot of AI_CRAWLERS) {
     const own = file.groups.filter((g) => g.agents.includes(bot.toLowerCase()))
     assert.equal(own.length, 1, `${bot} has ${own.length} groups`)
-    assert.deepEqual(own[0].rules, [{ allow: true, path: '/' }], `${bot}'s group`)
+    assert.deepEqual(own[0].rules, [{ allow: true, path: '/' }, ...PREVIEW_PATHS.map((path) => ({ allow: false, path }))], `${bot}'s group`)
     for (const path of ['/', '/guides/', '/blog/load-testing-a-cms/']) assert.ok(allowed(file, bot, path), `${bot} ${path}`)
+  }
+})
+
+test('no crawler, named or not, may fetch the draft-preview routes', () => {
+  assert.deepEqual(PREVIEW_PATHS, ['/api/preview', '/preview/'])
+  for (const bot of ['SomeOtherBot', 'Googlebot', ...AI_CRAWLERS]) {
+    for (const path of ['/api/preview', '/api/preview?code=cpc_x&path=/preview/posts/x', '/api/preview/exit', '/preview/', '/preview/posts/0190a4b0-0000-7000-8000-0000000000e1']) {
+      assert.equal(allowed(file, bot, path), false, `${bot} ${path}`)
+    }
+    // Only those two prefixes: a post whose address merely contains the word stays readable.
+    for (const path of ['/blog/preview-your-drafts/', '/features/draft-preview/', '/previews/']) assert.ok(allowed(file, bot, path), `${bot} ${path}`)
   }
 })
 

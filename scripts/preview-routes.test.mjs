@@ -195,3 +195,18 @@ test('leave: the cookie is cleared and the visitor goes to a public page that ex
   assert.equal(calls.length, 0, 'exit never talks to Colophon')
   assert.equal((await leave({ ...s, exists: undefined }, get('/api/preview/exit?path=/blog/any/'))).headers.get('location'), '/blog/any/')
 })
+
+test('leave: inside a frame the cookie is cleared and the visitor is told, not sent to a page that refuses frames', async () => {
+  const { calls, site: s } = site(undefined, { exists: async (path) => path === '/blog/hello/' })
+  for (const [dest, path, link] of [['iframe', '/blog/hello/', '/blog/hello/'], ['iframe', '/blog/unpublished/', '/'], ['frame', undefined, '/'], ['iframe', '//evil.example', '/']]) {
+    const answer = await leave(s, new Request(`${SITE}/api/preview/exit${path === undefined ? '' : `?path=${encodeURIComponent(path)}`}`, { headers: { 'sec-fetch-dest': dest, cookie: `colophon_preview=${TOKEN}` } }))
+    assert.deepEqual([answer.kind, answer.status, answer.notice.reason, answer.link], ['notice', 200, 'left_preview', link], String(path))
+    assert.deepEqual(answer.cookies, ['colophon_preview=; HttpOnly; Secure; SameSite=None; Partitioned; Path=/; Max-Age=0'])
+    sealed(answer.headers, 'no-store')
+  }
+  for (const dest of ['document', 'empty', 'IFRAME', '']) {
+    assert.ok((await leave(s, new Request(`${SITE}/api/preview/exit`, { headers: { 'sec-fetch-dest': dest } }))) instanceof Response, dest)
+  }
+  assert.equal(calls.length, 0)
+})
+
