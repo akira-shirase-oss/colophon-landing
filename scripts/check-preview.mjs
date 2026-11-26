@@ -65,7 +65,10 @@ for (const level of ['log', 'info', 'warn', 'error', 'debug']) {
 }
 const out = (line) => process.stdout.write(`${line}\n`)
 
-const EXISTING = new Set(['/blog/draft-only-post/', '/compare/', '/blog/'])
+// The static files "exist" at these paths. The last is a trap: if exit ever asked whether a preview address is
+// a public page, the answer here would send the visitor straight back to it.
+const STATIC_404 = 'the static 404 page'
+const EXISTING = new Set(['/blog/draft-only-post/', '/compare/', '/blog/', `/preview/posts/${ID.post}`])
 const assetRequests = []
 const env = {
   COLOPHON_API: STUDIO,
@@ -75,15 +78,30 @@ const env = {
     fetch: async (input) => {
       const request = input instanceof Request ? input : new Request(input)
       const path = new URL(request.url).pathname
-      assetRequests.push(path)
-      return EXISTING.has(path) ? new Response(request.method === 'HEAD' ? null : 'a static page', { status: 200 }) : new Response('the static 404 page', { status: 404, headers: { 'x-frame-options': 'DENY' } })
+      if (request.method === 'HEAD') assetRequests.push(path) // exit's question: is there a page here?
+      return EXISTING.has(path) ? new Response(request.method === 'HEAD' ? null : 'a static page', { status: 200 }) : new Response(STATIC_404, { status: 404, headers: { 'x-frame-options': 'DENY' } })
     },
   },
 }
 const worker = (await import(pathToFileURL(join(dist, '_worker.js', 'index.js')).href)).default
+/** One request to the worker. What holds for every answer it makes itself is checked here, whoever asks. */
 const call = async (path, init = {}, bindings = env) => {
   const response = await worker.fetch(new Request(`${SITE}${path}`, { redirect: 'manual', ...init }), bindings, { waitUntil() {}, passThroughOnException() {} })
-  return { status: response.status, headers: response.headers, text: await response.text() }
+  const answer = { status: response.status, headers: response.headers, text: await response.text() }
+  if (answer.text === STATIC_404) return answer // left to the static files, which carry _headers
+  const name = `${init.method ?? 'GET'} ${path.replaceAll(CODE, '<code>').slice(0, 90)}`
+  expect('headers', /(^|, )no-store$/.test(answer.headers.get('cache-control') ?? ''), `${name}: Cache-Control is ${answer.headers.get('cache-control')}; every answer of the worker is no-store`)
+  expect('headers', answer.headers.get('x-robots-tag') === 'noindex', `${name}: X-Robots-Tag is ${answer.headers.get('x-robots-tag')}`)
+  expect('headers', answer.headers.has('content-security-policy'), `${name}: no Content-Security-Policy`)
+  const sent = /colophon_preview=([^;]+)/.exec(new Headers(init.headers).get('cookie') ?? '')?.[1]
+  for (const [label, secret] of [['token', TOKEN], ['code', CODE], ['cookie’s value', sent]]) {
+    if (!secret || secret.length < 8) continue
+    expect('token', !answer.text.includes(secret), `${name}: the ${label} is in the body`)
+    for (const [header, value] of answer.headers) {
+      if (header !== 'set-cookie') expect('token', !value.includes(secret), `${name}: the ${label} is in the ${header} header`)
+    }
+  }
+  return answer
 }
 const withCookie = (token) => ({ headers: { cookie: `theme=dark; colophon_preview=${token}; other=1` } })
 
@@ -155,15 +173,6 @@ function checkScripts(name, answer) {
   return handshakes
 }
 
-function checkNoSecrets(name, answer) {
-  for (const [label, secret] of [['token', TOKEN], ['code', CODE]]) {
-    expect('token', !answer.text.includes(secret), `${name}: the ${label} is in the HTML`)
-    for (const [header, value] of answer.headers) {
-      if (header !== 'set-cookie') expect('token', !value.includes(secret), `${name}: the ${label} is in the ${header} header`)
-    }
-  }
-}
-
 const isNotice = (answer, title) => answer.text.includes(`<h1`) && answer.text.includes(title) && /<meta name="robots" content="noindex">/.test(answer.text) && !/rel="canonical"/.test(answer.text)
 const MARKERS = ['UNPUBLISHED-MARKER-7f3a', 'PAGE-MARKER-91c2', 'HOME-MARKER-44d0', 'STATUS-MARKER-0be7', 'A draft only the check has seen', 'Already live.']
 const showsNothing = (answer) => MARKERS.every((marker) => !answer.text.includes(marker))
@@ -192,7 +201,6 @@ try {
     expect('refusals', !answer.headers.has('location') && !answer.headers.has('set-cookie'), `path (${why}): redirected or set a cookie`)
     checkHeaders(`path (${why})`, answer, 'handler')
     checkScripts(`path (${why})`, answer)
-    checkNoSecrets(`path (${why})`, answer)
   }
   const posted = await call(`/api/preview?code=${CODE}&path=${target}`, { method: 'POST' })
   expect('refusals', posted.status === 405 && posted.headers.get('allow') === 'GET' && !posted.headers.has('set-cookie'), `POST answered ${posted.status} (Allow: ${posted.headers.get('allow')})`)
@@ -220,7 +228,7 @@ try {
   }
   for (const path of [`/preview/drafts/${ID.post}`, `/preview/session/${ID.post}`, `/preview/${ID.post}`, '/preview/', `/preview/posts/${ID.post}/extra`]) {
     const answer = await call(path, withCookie(TOKEN))
-    expect('address', answer.status === 404 && answer.text === 'the static 404 page', `${path}: the worker answered it itself (${answer.status}) instead of leaving it to the static files`)
+    expect('address', answer.status === 404 && answer.text === STATIC_404, `${path}: the worker answered it itself (${answer.status}) instead of leaving it to the static files`)
   }
   expect('address', seen.length === 0, `an address the site doesn't preview reached Colophon: ${seen.map((s) => s.path).join(', ')}`)
 
@@ -258,7 +266,6 @@ try {
   ]) expect('journey', ok, `the post preview lacks ${what}`)
   checkHeaders('the post preview', post, 'page')
   expect('journey', checkScripts('the post preview', post) === 1 && /data-previewing="true"/.test(post.text), 'the post preview must run the handshake once, with data-previewing="true"')
-  checkNoSecrets('the post preview', post)
   expect('journey', seen.length === 2 && seen.every((s) => s.method === 'GET' && s.headers.authorization === `Bearer ${TOKEN}` && s.headers.cookie === undefined), `the reads were ${seen.map((s) => `${s.method} ${s.path}`).join(', ')}, each with the bearer token and no cookie`)
   expect('journey', seen.map((s) => s.path).sort().join(' ') === [`/preview/v1/${PROJECT}/${ENVIRONMENT}/posts/${ID.post}`, `/preview/v1/${PROJECT}/${ENVIRONMENT}/site`].sort().join(' '), `the reads were ${seen.map((s) => s.path).join(', ')}`)
   const firstRenderMs = Date.now() - started
@@ -316,7 +323,6 @@ try {
     expect('refusals', !answer.headers.has('set-cookie') && !answer.headers.has('location'), `a ${why} code set a cookie or redirected`)
     checkHeaders(`a ${why} code`, answer, 'handler')
     expect('journey', checkScripts(`a ${why} code`, answer) === 0, `a ${why} code: the handler's page must not run the handshake`)
-    checkNoSecrets(`a ${why} code`, { ...answer, text: answer.text.replaceAll(`cpc_${'a'.repeat(600)}`, '') })
   }
   expect('refusals', seen.filter((s) => s.path.endsWith('/exchange')).length === 2, 'an empty or oversized code must be refused without asking Colophon; a used and an unknown one are asked once each')
 
@@ -357,14 +363,17 @@ try {
     [`?path=${encodeURIComponent('//evil.example/')}`, '/'],
     [`?path=${encodeURIComponent('https://evil.example/')}`, '/'],
     [`?path=${encodeURIComponent(target)}`, '/'],
+    [`?path=${encodeURIComponent(`${target}/`)}`, '/'],
     [`?path=${encodeURIComponent('/api/preview/exit')}`, '/'],
+    [`?path=${encodeURIComponent(`/api/preview?code=${CODE}&path=${target}`)}`, '/'],
   ]) {
     const answer = await call(`/api/preview/exit${path}`, withCookie(TOKEN))
     expect('exit', answer.status === 303 && answer.headers.get('location') === want, `exit${path}: ${answer.status} to ${answer.headers.get('location')} (want 303 to ${want})`)
     expect('exit', answer.headers.get('set-cookie') === 'colophon_preview=; HttpOnly; Secure; SameSite=None; Partitioned; Path=/; Max-Age=0', `exit${path}: Set-Cookie is ${answer.headers.get('set-cookie')}`)
     expect('headers', answer.headers.get('cache-control') === 'no-store' && answer.headers.get('x-robots-tag') === 'noindex' && answer.headers.get('referrer-policy') === 'no-referrer', `exit${path} is not no-store, noindex and no-referrer`)
-    checkNoSecrets(`exit${path}`, answer)
   }
+
+  expect('exit', assetRequests.every((path) => !/^\/(?:preview|api)(?:\/|$)/.test(path)), `exit asked the static files about a preview route: ${assetRequests.filter((path) => /^\/(?:preview|api)(?:\/|$)/.test(path)).join(', ')}`)
 
   // Inside the Studio's frame a redirect to a public page would be refused by that page's own headers.
   const framedExit = await call(`/api/preview/exit?path=${encodeURIComponent('/blog/draft-only-post/')}`, { headers: { cookie: `colophon_preview=${TOKEN}`, 'sec-fetch-dest': 'iframe' } })
@@ -390,6 +399,9 @@ try {
     out('  exit      ok: cookie cleared with the attributes that set it; goes to a public page that exists, else /; inside a frame it stays and says so')
     out(`  (the first exchange and render took ${firstRenderMs} ms here, cold; a laptop observation, not Cloudflare's)`)
   }
+} catch (error) {
+  // An answer so far from the expected one that the check couldn't go on: still a failure, after the ones above.
+  fail('check', `stopped early: ${error instanceof Error ? error.stack : error}`)
 } finally {
   await colophon.close()
 }
