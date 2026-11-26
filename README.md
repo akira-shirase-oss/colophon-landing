@@ -125,6 +125,37 @@ They are held to a performance budget (maintainer: "always top notch performance
   `dist/_headers`: mobile, the median of five runs, LCP at most 2.0 s, CLS 0, TBT at most 150 ms with the page's own script work at most 50 ms, Performance at least 95,
   SEO 100 and Accessibility 100. CI runner numbers are lab observations; a regression past a threshold fails.
 
+## Content comes from Colophon
+
+The site's words are entries in a Colophon project, edited and published in the Studio; the build reads them
+from the public delivery API (no credential) and prints plain HTML, as before.
+
+| In the Studio | Collection | What it is on the site |
+|---|---|---|
+| **Blog posts** | `posts` | `/blog/<URL name>/`, the blog index and the feed |
+| **Pages** | `pages` | comparisons, features, use cases, guides and each section's index, by **Kind** |
+| **Home page** | `home` (one entry) | the title and description, the hero, the benefit cards, the questions, the closing statement |
+| **Site settings** | `site` (one entry) | the status line under every post's title |
+
+- `cms/content-types.json` holds the four content types; `scripts/cms-seed.mjs` creates them and one draft per
+  entry in an empty project (it only creates, and never publishes).
+- `src/lib/colophon.ts` reads the delivery API: every read of one build names the same release, a failed read
+  fails the build, and nothing is cached between builds. `src/content.config.ts` turns the entries into the
+  `blog`, `pages`, `home` and `site` collections and checks each against the same schema as before, so an
+  entry the page can't hold (a title that is too long, a missing description) fails the build and the live
+  site stays on the last good release.
+- Every page's `<head>` carries `<meta name="colophon-generation" content="N">`: the release it was built
+  from. A Colophon **site check** pointed at the home page reads it, so a release's receipt says **Verified**
+  only once the rebuilt site is live.
+- The project is named in `src/lib/colophon.ts`; `COLOPHON_PROJECT`, `COLOPHON_API` and `COLOPHON_ENVIRONMENT`
+  point a build at another project, server or environment. The Markdown in `src/content` and the words in
+  `src/data/home.ts` are the copy the project was seeded from on 26 November 2026: nothing reads them unless a
+  build sets `COLOPHON_PROJECT=` (empty), which builds from them and prints no marker. Edit the site in the
+  Studio, not there.
+- A deploy is a build, the checks and an upload, with the app's address so the header links to it:
+  `PUBLIC_APP_URL=https://colophonapp.404human.dev npm run build`, `npm run check` with the same variable,
+  then `wrangler pages deploy dist`. Publishing in the Studio doesn't rebuild the site by itself yet.
+
 ## Security headers and checks
 
 `public/_headers` holds the headers Cloudflare Pages sends with every response: a Content-Security-Policy,

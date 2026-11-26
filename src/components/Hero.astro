@@ -1,8 +1,11 @@
 ---
 import ArrowButton from './ui/ArrowButton.astro'
-import { hero } from '../data/hero'
+import { homeCopy } from '../lib/home'
 import { QUICK_START } from '../data/app'
 import styles from './Hero.module.css'
+
+const copy = await homeCopy()
+const hero = { headline: copy.hero_headline, description: copy.hero_description }
 
 // Eight Colophon ideas as quiet line icons around the edges (lucide, stroke 1.5), placed outside the clear zone
 // around the words. x/y are the icon's centre in the card, s its size, r its resting turn; `phone` marks the four

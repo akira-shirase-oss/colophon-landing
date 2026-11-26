@@ -1,0 +1,452 @@
+{
+  "posts": {
+    "name": "Blog posts",
+    "title_field": "title",
+    "fields": [
+      {
+        "id": "title",
+        "label": "Title",
+        "type": "text",
+        "required": true,
+        "max_chars": 49,
+        "description": "At most 49 characters: the page adds \" | Colophon\", and the whole title stays within 60."
+      },
+      {
+        "id": "slug",
+        "label": "URL name",
+        "type": "slug",
+        "required": true,
+        "source": "title",
+        "description": "The post's address: /blog/<URL name>/. Changing it changes the address.",
+        "index": true
+      },
+      {
+        "id": "description",
+        "label": "Description",
+        "type": "text",
+        "required": true,
+        "min_chars": 120,
+        "max_chars": 155,
+        "description": "120 to 155 characters: what the post teaches. Shown in search results and on the blog index."
+      },
+      {
+        "id": "pub_date",
+        "label": "Published on",
+        "type": "date",
+        "required": true,
+        "index": true
+      },
+      {
+        "id": "updated_date",
+        "label": "Last updated",
+        "type": "date"
+      },
+      {
+        "id": "tags",
+        "label": "Tags",
+        "type": "list",
+        "of": {
+          "type": "text",
+          "max_chars": 40
+        },
+        "max": 12
+      },
+      {
+        "id": "glossary",
+        "label": "Glossary post",
+        "type": "boolean",
+        "description": "On: every <h3 id=\"…\"> term in the body also becomes structured data for search engines."
+      },
+      {
+        "id": "status",
+        "label": "Status note",
+        "type": "text",
+        "max_chars": 300,
+        "description": "One sentence on what is still missing for this post's topic, shown after the shared status line."
+      },
+      {
+        "id": "body",
+        "label": "Body",
+        "type": "markdown",
+        "required": true,
+        "max_chars": 100000,
+        "description": "Markdown. Headings start at ##; tables and code blocks work."
+      }
+    ]
+  },
+  "pages": {
+    "name": "Pages",
+    "title_field": "title",
+    "fields": [
+      {
+        "id": "kind",
+        "label": "Kind",
+        "type": "enum",
+        "required": true,
+        "index": true,
+        "values": [
+          "compare",
+          "use-case",
+          "feature",
+          "guide",
+          "hub"
+        ],
+        "description": "Decides the address: compare → /compare/<URL name>/; use-case → /use-cases/…; feature → /features/…; guide → /guides/…; hub → /<URL name>/ (a section's index)."
+      },
+      {
+        "id": "title",
+        "label": "Title",
+        "type": "text",
+        "required": true,
+        "max_chars": 49,
+        "description": "At most 49 characters: the page adds \" | Colophon\", and the whole title stays within 60."
+      },
+      {
+        "id": "slug",
+        "label": "URL name",
+        "type": "slug",
+        "required": true,
+        "source": "title",
+        "index": true
+      },
+      {
+        "id": "description",
+        "label": "Description",
+        "type": "text",
+        "required": true,
+        "min_chars": 120,
+        "max_chars": 155,
+        "description": "120 to 155 characters. Shown in search results."
+      },
+      {
+        "id": "target_query",
+        "label": "Search it answers",
+        "type": "text",
+        "required": true,
+        "min_chars": 3,
+        "max_chars": 200,
+        "description": "The search this page is written for. Recorded, not shown."
+      },
+      {
+        "id": "pub_date",
+        "label": "Published on",
+        "type": "date",
+        "required": true,
+        "index": true
+      },
+      {
+        "id": "updated_date",
+        "label": "Last updated",
+        "type": "date"
+      },
+      {
+        "id": "facts_checked",
+        "label": "Facts checked on",
+        "type": "date",
+        "description": "Comparisons: the day every competitor fact on the page was checked against the vendor's own pages."
+      },
+      {
+        "id": "related",
+        "label": "Read next",
+        "type": "list",
+        "required": true,
+        "max": 12,
+        "description": "At least three pages to read next, on this site or the docs.",
+        "of": {
+          "type": "object",
+          "fields": [
+            {
+              "id": "href",
+              "label": "Address",
+              "type": "text",
+              "required": true,
+              "max_chars": 2048,
+              "description": "A path on this site, such as /features/, or a full https address."
+            },
+            {
+              "id": "text",
+              "label": "Link text",
+              "type": "text",
+              "required": true,
+              "max_chars": 200
+            }
+          ]
+        }
+      },
+      {
+        "id": "faq",
+        "label": "Questions and answers",
+        "type": "list",
+        "max": 20,
+        "of": {
+          "type": "object",
+          "fields": [
+            {
+              "id": "q",
+              "label": "Question",
+              "type": "text",
+              "required": true,
+              "min_chars": 5,
+              "max_chars": 300
+            },
+            {
+              "id": "a",
+              "label": "Answer",
+              "type": "text",
+              "required": true,
+              "min_chars": 20,
+              "max_chars": 1000
+            }
+          ]
+        }
+      },
+      {
+        "id": "status",
+        "label": "Status note",
+        "type": "text",
+        "max_chars": 300
+      },
+      {
+        "id": "body",
+        "label": "Body",
+        "type": "markdown",
+        "required": true,
+        "max_chars": 100000,
+        "description": "Markdown. Headings start at ##; tables and code blocks work."
+      }
+    ]
+  },
+  "home": {
+    "name": "Home page",
+    "title_field": "seo_title",
+    "single": true,
+    "fields": [
+      {
+        "id": "seo_title",
+        "label": "Page title",
+        "type": "text",
+        "required": true,
+        "max_chars": 60,
+        "description": "The browser tab and search result title. What people search for first, the brand last."
+      },
+      {
+        "id": "seo_description",
+        "label": "Page description",
+        "type": "text",
+        "required": true,
+        "min_chars": 120,
+        "max_chars": 155
+      },
+      {
+        "id": "hero_headline",
+        "label": "Headline",
+        "type": "text",
+        "required": true,
+        "max_chars": 60
+      },
+      {
+        "id": "hero_description",
+        "label": "Sentence under the headline",
+        "type": "text",
+        "required": true,
+        "max_chars": 300
+      },
+      {
+        "id": "benefits",
+        "label": "Benefit cards",
+        "type": "list",
+        "required": true,
+        "max": 9,
+        "of": {
+          "type": "object",
+          "fields": [
+            {
+              "id": "title",
+              "label": "Title",
+              "type": "text",
+              "required": true,
+              "max_chars": 40
+            },
+            {
+              "id": "line_one",
+              "label": "First line",
+              "type": "text",
+              "required": true,
+              "max_chars": 120
+            },
+            {
+              "id": "line_two",
+              "label": "Second line",
+              "type": "text",
+              "required": true,
+              "max_chars": 120
+            },
+            {
+              "id": "tag",
+              "label": "Tag",
+              "type": "text",
+              "required": true,
+              "max_chars": 30
+            },
+            {
+              "id": "tone",
+              "label": "Tag colour",
+              "type": "enum",
+              "required": true,
+              "values": [
+                "brand",
+                "live",
+                "changed"
+              ]
+            },
+            {
+              "id": "icon",
+              "label": "Icon",
+              "type": "enum",
+              "required": true,
+              "values": [
+                "file-check",
+                "dice",
+                "history",
+                "receipt",
+                "shield-check",
+                "bot"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "faq",
+        "label": "Questions and answers",
+        "type": "list",
+        "required": true,
+        "max": 12,
+        "of": {
+          "type": "object",
+          "fields": [
+            {
+              "id": "q",
+              "label": "Question",
+              "type": "text",
+              "required": true,
+              "min_chars": 5,
+              "max_chars": 200
+            },
+            {
+              "id": "a",
+              "label": "Answer",
+              "type": "text",
+              "required": true,
+              "min_chars": 20,
+              "max_chars": 600
+            }
+          ]
+        }
+      },
+      {
+        "id": "statement_heading",
+        "label": "Closing statement: heading",
+        "type": "text",
+        "required": true,
+        "max_chars": 60
+      },
+      {
+        "id": "statement",
+        "label": "Closing statement: parts",
+        "type": "list",
+        "required": true,
+        "max": 8,
+        "description": "One sentence in parts. Each part is some words, then the word its illustration sits after, the illustration, and any punctuation.",
+        "of": {
+          "type": "object",
+          "fields": [
+            {
+              "id": "lead",
+              "label": "Words before",
+              "type": "text",
+              "required": true,
+              "max_chars": 120
+            },
+            {
+              "id": "word",
+              "label": "Word with the illustration",
+              "type": "text",
+              "required": true,
+              "max_chars": 30
+            },
+            {
+              "id": "icon",
+              "label": "Illustration",
+              "type": "enum",
+              "required": true,
+              "values": [
+                "pen",
+                "people",
+                "stamp",
+                "receipt",
+                "globe"
+              ]
+            },
+            {
+              "id": "after",
+              "label": "Punctuation after",
+              "type": "text",
+              "max_chars": 3
+            }
+          ]
+        }
+      },
+      {
+        "id": "statement_link_text",
+        "label": "Closing statement: link text",
+        "type": "text",
+        "required": true,
+        "max_chars": 60
+      },
+      {
+        "id": "statement_link_href",
+        "label": "Closing statement: link address",
+        "type": "url",
+        "required": true
+      }
+    ]
+  },
+  "site": {
+    "name": "Site settings",
+    "title_field": "name",
+    "single": true,
+    "fields": [
+      {
+        "id": "name",
+        "label": "Name",
+        "type": "text",
+        "required": true,
+        "max_chars": 60,
+        "description": "What this entry is called in the Studio. Not shown on the site."
+      },
+      {
+        "id": "status_line",
+        "label": "Status line",
+        "type": "text",
+        "required": true,
+        "max_chars": 300,
+        "description": "Shown under every post's title: what Colophon is today, in plain words."
+      },
+      {
+        "id": "version",
+        "label": "Version it speaks of",
+        "type": "text",
+        "required": true,
+        "max_chars": 40
+      },
+      {
+        "id": "status_checked",
+        "label": "Checked on",
+        "type": "date",
+        "required": true,
+        "description": "The day the status line was last checked against Colophon's main branch."
+      }
+    ]
+  }
+}

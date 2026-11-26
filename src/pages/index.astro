@@ -7,11 +7,11 @@ import FAQ from '../components/FAQ.astro'
 import Integrations from '../components/Integrations.astro'
 import CTA from '../components/CTA.astro'
 import Footer from '../components/Footer.astro'
-import { HOME } from '../lib/site-map'
+import { homePage } from '../lib/site-map'
 
 // What people search for comes first in the title (the brand last, as on every other page); the
 // visible headline stays the hero's. Every claim in the description is built and tested.
-const { title, description } = HOME
+const { title, description } = await homePage()
 const site = Astro.site!.href
 const REPO = 'https://github.com/akira-shirase-oss/colophon-cms'
 // The project (never a person) is the organisation; the docs refer to it by this @id.
