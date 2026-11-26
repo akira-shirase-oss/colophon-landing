@@ -1,3 +1,4 @@
+import { homeCopy } from './home'
 import { posts } from './posts'
 import { pathOf, seoPages } from './pages'
 
@@ -15,12 +16,11 @@ const SECTION_OF = { compare: 'Comparisons', 'use-case': 'Use cases', feature: '
 
 // Pages built by src/pages rather than from a collection. Those pages take their title and description from
 // here, so the sitemap, llms.txt and the page itself say the same thing.
-export const HOME = {
-  path: '/',
-  title: 'Open-source headless CMS with publish receipts | Colophon',
-  description:
-    'Open-source headless CMS in Rust and Svelte: every publish is a numbered release with a receipt, rollbacks are reviewed, and roles reach each field.',
-} as const
+/** The home page's title and description: the `home` entry's, so the page, the sitemap and llms.txt agree. */
+export async function homePage() {
+  const copy = await homeCopy()
+  return { path: '/', title: copy.seo_title, description: copy.seo_description } as const
+}
 export const BLOG = {
   path: '/blog/',
   title: 'Colophon blog: publishing, releases and proof',
@@ -45,7 +45,7 @@ export async function listedPages(): Promise<ListedPage[]> {
   // The blog index changes whenever a post is published or updated.
   const newest = list.map((p) => changed(p.data)).reduce<Date | undefined>((a, d) => (a && a >= d ? a : d), undefined)
   return [
-    { ...HOME, section: 'Start here' },
+    { ...(await homePage()), section: 'Start here' },
     { ...BLOG, section: 'Blog', lastmod: newest },
     ...pages.map((p) => ({
       path: pathOf(p),

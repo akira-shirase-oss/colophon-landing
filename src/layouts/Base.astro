@@ -3,7 +3,10 @@
 // optional structured data. Pages pass their own preloads through the `head` slot.
 import '../styles/global.css'
 import { jsonLd } from '../lib/json-ld'
-import { hero } from '../data/hero'
+import { homeCopy } from '../lib/home'
+import { getEntry } from 'astro:content'
+
+const hero = { headline: (await homeCopy()).hero_headline }
 
 type Props = {
   title: string
@@ -34,6 +37,8 @@ const {
 } = Astro.props
 const canonical = new URL(Astro.url.pathname, Astro.site)
 const imageUrl = new URL(image, Astro.site)
+// The Colophon release this build was made from (src/content.config.ts); 0 when there is none to name.
+const generation = (await getEntry('build', 'current'))?.data.generation ?? 0
 const ld = structured ? (Array.isArray(structured) ? structured : [structured]) : []
 ---
 
@@ -49,6 +54,7 @@ const ld = structured ? (Array.isArray(structured) ? structured : [structured]) 
          "1"; D-200), which swaps Sign in and Sign up for Dashboard. Nothing is fetched. Hash-allowed in _headers. -->
     <script is:inline>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}try{var r=document.documentElement,m=matchMedia('(prefers-color-scheme: dark)'),f=function(){r.classList.toggle('dark',r.dataset.theme?r.dataset.theme==='dark':m.matches)};f();m.addEventListener('change',f);new MutationObserver(f).observe(r,{attributes:true,attributeFilter:['data-theme']})}catch(e){}try{if(document.cookie.split('; ').indexOf('colophon_signed_in=1')>=0)document.documentElement.dataset.session='in'}catch(e){}</script>
     <title>{title}</title>
+    {generation > 0 && <meta name="colophon-generation" content={String(generation)} />}
     <meta name="description" content={description} />
     {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <meta property="og:type" content={type} />

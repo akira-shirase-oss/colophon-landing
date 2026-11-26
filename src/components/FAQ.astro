@@ -3,30 +3,10 @@ import Badge from './ui/Badge.astro'
 import Button from './ui/Button.astro'
 import MaskIcon from './ui/MaskIcon.astro'
 import { jsonLd } from '../lib/json-ld'
+import { homeCopy } from '../lib/home'
 import styles from './FAQ.module.css'
 
-const faqs = [
-  {
-    q: 'What is Colophon?',
-    a: "A content management system for writing, reviewing and publishing a website's articles, built so you always know which version readers are seeing.",
-  },
-  {
-    q: 'Why is it called Colophon?',
-    a: 'Printed books end with a colophon: a short note on how, when and by whom the book was made. Colophon gives a website that same kind of record.',
-  },
-  {
-    q: 'Can AI agents and scripts use it?',
-    a: 'Yes. An AI app connects by signing in, acts with your role and asks you before anything that publishes. Scripts use scoped tokens with spending caps and request quotas, and nothing they submit can be approved by another token.',
-  },
-  {
-    q: 'What happens if it crashes mid-publish?',
-    a: 'Your saved work survives, and the half-finished publish never reaches readers. Crash recovery is tested on every change.',
-  },
-  {
-    q: 'Can I use it for my site today?',
-    a: 'Yes, in alpha. Anyone can sign up for the hosted service and publish, or run it on their own server. It is built in public by one person, and the stability promises of v0.1 come next.',
-  },
-]
+const faqs = (await homeCopy()).faq
 
 // FAQPage structured data: lets search engines show these answers directly in results.
 const faq = {
