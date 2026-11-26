@@ -3,7 +3,7 @@
 // a draft preview checks the draft with the same ones (src/lib/preview), so a preview can only show what a
 // build would accept.
 import { z } from 'astro/zod'
-import { BENEFIT_ICONS, BENEFIT_TONES, STATEMENT_ICONS } from '../data/home'
+import { BENEFIT_ICONS, BENEFIT_TONES, STATEMENT_ICONS } from '../data/home.ts'
 
 /** Colophon stores no empty values: a field left blank is absent (or null), which the schema reads as unset. */
 const set = (content: Record<string, unknown>, field: string) => {

@@ -14,7 +14,9 @@
     "check:app": "PUBLIC_APP_URL=https://app.example.test sh -c 'astro build --outDir dist-app && node scripts/check-dist.mjs dist-app && node scripts/check-csp-browser.mjs --dist dist-app'"
   },
   "dependencies": {
-    "astro": "7.4.12"
+    "astro": "7.4.12",
+    "github-slugger": "2.0.0",
+    "marked": "18.3.0"
   },
   "devDependencies": {
     "oxlint": "^1.90.0",
