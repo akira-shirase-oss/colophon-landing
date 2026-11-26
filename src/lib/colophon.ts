@@ -2,14 +2,20 @@
 // Colophon project, edited and published in the Studio. Published content is public, so there is no credential
 // here. Every read of one build names the same release, so a publish that lands mid-build can't mix two.
 
-/** Where the content lives. All three are public values; the environment can point a build somewhere else. */
+/** The site's own project on the hosted service. An id, not a secret: published content is public. */
+const SITE_PROJECT = '01a2093b-bd4e-77e8-a5da-06ab1634576f'
+
+/**
+ * Where the content lives. All three are public values; the environment can point a build somewhere else
+ * (another server, a copy of the project), and `COLOPHON_PROJECT=` (empty) reads the Markdown files instead.
+ */
 export const source = {
   api: (process.env.COLOPHON_API ?? 'https://colophonapp.404human.dev').replace(/\/+$/, ''),
-  project: process.env.COLOPHON_PROJECT ?? '',
+  project: process.env.COLOPHON_PROJECT ?? SITE_PROJECT,
   environment: process.env.COLOPHON_ENVIRONMENT ?? 'production',
 }
 
-/** Whether this build reads Colophon. Without a project it reads the Markdown files in src/content. */
+/** Whether this build reads Colophon. With an empty project it reads the Markdown files in src/content. */
 export const fromColophon = source.project !== ''
 
 /** One published entry, as the delivery API answers it. */

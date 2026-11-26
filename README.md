@@ -147,9 +147,14 @@ from the public delivery API (no credential) and prints plain HTML, as before.
 - Every page's `<head>` carries `<meta name="colophon-generation" content="N">`: the release it was built
   from. A Colophon **site check** pointed at the home page reads it, so a release's receipt says **Verified**
   only once the rebuilt site is live.
-- `COLOPHON_PROJECT` (the project's id) turns this on; `COLOPHON_API` and `COLOPHON_ENVIRONMENT` default to
-  the hosted service and `production`. Without `COLOPHON_PROJECT` the build reads `src/content/*.md` and
-  `src/data/home.ts` instead, and prints no marker.
+- The project is named in `src/lib/colophon.ts`; `COLOPHON_PROJECT`, `COLOPHON_API` and `COLOPHON_ENVIRONMENT`
+  point a build at another project, server or environment. The Markdown in `src/content` and the words in
+  `src/data/home.ts` are the copy the project was seeded from on 26 November 2026: nothing reads them unless a
+  build sets `COLOPHON_PROJECT=` (empty), which builds from them and prints no marker. Edit the site in the
+  Studio, not there.
+- A deploy is a build, the checks and an upload, with the app's address so the header links to it:
+  `PUBLIC_APP_URL=https://colophonapp.404human.dev npm run build`, `npm run check` with the same variable,
+  then `wrangler pages deploy dist`. Publishing in the Studio doesn't rebuild the site by itself yet.
 
 ## Security headers and checks
 
