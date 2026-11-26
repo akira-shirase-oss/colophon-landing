@@ -42,8 +42,11 @@
   --font-text: var(--font-sans);
   --font-code: var(--font-mono);
   /* Printing, like a receipt printer, row by row: the hero's title, once at load (nothing waits for a scroll).
-     600ms a printed line; a line of Geist Pixel at line-height 1.1 is 29 pixel rows. */
+     600ms a printed line, and never longer than --print-most in all: the title's words come from the site's
+     Colophon project, so a long one that wraps to four lines on a phone prints faster, not for 2.4 s. A line of
+     Geist Pixel at line-height 1.1 is 29 pixel rows. */
   --print-line: 600ms;
+  --print-most: 1200ms;
   --print-rows: 29;
 
   /* One easing curve for every transition; --spring is kept as an alias for older rules */
@@ -298,7 +301,7 @@ figcaption {
 }
 @media (prefers-reduced-motion: no-preference) {
   [data-print-title][data-print='go'] {
-    animation: print calc(var(--print-line) * var(--print-lines, 1)) steps(var(--print-steps, 29), end);
+    animation: print min(calc(var(--print-line) * var(--print-lines, 1)), var(--print-most)) steps(var(--print-steps, 29), end);
   }
 }
 .visually-hidden {
