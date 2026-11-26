@@ -73,6 +73,10 @@ jobs:
         env:
           LEAK_SCAN_NAMES: ${{ secrets.LEAK_SCAN_NAMES }}
         run: npm run check
+      # Before the upload, while the live site is still the old one: the pages this deploy changes.
+      - name: Which pages differ from the live site
+        if: steps.credentials.outputs.set == 'true'
+        run: node scripts/changed-pages.mjs --out "$RUNNER_TEMP/changed-urls.txt"
       # wrangler isn't a dependency of the site (nothing ships it); one pinned version, as CI does for Playwright.
       - name: Upload to Cloudflare Pages
         if: steps.credentials.outputs.set == 'true'
@@ -83,3 +87,7 @@ jobs:
           set -euo pipefail
           npm install --no-save --no-package-lock wrangler@4.159.0
           npx wrangler pages deploy dist --project-name colophon-landing --branch main
+      # Search engines are told which pages changed (IndexNow). It never fails the deploy.
+      - name: Tell search engines which pages changed
+        if: steps.credentials.outputs.set == 'true'
+        run: node scripts/indexnow.mjs --urls-file "$RUNNER_TEMP/changed-urls.txt"
