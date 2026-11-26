@@ -1,6 +1,6 @@
 ---
 // The closing statement: one sentence in display-size Inter on the page itself, with small pixel-art
-// illustrations between the words, and the build log link under it. The words are the `home` entry's (src/lib/home.ts).
+// illustrations between the words, and the build log link under it. The words are the `home` entry's, handed in by the page.
 //
 // The one scroll effect on the site (the maintainer's call, 2026-11-19): the sentence is readable at rest in
 // --muted-foreground (4.5:1 or more, never hidden), and the first time it comes into view its words brighten to
@@ -9,10 +9,11 @@
 // the sentence is simply --foreground and nothing moves. One IntersectionObserver, for this section only, and it
 // disconnects after it fires. scripts/check-dist.mjs and check-csp-browser.mjs hold it to exactly that.
 import PixelArt from './ui/PixelArt.astro'
-import { homeCopy } from '../lib/home'
+import type { HomeCopy } from '../lib/schemas'
 import styles from './CTA.module.css'
 
-const copy = await homeCopy()
+type Props = { copy: Pick<HomeCopy, 'statement_heading' | 'statement' | 'statement_link_text' | 'statement_link_href'> }
+const { copy } = Astro.props
 // A lead is stored without its outer spaces (Colophon keeps none at a text's ends): each part starts one space
 // after the part before it, and its lead ends with the space before its word.
 const statement = {

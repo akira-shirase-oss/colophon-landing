@@ -32,6 +32,7 @@ const FILES = [
   'src/components/Blog.module.css',
   'src/pages/blog/index.astro',
   'src/pages/blog/[...slug].astro',
+  'src/layouts/Post.astro',
   'src/pages/404.astro',
 ]
 

@@ -13,3 +13,15 @@ export async function siteCopy() {
   if (!entry) throw new Error('the site entry is missing')
   return entry.data
 }
+
+/**
+ * What every built page's document needs from the published words: the share image's alt text (it names the
+ * home page's headline) and the release this build read. The layouts in src/layouts take these as props, so a
+ * draft preview can hand them its own.
+ */
+export async function published() {
+  return {
+    imageAlt: `Colophon: ${(await homeCopy()).hero_headline}`,
+    generation: (await getEntry('build', 'current'))?.data.generation ?? 0,
+  }
+}

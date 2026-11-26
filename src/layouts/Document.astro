@@ -1,0 +1,79 @@
+---
+// Every page's <head>: title, description, canonical URL, Open Graph and Twitter cards, feeds, and
+// optional structured data. It reads nothing itself: the words it needs arrive as props, so the same
+// document serves a built page (Base.astro gives it the published words) and a draft preview (which gives
+// it the draft's). Pages pass their own preloads through the `head` slot; the `bar` slot is the first thing
+// in <body>, used only by draft previews.
+import '../styles/global.css'
+import { jsonLd } from '../lib/json-ld'
+
+export type Props = {
+  title: string
+  description: string
+  /** og:type: `website` for pages, `article` for posts */
+  type?: 'website' | 'article'
+  /** share image path under public/, 1200 × 630 */
+  image?: string
+  /** what the share image shows, for og:image:alt and twitter:image:alt */
+  imageAlt: string
+  published?: Date
+  modified?: Date
+  /** keep the page out of search results: no canonical URL, `robots: noindex` (the 404 page, drafts) */
+  noindex?: boolean
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[]
+  /** The Colophon release the page was built from (src/content.config.ts); 0 when there is none to name. */
+  generation: number
+}
+
+const { title, description, type = 'website', image = '/og.jpg', imageAlt, published, modified, noindex = false, jsonLd: structured, generation } = Astro.props
+const canonical = new URL(Astro.url.pathname, Astro.site)
+const imageUrl = new URL(image, Astro.site)
+const ld = structured ? (Array.isArray(structured) ? structured : [structured]) : []
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <!-- Before the first paint: a stored Light or Dark choice (else the device's setting decides), shown as
+         .dark on <html>, the class Colophon's design tokens switch on (D-210) and kept in step with the choice
+         and the device's setting from then on; and whether the app's hint cookie says someone is signed in (colophon_signed_in, exactly
+         "1"; D-200), which swaps Sign in and Sign up for Dashboard. Nothing is fetched. Hash-allowed in _headers. -->
+    <script is:inline>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}try{var r=document.documentElement,m=matchMedia('(prefers-color-scheme: dark)'),f=function(){r.classList.toggle('dark',r.dataset.theme?r.dataset.theme==='dark':m.matches)};f();m.addEventListener('change',f);new MutationObserver(f).observe(r,{attributes:true,attributeFilter:['data-theme']})}catch(e){}try{if(document.cookie.split('; ').indexOf('colophon_signed_in=1')>=0)document.documentElement.dataset.session='in'}catch(e){}</script>
+    <title>{title}</title>
+    {generation > 0 && <meta name="colophon-generation" content={String(generation)} />}
+    <meta name="description" content={description} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content="Colophon" />
+    {!noindex && <meta property="og:url" content={canonical} />}
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
+    {published && <meta property="article:published_time" content={published.toISOString()} />}
+    {modified && <meta property="article:modified_time" content={modified.toISOString()} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+    <!-- Every page's title is set in Geist Pixel, and on the home page it is the largest paint. Inter sets every
+         word under it: preloaded too, so a late swap can't re-wrap a centred paragraph (a layout shift). -->
+    <link rel="preload" href="/fonts/geist-pixel-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title="Colophon blog" href="/rss.xml" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <slot name="head" />
+    {ld.map((data) => <script type="application/ld+json" set:html={jsonLd(data)} />)}
+  </head>
+  <body>
+    <slot name="bar" />
+    <slot />
+  </body>
+</html>

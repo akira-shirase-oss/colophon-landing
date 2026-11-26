@@ -8,5 +8,4 @@ export async function posts(): Promise<Post[]> {
   return all.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
 }
 
-export const formatDate = (d: Date) =>
-  d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
+export { formatDate } from './dates'

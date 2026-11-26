@@ -1,135 +1,16 @@
 ---
-// The one layout for every page in src/content/pages (comparisons first; features, use cases, guides and hubs
-// later). Built only from what a blog post already uses: Base, Nav, Footer, Status and the classes of
-// Blog.module.css, so it adds no visual element, no stylesheet and no script of its own. The FAQ and the
-// related links come from frontmatter and are drawn as the post prose draws headings, paragraphs and lists.
+// A published page of the `pages` collection (src/content.config.ts) in the one layout they all share,
+// src/layouts/Page.astro: its fields, its rendered body, and the published words the document needs.
 import { render } from 'astro:content'
-import Base from './Base.astro'
-import Nav from '../components/Nav.astro'
-import Footer from '../components/Footer.astro'
-import Status from '../components/Status.astro'
-import styles from '../components/Blog.module.css'
-import { formatDate } from '../lib/posts'
-import { pathOf, type SeoPage } from '../lib/pages'
+import PageLayout from './Page.astro'
+import { published, siteCopy } from '../lib/home'
+import type { SeoPage } from '../lib/pages'
 
 type Props = { page: SeoPage }
 const { page } = Astro.props
 const { Content } = await render(page)
-const { title, description, pubDate, updatedDate, factsChecked, related, faq, draft } = page.data
-const site = Astro.site!.href
-// Shown as "Last updated" and sent as dateModified: one value, so the label and the structured data agree.
-const modified = updatedDate ?? pubDate
-// Each kind's section index: the breadcrumb above the page and the back link. A hub goes back to the home page.
-const HUB = {
-  compare: { name: 'Comparisons', href: '/compare/', text: '← All comparisons' },
-  'use-case': { name: 'Use cases', href: '/use-cases/', text: '← All use cases' },
-  feature: { name: 'Features', href: '/features/', text: '← All features' },
-  guide: { name: 'Guides', href: '/guides/', text: '← All guides' },
-} as const satisfies Record<Exclude<SeoPage['data']['kind'], 'hub'>, { name: string; href: string; text: string }>
-const back = page.data.kind === 'hub' ? { href: '/', text: '← Colophon home' } : HUB[page.data.kind]
-const url = new URL(pathOf(page), site).href
-const organization = { '@id': `${site}#organization` }
-
-// Structured data, built as objects from frontmatter and serialised by Base through jsonLd().
-const article = {
-  '@context': 'https://schema.org',
-  '@type': 'Article',
-  headline: title,
-  description,
-  datePublished: pubDate.toISOString(),
-  dateModified: modified.toISOString(),
-  mainEntityOfPage: url,
-  url,
-  inLanguage: 'en',
-  image: new URL('/og.jpg', site).href,
-  author: { '@type': 'Organization', ...organization, name: 'Colophon CMS', url: site },
-  publisher: { '@type': 'Organization', ...organization, name: 'Colophon CMS', url: site },
-}
-const breadcrumbs = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { name: 'Colophon', item: site },
-    ...(page.data.kind === 'hub' ? [] : [{ name: HUB[page.data.kind].name, item: new URL(HUB[page.data.kind].href, site).href }]),
-    { name: title },
-  ].map((crumb, i) => ({ '@type': 'ListItem', position: i + 1, ...crumb })),
-}
-const faqPage =
-  faq.length > 0
-    ? {
-        '@context': 'https://schema.org',
-        '@type': 'FAQPage',
-        mainEntity: faq.map(({ q, a }) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
-      }
-    : undefined
-const jsonLd = [article, breadcrumbs, ...(faqPage ? [faqPage] : [])]
 ---
 
-<Base
-  title={`${title} | Colophon`}
-  description={description}
-  type="article"
-  published={pubDate}
-  modified={modified}
-  noindex={draft}
-  jsonLd={jsonLd}
->
-  <div style="display: flex; flex-direction: column; align-items: center; overflow: clip;">
-    <Nav />
-    <main class={styles.page}>
-      <article class={styles.column}>
-        {
-          <a class={styles.back} href={back.href}>
-            {back.text}
-          </a>
-        }
-        <header class={styles.postHead}>
-          <span class={styles.stamp}>
-            Published <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time> · Last updated{' '}
-            <time datetime={modified.toISOString()}>{formatDate(modified)}</time>
-            {
-              factsChecked && (
-                <span>
-                  · Facts checked <time datetime={factsChecked.toISOString()}>{formatDate(factsChecked)}</time>
-                </span>
-              )
-            }
-          </span>
-          <h1 class={styles.postTitle}>{title}</h1>
-          <p class={styles.desc}>{description}</p>
-          <Status note={page.data.status} />
-        </header>
-        <div class={styles.prose}>
-          <Content />
-          {
-            faq.length > 0 && (
-              <>
-                <h2 id="faq">FAQ</h2>
-                {faq.map(({ q, a }) => (
-                  <>
-                    <h3>{q}</h3>
-                    <p>{a}</p>
-                  </>
-                ))}
-              </>
-            )
-          }
-          <h2 id="read-next">Read next</h2>
-          <ul>
-            {related.map(({ href, text }) => (
-              <li>
-                <a href={href}>{text}</a>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <footer class={styles.foot}>
-          <a href="/blog/">More posts</a>
-          <a href="https://404human.dev/colophon/">The build log</a>
-          <a href="https://github.com/akira-shirase-oss/colophon-cms">Source on GitHub</a>
-        </footer>
-      </article>
-    </main>
-    <Footer />
-  </div>
-</Base>
+<PageLayout id={page.id} data={page.data} statusLine={(await siteCopy()).status_line} {...await published()}>
+  <Content />
+</PageLayout>

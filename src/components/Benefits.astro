@@ -2,8 +2,11 @@
 import Badge from './ui/Badge.astro'
 import Card from './ui/Card.astro'
 import { BENEFIT_ICONS } from '../data/home'
-import { homeCopy } from '../lib/home'
+import type { HomeCopy } from '../lib/schemas'
 import styles from './Benefits.module.css'
+
+type Props = { copy: Pick<HomeCopy, 'benefits'> }
+const { copy } = Astro.props
 
 // The icons a card can name (lucide-style, one stroke): the words and the choice of icon and tone are the `home`
 // entry's; the drawings stay here.
@@ -15,7 +18,7 @@ const ICONS: Record<(typeof BENEFIT_ICONS)[number], string> = {
   'shield-check': '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
   'bot': '<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>',
 }
-const cards = (await homeCopy()).benefits.map((c) => ({ title: c.title, lines: [c.line_one, c.line_two], tag: c.tag, tone: c.tone, icon: ICONS[c.icon] }))
+const cards = copy.benefits.map((c) => ({ title: c.title, lines: [c.line_one, c.line_two], tag: c.tag, tone: c.tone, icon: ICONS[c.icon] }))
 ---
 
 <section class={styles.section} id="benefits">

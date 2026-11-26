@@ -1,0 +1,110 @@
+---
+// A blog post's page, from its words alone: nothing here reads the content store. /blog/<slug>/ renders it
+// with a published post (src/pages/blog/[...slug].astro) and a draft preview with a draft
+// (src/pages/preview/posts/[id].astro), so the two can't drift. The body arrives as the default slot.
+import Document from './Document.astro'
+import Nav from '../components/Nav.astro'
+import Footer from '../components/Footer.astro'
+// Badge before Status, on purpose: Astro orders a page's stylesheets by where their imports sit, and the
+// badge's rules must stay ahead of the blog's (which Status imports too), as they were before this layout
+// was split from the page. The public-pages diff in the README's "Draft preview" section catches a change.
+import Badge from '../components/ui/Badge.astro'
+import Status from '../components/Status.astro'
+import styles from '../components/Blog.module.css'
+import { formatDate } from '../lib/dates'
+import { glossaryTerms } from '../lib/glossary'
+import type { PostData } from '../lib/schemas'
+
+type Props = {
+  /** The post's URL name: /blog/<id>/. */
+  id: string
+  data: PostData
+  /** The body's Markdown source: a glossary post's terms are read from it. */
+  source: string
+  /** The `site` entry's status line, shown under the title. */
+  statusLine: string
+  imageAlt: string
+  generation: number
+  /** Keep the page out of search results whatever the post says (a draft preview). */
+  noindex?: boolean
+}
+
+const { id, data, source, statusLine, imageAlt, generation, noindex } = Astro.props
+const { title, description, pubDate, updatedDate, draft, tags } = data
+// Shown as "Last updated" and sent as dateModified: one value, so the label and the structured data agree.
+const modified = updatedDate ?? pubDate
+const url = new URL(`/blog/${id}/`, Astro.site).href
+const posting = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: pubDate.toISOString(),
+  dateModified: modified.toISOString(),
+  mainEntityOfPage: url,
+  url,
+  inLanguage: 'en',
+  ...(tags.length > 0 ? { keywords: tags.join(', ') } : {}),
+  image: new URL('/og.jpg', Astro.site).href,
+  author: { '@type': 'Organization', name: 'Colophon', url: Astro.site?.href },
+  publisher: { '@type': 'Organization', name: 'Colophon', url: Astro.site?.href },
+}
+// A glossary post also describes its terms, read from the post itself so the data matches the page.
+const terms = data.glossary ? glossaryTerms(source) : []
+const termSet = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTermSet',
+  '@id': `${url}#terms`,
+  name: title,
+  url,
+  hasDefinedTerm: terms.map((t) => ({
+    '@type': 'DefinedTerm',
+    '@id': `${url}#${t.id}`,
+    name: t.name,
+    description: t.description,
+    url: `${url}#${t.id}`,
+    inDefinedTermSet: `${url}#terms`,
+  })),
+}
+---
+
+<Document
+  title={`${title} | Colophon`}
+  description={description}
+  type="article"
+  published={pubDate}
+  modified={modified}
+  noindex={noindex ?? draft}
+  jsonLd={terms.length > 0 ? [posting, termSet] : posting}
+  imageAlt={imageAlt}
+  generation={generation}
+>
+  <slot name="bar" slot="bar" />
+  <div style="display: flex; flex-direction: column; align-items: center; overflow: clip;">
+    <Nav />
+    <main class={styles.page}>
+      <article class={styles.column}>
+        <a class={styles.back} href="/blog/">← All posts</a>
+        <header class={styles.postHead}>
+          <span class={styles.stamp}>
+            Published <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time> · Last updated{' '}
+            <time datetime={modified.toISOString()}>{formatDate(modified)}</time>
+            {draft && <Badge tone="draft" dot>Draft</Badge>}
+          </span>
+          <h1 class={styles.postTitle}>{title}</h1>
+          <p class={styles.desc}>{description}</p>
+          <Status line={statusLine} note={data.status} />
+        </header>
+        <div class={styles.prose}>
+          <slot />
+        </div>
+        <footer class={styles.foot}>
+          <a href="/blog/">More posts</a>
+          <a href="https://404human.dev/colophon/">The build log</a>
+          <a href="https://github.com/akira-shirase-oss/colophon-cms">Source on GitHub</a>
+        </footer>
+      </article>
+    </main>
+    <Footer />
+  </div>
+</Document>

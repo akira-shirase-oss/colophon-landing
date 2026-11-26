@@ -1,10 +1,12 @@
 ---
 import ArrowButton from './ui/ArrowButton.astro'
-import { homeCopy } from '../lib/home'
 import { QUICK_START } from '../data/app'
+import type { HomeCopy } from '../lib/schemas'
 import styles from './Hero.module.css'
 
-const copy = await homeCopy()
+// The words are the `home` entry's, handed in by the page (src/layouts/Home.astro).
+type Props = { copy: Pick<HomeCopy, 'hero_headline' | 'hero_description'> }
+const { copy } = Astro.props
 const hero = { headline: copy.hero_headline, description: copy.hero_description }
 
 // Eight Colophon ideas as quiet line icons around the edges (lucide, stroke 1.5), placed outside the clear zone
