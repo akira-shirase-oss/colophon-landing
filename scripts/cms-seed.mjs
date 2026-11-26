@@ -126,15 +126,14 @@ for (const [slug, definition] of Object.entries(types)) {
 
 const created = []
 for (const [collection, documents] of Object.entries(plan)) {
-  // What is already there, by URL name (or, for a single type, at all).
+  // What is already there, by URL name (or, for a single type, at all): the export is every draft's content,
+  // one JSON document a line.
   const have = new Set()
-  let cursor = null
-  for (let pageNo = 0; pageNo < 50; pageNo += 1) {
-    const list = await call('GET', `/collections/${collection}/entries?limit=100${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''}`)
-    if (list.status !== 200) fail(`list ${collection}`, list)
-    for (const entry of list.json.data) have.add(entry.slug ?? entry.content?.slug ?? '*')
-    cursor = list.json.next_cursor ?? null
-    if (!cursor) break
+  const exported = await call('GET', `/collections/${collection}/export`)
+  if (exported.status !== 200) fail(`export ${collection}`, exported)
+  for (const row of exported.text.split('\n').filter(Boolean)) {
+    const content = JSON.parse(row)
+    have.add((content.content ?? content).slug ?? '*')
   }
   for (const document of documents) {
     const name = document.slug ?? '*'
