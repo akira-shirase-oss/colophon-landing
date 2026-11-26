@@ -1,0 +1,150 @@
+---
+// The one layout for every page of the `pages` collection (comparisons, features, use cases, guides and each
+// section's hub), from its words alone: nothing here reads the content store. SeoPage.astro renders it with a
+// published page and a draft preview with a draft (src/pages/preview/pages/[id].astro), so the two can't
+// drift. Built only from what a blog post already uses: Document, Nav, Footer, Status and the classes of
+// Blog.module.css, so it adds no visual element, no stylesheet and no script of its own. The FAQ and the
+// related links come from the page's fields and are drawn as the post prose draws headings, paragraphs and
+// lists. The body arrives as the default slot.
+import Document from './Document.astro'
+import Nav from '../components/Nav.astro'
+import Footer from '../components/Footer.astro'
+import Status from '../components/Status.astro'
+import styles from '../components/Blog.module.css'
+import { formatDate } from '../lib/dates'
+import { pagePath } from '../lib/sections'
+import type { PageData } from '../lib/schemas'
+
+type Props = {
+  /** The page's URL name: /compare/<id>/, or a hub's own section, /<id>/. */
+  id: string
+  data: PageData
+  /** The `site` entry's status line, shown under the title. A preview whose reader can't see it has none. */
+  statusLine?: string
+  imageAlt: string
+  generation: number
+  /** Keep the page out of search results whatever the page says (a draft preview). */
+  noindex?: boolean
+}
+const { id, data, statusLine, imageAlt, generation, noindex } = Astro.props
+const { title, description, pubDate, updatedDate, factsChecked, related, faq, draft } = data
+const site = Astro.site!.href
+// Shown as "Last updated" and sent as dateModified: one value, so the label and the structured data agree.
+const modified = updatedDate ?? pubDate
+// Each kind's section index: the breadcrumb above the page and the back link. A hub goes back to the home page.
+const HUB = {
+  compare: { name: 'Comparisons', href: '/compare/', text: '← All comparisons' },
+  'use-case': { name: 'Use cases', href: '/use-cases/', text: '← All use cases' },
+  feature: { name: 'Features', href: '/features/', text: '← All features' },
+  guide: { name: 'Guides', href: '/guides/', text: '← All guides' },
+} as const satisfies Record<Exclude<PageData['kind'], 'hub'>, { name: string; href: string; text: string }>
+const back = data.kind === 'hub' ? { href: '/', text: '← Colophon home' } : HUB[data.kind]
+const url = new URL(pagePath(data.kind, id), site).href
+const organization = { '@id': `${site}#organization` }
+
+// Structured data, built as objects from the page's fields and serialised by Document through jsonLd().
+const article = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  datePublished: pubDate.toISOString(),
+  dateModified: modified.toISOString(),
+  mainEntityOfPage: url,
+  url,
+  inLanguage: 'en',
+  image: new URL('/og.jpg', site).href,
+  author: { '@type': 'Organization', ...organization, name: 'Colophon CMS', url: site },
+  publisher: { '@type': 'Organization', ...organization, name: 'Colophon CMS', url: site },
+}
+const breadcrumbs = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { name: 'Colophon', item: site },
+    ...(data.kind === 'hub' ? [] : [{ name: HUB[data.kind].name, item: new URL(HUB[data.kind].href, site).href }]),
+    { name: title },
+  ].map((crumb, i) => ({ '@type': 'ListItem', position: i + 1, ...crumb })),
+}
+const faqPage =
+  faq.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faq.map(({ q, a }) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+      }
+    : undefined
+const jsonLd = [article, breadcrumbs, ...(faqPage ? [faqPage] : [])]
+---
+
+<Document
+  title={`${title} | Colophon`}
+  description={description}
+  type="article"
+  published={pubDate}
+  modified={modified}
+  noindex={noindex ?? draft}
+  jsonLd={jsonLd}
+  imageAlt={imageAlt}
+  generation={generation}
+>
+  <slot name="bar" slot="bar" />
+  <div style="display: flex; flex-direction: column; align-items: center; overflow: clip;">
+    <Nav />
+    <main class={styles.page}>
+      <article class={styles.column}>
+        {
+          <a class={styles.back} href={back.href}>
+            {back.text}
+          </a>
+        }
+        <header class={styles.postHead}>
+          <span class={styles.stamp}>
+            Published <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time> · Last updated{' '}
+            <time datetime={modified.toISOString()}>{formatDate(modified)}</time>
+            {
+              factsChecked && (
+                <span>
+                  · Facts checked <time datetime={factsChecked.toISOString()}>{formatDate(factsChecked)}</time>
+                </span>
+              )
+            }
+          </span>
+          <h1 class={styles.postTitle}>{title}</h1>
+          <p class={styles.desc}>{description}</p>
+          {statusLine !== undefined && <Status line={statusLine} note={data.status} />}
+        </header>
+        <div class={styles.prose}>
+          <slot />
+          {
+            faq.length > 0 && (
+              <>
+                <h2 id="faq">FAQ</h2>
+                {faq.map(({ q, a }) => (
+                  <>
+                    <h3>{q}</h3>
+                    <p>{a}</p>
+                  </>
+                ))}
+              </>
+            )
+          }
+          <h2 id="read-next">Read next</h2>
+          <ul>
+            {related.map(({ href, text }) => (
+              <li>
+                <a href={href}>{text}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <footer class={styles.foot}>
+          <a href="/blog/">More posts</a>
+          <a href="https://404human.dev/colophon/">The build log</a>
+          <a href="https://github.com/akira-shirase-oss/colophon-cms">Source on GitHub</a>
+        </footer>
+      </article>
+    </main>
+    <Footer />
+  </div>
+</Document>

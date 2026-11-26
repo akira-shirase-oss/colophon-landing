@@ -32,6 +32,11 @@ const FILES = [
   'src/components/Blog.module.css',
   'src/pages/blog/index.astro',
   'src/pages/blog/[...slug].astro',
+  'src/layouts/Post.astro',
+  'src/layouts/PreviewNotice.astro',
+  'src/components/PreviewBar.astro',
+  'src/components/PreviewBar.module.css',
+  'src/components/PreviewListen.astro',
   'src/pages/404.astro',
 ]
 

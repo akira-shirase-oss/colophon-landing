@@ -1,0 +1,54 @@
+---
+// GET /preview/site/<entry id>: the draft of the site settings. Their one visible word is the status line
+// under every post's title, so the preview is a post page (src/layouts/Post.astro) with that line in its
+// place and a body that says what the other fields are: a sample, labelled as one, not a real post.
+import PreviewBar from '../../../components/PreviewBar.astro'
+import PostLayout from '../../../layouts/Post.astro'
+import PreviewNotice from '../../../layouts/PreviewNotice.astro'
+import { siteDraft, UNBUILDABLE } from '../../../lib/preview/draft.ts'
+import { answerWith, here } from '../../../lib/preview/here.ts'
+import { open } from '../../../lib/preview/routes.ts'
+import { formatDate } from '../../../lib/dates.ts'
+
+export const prerender = false
+
+const answer = await open(here(Astro.locals), Astro.request, 'site', Astro.params.id)
+const draft = answer.kind === 'draft' ? siteDraft(answer.entry) : null
+answerWith(Astro.response, draft && !draft.ok ? { ...answer, status: UNBUILDABLE.status } : answer)
+const sample = draft?.ok
+  ? {
+      title: 'Site settings: the status line',
+      description: 'A sample post. The line marked Status below is the one this draft would put under the title of every post and page on the site.',
+      pubDate: draft.value.status_checked,
+      tags: [],
+      draft: false,
+      glossary: false,
+    }
+  : null
+---
+
+{
+  answer.kind === 'notice' ? (
+    <PreviewNotice notice={answer.notice} handshake={answer.studioOrigin ? { studioOrigin: answer.studioOrigin, previewing: false } : undefined} />
+  ) : draft && !draft.ok ? (
+    <PreviewNotice notice={UNBUILDABLE} problems={draft.problems} handshake={{ studioOrigin: answer.studioOrigin, previewing: true }} />
+  ) : (
+    draft &&
+    sample && (
+      <PostLayout id="sample" data={sample} source="" statusLine={draft.value.status_line} imageAlt="Colophon" generation={0} noindex>
+        <PreviewBar slot="bar" source={answer.entry.preview.source} exitTo="/blog/" studioOrigin={answer.studioOrigin} />
+        <p>
+          This page is a sample, not a post. It shows the site settings as a reader would meet them: the status line, under the title above, on every post and page.
+        </p>
+        <ul>
+          <li><strong>Status line</strong>: {draft.value.status_line}</li>
+          <li><strong>Version it speaks of</strong>: {draft.value.version}</li>
+          <li><strong>Checked on</strong>: {formatDate(draft.value.status_checked)} (shown above as this sample's date)</li>
+          <li><strong>Blog index: page title</strong>: {draft.value.blog_title ?? 'not set: the site keeps its own words'}</li>
+          <li><strong>Blog index: page description</strong>: {draft.value.blog_description ?? 'not set: the site keeps its own words'}</li>
+          <li><strong>Name</strong>: {draft.value.name} (the entry's name in the Studio; the site doesn't show it)</li>
+        </ul>
+      </PostLayout>
+    )
+  )
+}

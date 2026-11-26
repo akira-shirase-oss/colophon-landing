@@ -1,0 +1,27 @@
+/* The preview strip: the page's own ground with a hairline under it, the kit's badge and small button. In the
+   normal flow above the header, so nothing is covered and nothing follows the scroll. */
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  width: 100%;
+  padding: 8px var(--content-pad);
+  border-bottom: 1px solid var(--border);
+  background: var(--muted);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 20px;
+}
+.says {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0;
+}
+.text {
+  color: var(--muted-foreground);
+}

@@ -3,18 +3,14 @@ import { glob } from 'astro/loaders'
 import type { Loader } from 'astro/loaders'
 import { z } from 'astro/zod'
 import { entries, fromColophon, release, type Entry } from './lib/colophon'
-import { BENEFIT_ICONS, BENEFIT_TONES, STATEMENT_ICONS, home as homeDefaults, site as siteDefaults } from './data/home'
+import { home as homeDefaults, site as siteDefaults } from './data/home'
+import { homeSchema, pageFields, pageSchema, postFields, postSchema, siteSchema } from './lib/schemas'
 
 // Where the content comes from. With COLOPHON_PROJECT set, posts and pages are entries of that Colophon project,
 // read from its public delivery API at one release; an entry's fields are the frontmatter below and its
 // `body` field is the Markdown. Without it, the Markdown files in src/content are read, as before. Either
-// way the same schema checks every entry, so a title that is too long fails the build instead of going live.
-
-/** Colophon stores no empty values: a field left blank is absent (or null), which the schema reads as unset. */
-const set = (content: Record<string, unknown>, field: string) => {
-  const value = content[field]
-  return value === null || value === '' ? undefined : value
-}
+// way the same schema checks every entry (src/lib/schemas.ts, which a draft preview uses too), so a title that
+// is too long fails the build instead of going live.
 
 /** A collection of the Colophon project as an Astro collection: `fields` maps an entry to its frontmatter. */
 function colophon(collection: string, fields: (content: Record<string, unknown>) => Record<string, unknown>): Loader {
@@ -33,46 +29,10 @@ function colophon(collection: string, fields: (content: Record<string, unknown>)
   }
 }
 
-const postFields = (c: Record<string, unknown>) => ({
-  title: c.title,
-  description: c.description,
-  pubDate: c.pub_date,
-  updatedDate: set(c, 'updated_date'),
-  tags: set(c, 'tags') ?? [],
-  glossary: c.glossary === true,
-  status: set(c, 'status'),
-})
-
-const pageFields = (c: Record<string, unknown>) => ({
-  kind: c.kind,
-  title: c.title,
-  description: c.description,
-  targetQuery: c.target_query,
-  pubDate: c.pub_date,
-  updatedDate: set(c, 'updated_date'),
-  factsChecked: set(c, 'facts_checked'),
-  related: set(c, 'related') ?? [],
-  faq: set(c, 'faq') ?? [],
-  status: set(c, 'status'),
-})
-
 // Blog posts: Markdown in src/content/blog. A post with `draft: true` shows in `astro dev` only.
 const blog = defineCollection({
   loader: fromColophon ? colophon('posts', postFields) : glob({ pattern: '**/*.md', base: './src/content/blog' }),
-  schema: z.object({
-    // At most 49 characters: the layout adds " | Colophon", and the whole title stays within 60.
-    title: z.string().max(49),
-    // 120 to 155 characters: long enough to say what the post teaches, short enough not to be cut in results.
-    description: z.string().min(120).max(155),
-    pubDate: z.coerce.date(),
-    updatedDate: z.coerce.date().optional(),
-    tags: z.array(z.string()).default([]),
-    draft: z.boolean().default(false),
-    // A glossary post: its <h3 id> terms also become DefinedTermSet structured data.
-    glossary: z.boolean().default(false),
-    // One sentence on what is still missing for this post's topic, shown after the shared status line.
-    status: z.string().optional(),
-  }),
+  schema: postSchema,
 })
 
 // Pages written for one search intent (comparisons, features, use cases, framework guides, hubs): Markdown in
@@ -81,23 +41,7 @@ const blog = defineCollection({
 // the FAQPage data can't drift apart.
 const pages = defineCollection({
   loader: fromColophon ? colophon('pages', pageFields) : glob({ pattern: '**/*.md', base: './src/content/pages' }),
-  schema: z.object({
-    /** Decides the address: compare → /compare/<id>/; use-case → /use-cases/<id>/; feature → /features/<id>/; guide → /guides/<id>/; hub → /<id>/ (the index of a section, such as /compare/). */
-    kind: z.enum(['compare', 'use-case', 'feature', 'guide', 'hub']),
-    title: z.string().max(49),
-    description: z.string().min(120).max(155),
-    /** The search the page answers. Recorded, not rendered: the plan and Search Console are read against it. */
-    targetQuery: z.string().min(3),
-    pubDate: z.coerce.date(),
-    updatedDate: z.coerce.date().optional(),
-    /** Comparisons: the day every competitor fact on the page was checked against the vendor's own pages. */
-    factsChecked: z.coerce.date().optional(),
-    /** At least three pages to read next, on this site or the docs; rendered at the end. */
-    related: z.array(z.object({ href: z.string(), text: z.string() })).min(3),
-    faq: z.array(z.object({ q: z.string().min(5), a: z.string().min(20) })).default([]),
-    draft: z.boolean().default(false),
-    status: z.string().optional(),
-  }),
+  schema: pageSchema,
 })
 
 /**
@@ -122,43 +66,9 @@ function single(collection: string, local: Record<string, unknown>): Loader {
   }
 }
 
-const line = z.string().min(1)
-
-// The home page's words (src/data/home.ts says what each is). Limits here match the fields of the Colophon
-// `home` type, so the Studio refuses what the page can't hold before the build would.
-const home = defineCollection({
-  loader: single('home', homeDefaults),
-  schema: z.object({
-    seo_title: line.max(60),
-    seo_description: z.string().min(120).max(155),
-    hero_headline: line.max(60),
-    hero_description: line.max(300),
-    benefits: z
-      .array(z.object({ title: line.max(40), line_one: line.max(120), line_two: line.max(120), tag: line.max(30), tone: z.enum(BENEFIT_TONES), icon: z.enum(BENEFIT_ICONS) }))
-      .min(1)
-      .max(9),
-    faq: z.array(z.object({ q: z.string().min(5).max(200), a: z.string().min(20).max(600) })).min(1).max(12),
-    statement_heading: line.max(60),
-    statement: z.array(z.object({ lead: line.max(120), word: line.max(30), icon: z.enum(STATEMENT_ICONS), after: z.string().max(3).nullish() })).min(1).max(8),
-    statement_link_text: line.max(60),
-    statement_link_href: z.string().url(),
-  }),
-})
-
-// The status line under every post's title.
-const site = defineCollection({
-  loader: single('site', siteDefaults),
-  schema: z.object({
-    name: line,
-    version: line.max(40),
-    status_checked: z.coerce.date(),
-    status_line: line.max(300),
-    // The blog index's title and description. Unset (an entry published before the fields existed) falls back to
-    // the words in src/data/home.ts.
-    blog_title: line.max(60).nullish(),
-    blog_description: z.string().min(120).max(155).nullish(),
-  }),
-})
+// The home page's words (src/data/home.ts says what each is) and the status line under every post's title.
+const home = defineCollection({ loader: single('home', homeDefaults), schema: homeSchema })
+const site = defineCollection({ loader: single('site', siteDefaults), schema: siteSchema })
 
 // The release this build was made from: one entry, `current`. Base.astro prints it in every page's head as
 // <meta name="colophon-generation">, which is what a Colophon site check looks for on the live site. 0 when the

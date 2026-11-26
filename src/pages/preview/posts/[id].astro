@@ -1,0 +1,40 @@
+---
+// GET /preview/posts/<entry id>: the draft of a blog post in the layout /blog/<slug>/ uses
+// (src/layouts/Post.astro). Without a preview session it says the preview has ended, and nothing else.
+import PreviewBar from '../../../components/PreviewBar.astro'
+import PostLayout from '../../../layouts/Post.astro'
+import PreviewNotice from '../../../layouts/PreviewNotice.astro'
+import { postDraft, siteDraft, UNBUILDABLE } from '../../../lib/preview/draft.ts'
+import { answerWith, here } from '../../../lib/preview/here.ts'
+import { open } from '../../../lib/preview/routes.ts'
+
+export const prerender = false
+
+const answer = await open(here(Astro.locals), Astro.request, 'posts', Astro.params.id)
+const draft = answer.kind === 'draft' ? postDraft(answer.entry) : null
+answerWith(Astro.response, draft && !draft.ok ? { ...answer, status: UNBUILDABLE.status } : answer)
+const settings = answer.kind === 'draft' && answer.settings ? siteDraft(answer.settings) : null
+---
+
+{
+  answer.kind === 'notice' ? (
+    <PreviewNotice notice={answer.notice} handshake={answer.studioOrigin ? { studioOrigin: answer.studioOrigin, previewing: false } : undefined} />
+  ) : draft && !draft.ok ? (
+    <PreviewNotice notice={UNBUILDABLE} problems={draft.problems} handshake={{ studioOrigin: answer.studioOrigin, previewing: true }} />
+  ) : (
+    draft && (
+      <PostLayout
+        id={draft.value.id}
+        data={draft.value.data}
+        source={draft.value.body}
+        statusLine={settings?.ok ? settings.value.status_line : undefined}
+        imageAlt="Colophon"
+        generation={0}
+        noindex
+      >
+        <PreviewBar slot="bar" source={answer.entry.preview.source} exitTo={`/blog/${draft.value.id}/`} studioOrigin={answer.studioOrigin} />
+        <Fragment set:html={draft.value.html} />
+      </PostLayout>
+    )
+  )
+}

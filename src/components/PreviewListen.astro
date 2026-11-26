@@ -1,0 +1,11 @@
+---
+// The Studio handshake on a page at a preview address (src/lib/preview/listen.ts): tells the framing Studio the
+// page is ready and whether it holds a preview session, and reloads after each saved draft. The script's text
+// is the same on every page, so the preview routes' policy allows it by hash; what varies is on the element.
+import { LISTEN_SCRIPT } from '../lib/preview/listen.ts'
+
+type Props = { studioOrigin: string; previewing: boolean }
+const { studioOrigin, previewing } = Astro.props
+---
+
+<script is:inline data-studio-origin={studioOrigin} data-previewing={String(previewing)} set:html={LISTEN_SCRIPT} />

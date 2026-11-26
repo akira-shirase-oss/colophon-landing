@@ -1,13 +1,13 @@
 ---
-// The shared status line under every post's title, fed from the `site` entry (src/lib/home.ts). A post may add one
-// sentence of its own (frontmatter `status`) saying what is still missing for its topic.
-import { siteCopy } from '../lib/home'
+// The shared status line under every post's title: `line` is the `site` entry's (the page that renders the post
+// reads it, src/lib/home.ts). A post may add one sentence of its own (frontmatter `status`) saying what is still
+// missing for its topic.
 import styles from './Blog.module.css'
 
-type Props = { note?: string }
-const { note } = Astro.props
+type Props = { line: string; note?: string }
+const { line, note } = Astro.props
 const status = {
-  line: (await siteCopy()).status_line,
+  line,
   /** Where a reader goes for what's done and what broke. */
   done: { href: 'https://github.com/akira-shirase-oss/colophon-cms/blob/main/docs/ROADMAP.md', text: 'what’s built' },
   log: { href: 'https://404human.dev/colophon/', text: 'the build log' },

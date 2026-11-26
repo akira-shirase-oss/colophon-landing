@@ -1,0 +1,92 @@
+---
+// The home page, from its words alone: nothing here reads the content store. / renders it with the published
+// `home` entry (src/pages/index.astro) and a draft preview with a draft (src/pages/preview/home/[id].astro),
+// so the two can't drift.
+import Document from './Document.astro'
+import Nav from '../components/Nav.astro'
+import Hero from '../components/Hero.astro'
+import Benefits from '../components/Benefits.astro'
+import FAQ from '../components/FAQ.astro'
+import Integrations from '../components/Integrations.astro'
+import CTA from '../components/CTA.astro'
+import Footer from '../components/Footer.astro'
+import type { HomeCopy } from '../lib/schemas'
+
+type Props = {
+  copy: HomeCopy
+  generation: number
+  /** Keep the page out of search results (a draft preview). */
+  noindex?: boolean
+}
+const { copy, generation, noindex } = Astro.props
+
+// What people search for comes first in the title (the brand last, as on every other page); the
+// visible headline stays the hero's. Every claim in the description is built and tested.
+const { seo_title: title, seo_description: description } = copy
+const site = Astro.site!.href
+const REPO = 'https://github.com/akira-shirase-oss/colophon-cms'
+// The project (never a person) is the organisation; the docs refer to it by this @id.
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': `${site}#organization`,
+  name: 'Colophon CMS',
+  url: site,
+  logo: new URL('/favicon.svg', site).href,
+  sameAs: [REPO, 'https://x.com/404humandev'],
+}
+// The software itself. No rating or review: it has none, and none is invented (so Google shows no
+// rich result for it; the data still ties the name to what it is). No version while the first
+// release is unpublished.
+const software = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Colophon CMS',
+  url: site,
+  description,
+  applicationCategory: 'DeveloperApplication',
+  applicationSubCategory: 'Headless content management system',
+  operatingSystem: 'Linux, macOS',
+  license: 'https://opensource.org/license/mit',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
+  sameAs: [REPO],
+  publisher: { '@id': organization['@id'] },
+}
+---
+
+<Document
+  title={title}
+  description={description}
+  noindex={noindex}
+  imageAlt={`Colophon: ${copy.hero_headline}`}
+  generation={generation}
+  jsonLd={[
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      '@id': `${site}#website`,
+      name: 'Colophon',
+      url: site,
+      description,
+      publisher: { '@id': organization['@id'] },
+    },
+    organization,
+    software,
+  ]}
+>
+    <slot name="bar" slot="bar" />
+    <div id="root">
+      <div style="display: flex; flex-direction: column; align-items: center; overflow: clip;">
+        <Nav />
+        <main style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 1px; gap: var(--section-gap); padding-bottom: var(--section-gap);">
+          <Hero copy={copy} />
+          <Integrations />
+          <Benefits copy={copy} />
+          <FAQ copy={copy} />
+          <CTA copy={copy} />
+        </main>
+        <Footer />
+      </div>
+    </div>
+</Document>
