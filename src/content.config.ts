@@ -148,7 +148,16 @@ const home = defineCollection({
 // The status line under every post's title.
 const site = defineCollection({
   loader: single('site', siteDefaults),
-  schema: z.object({ name: line, version: line.max(40), status_checked: z.coerce.date(), status_line: line.max(300) }),
+  schema: z.object({
+    name: line,
+    version: line.max(40),
+    status_checked: z.coerce.date(),
+    status_line: line.max(300),
+    // The blog index's title and description. Unset (an entry published before the fields existed) falls back to
+    // the words in src/data/home.ts.
+    blog_title: line.max(60).nullish(),
+    blog_description: z.string().min(120).max(155).nullish(),
+  }),
 })
 
 // The release this build was made from: one entry, `current`. Base.astro prints it in every page's head as

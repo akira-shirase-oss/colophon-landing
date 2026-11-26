@@ -1,4 +1,5 @@
-import { homeCopy } from './home'
+import { site as siteDefaults } from '../data/home'
+import { homeCopy, siteCopy } from './home'
 import { posts } from './posts'
 import { pathOf, seoPages } from './pages'
 
@@ -21,12 +22,15 @@ export async function homePage() {
   const copy = await homeCopy()
   return { path: '/', title: copy.seo_title, description: copy.seo_description } as const
 }
-export const BLOG = {
-  path: '/blog/',
-  title: 'Colophon blog: publishing, releases and proof',
-  description:
-    'How Colophon proves what it published: releases, receipts, reviewed rollbacks and safe automation, explained from the code that does it.',
-} as const
+/** The blog index's title and description: the `site` entry's, or the seeded words while it has none. */
+export async function blogPage() {
+  const copy = await siteCopy()
+  return {
+    path: '/blog/',
+    title: copy.blog_title ?? siteDefaults.blog_title,
+    description: copy.blog_description ?? siteDefaults.blog_description,
+  } as const
+}
 export const COMMUNITY = {
   path: '/community/',
   title: 'Community, support and security | Colophon',
@@ -46,7 +50,7 @@ export async function listedPages(): Promise<ListedPage[]> {
   const newest = list.map((p) => changed(p.data)).reduce<Date | undefined>((a, d) => (a && a >= d ? a : d), undefined)
   return [
     { ...(await homePage()), section: 'Start here' },
-    { ...BLOG, section: 'Blog', lastmod: newest },
+    { ...(await blogPage()), section: 'Blog', lastmod: newest },
     ...pages.map((p) => ({
       path: pathOf(p),
       title: p.data.title,
