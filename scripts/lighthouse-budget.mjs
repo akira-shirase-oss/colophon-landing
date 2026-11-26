@@ -14,7 +14,7 @@ import { createServer } from 'node:http'
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { extname, join, normalize, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { LIGHTHOUSE as THRESHOLDS, PAGE_DEADLINE_MS, SECTIONS } from './budget-config.mjs'
+import { LIGHTHOUSE as THRESHOLDS, PAGE_DEADLINE_MS, SECTIONS, tbtLimit } from './budget-config.mjs'
 
 const arg = (name, fallback) => (process.argv.includes(`--${name}`) ? process.argv[process.argv.indexOf(`--${name}`) + 1] : fallback)
 const root = fileURLToPath(new URL('..', import.meta.url))
@@ -113,10 +113,13 @@ for (const path of targets) {
   if (samples.length === 0) continue
   const m = Object.fromEntries(['performance', 'seo', 'accessibility', 'lcpMs', 'cls', 'tbtMs', 'ownScriptMs'].map((k) => [k, median(samples.map((s) => s[k]))]))
   rows.push({ path, ...m })
+  // Held to the budget for the runner this page was measured on (budget-config.mjs, tbtLimit).
+  const benchmark = median(samples.map((s) => s.benchmarkIndex))
+  const tbtMost = tbtLimit(benchmark)
   const misses = [
     m.lcpMs > THRESHOLDS.lcpMs && `LCP ${Math.round(m.lcpMs)} ms > ${THRESHOLDS.lcpMs}`,
     m.cls > THRESHOLDS.cls && `CLS ${m.cls.toFixed(3)} > 0`,
-    m.tbtMs > THRESHOLDS.tbtMs && `TBT ${Math.round(m.tbtMs)} ms > ${THRESHOLDS.tbtMs}`,
+    m.tbtMs > tbtMost && `TBT ${Math.round(m.tbtMs)} ms > ${tbtMost} (the budget of ${THRESHOLDS.tbtMs} at a runner benchmark of ${Math.round(benchmark)})`,
     m.ownScriptMs > THRESHOLDS.ownScriptMs && `the page's own script work ${Math.round(m.ownScriptMs)} ms > ${THRESHOLDS.ownScriptMs}`,
     m.performance < THRESHOLDS.performance && `Performance ${m.performance} < ${THRESHOLDS.performance}`,
     m.seo < THRESHOLDS.seo && `SEO ${m.seo} < 100 (failing: ${[...new Set(samples.flatMap((s) => s.failed))].join(', ')})`,

@@ -45,3 +45,8 @@ test('the key is the one public/<32 hex>.txt that holds its own name', () => {
 test('the committed key file is valid', () => {
   assert.match(keyOf(), /^[0-9a-f]{32}$/)
 })
+
+test('a list file gives only this site\'s addresses, each once', async () => {
+  const { urlsOf, SITE } = await import('./indexnow.mjs')
+  assert.deepEqual(urlsOf(`${SITE}/blog/a/\n\n  ${SITE}/blog/a/  \nhttps://elsewhere.example/x\n${SITE}.evil.example/\n${SITE}/\n`), [`${SITE}/`, `${SITE}/blog/a/`])
+})

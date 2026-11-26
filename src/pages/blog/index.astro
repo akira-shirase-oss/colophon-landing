@@ -5,10 +5,10 @@ import Footer from '../../components/Footer.astro'
 import Badge from '../../components/ui/Badge.astro'
 import styles from '../../components/Blog.module.css'
 import { posts, formatDate } from '../../lib/posts'
-import { BLOG } from '../../lib/site-map'
+import { blogPage } from '../../lib/site-map'
 
 const list = await posts()
-const { title, description } = BLOG
+const { title, description } = await blogPage()
 ---
 
 <Base

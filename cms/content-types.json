@@ -446,6 +446,21 @@
         "type": "date",
         "required": true,
         "description": "The day the status line was last checked against Colophon's main branch."
+      },
+      {
+        "id": "blog_title",
+        "label": "Blog index: page title",
+        "type": "text",
+        "max_chars": 60,
+        "description": "The browser tab and search result title of /blog/."
+      },
+      {
+        "id": "blog_description",
+        "label": "Blog index: page description",
+        "type": "text",
+        "min_chars": 120,
+        "max_chars": 155,
+        "description": "120 to 155 characters. Shown in search results for /blog/."
       }
     ]
   }
