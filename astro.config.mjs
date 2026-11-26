@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config'
+import pages from './adapter/pages.mjs'
 
 // The one place the public address lives: canonical URLs, the sitemap, RSS and share images all derive from it.
 const site = 'https://colophon.404human.dev'
@@ -22,10 +23,13 @@ const aaOnSurface = {
 }
 
 // Static output: every page is plain HTML at build time, so search engines read it without running JavaScript.
-// The few interactive pieces are small vanilla scripts.
+// The few interactive pieces are small vanilla scripts. The adapter (adapter/pages.mjs) adds the draft-preview
+// routes as a Cloudflare Pages Function and leaves every built page where and as it was; a route outside these
+// prefixes that opts out of prerendering fails the build.
 export default defineConfig({
   site,
   output: 'static',
+  adapter: pages({ onDemand: ['/api/preview', '/preview'] }),
   trailingSlash: 'ignore',
   // Code is coloured through CSS variables (--shiki-light, --shiki-dark) instead of fixed colours, so its
   // tokens are drawn for the background they sit on. `npm run check` measures every token against the code
