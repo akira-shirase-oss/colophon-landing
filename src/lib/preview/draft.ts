@@ -50,6 +50,8 @@ const LABELS: Record<string, string> = {
   version: 'Version it speaks of',
   status_checked: 'Checked on',
   status_line: 'Status line',
+  blog_title: 'Blog index: page title',
+  blog_description: 'Blog index: page description',
 }
 
 /** `faq.2.a` as "Questions and answers, item 3, a". */

@@ -44,6 +44,8 @@ const sample = draft?.ok
           <li><strong>Status line</strong>: {draft.value.status_line}</li>
           <li><strong>Version it speaks of</strong>: {draft.value.version}</li>
           <li><strong>Checked on</strong>: {formatDate(draft.value.status_checked)} (shown above as this sample's date)</li>
+          <li><strong>Blog index: page title</strong>: {draft.value.blog_title ?? 'not set: the site keeps its own words'}</li>
+          <li><strong>Blog index: page description</strong>: {draft.value.blog_description ?? 'not set: the site keeps its own words'}</li>
           <li><strong>Name</strong>: {draft.value.name} (the entry's name in the Studio; the site doesn't show it)</li>
         </ul>
       </PostLayout>
