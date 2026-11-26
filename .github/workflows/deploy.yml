@@ -1,0 +1,85 @@
+name: deploy
+
+# The site is built from its Colophon project and uploaded to Cloudflare Pages:
+# - on every push to main (a change to the site itself);
+# - every five minutes, only when the project has a release the live site wasn't built from (someone published
+#   in the Studio): scripts/deploy-needed.mjs compares the live page's release marker with the project's;
+# - by hand (Run workflow), whatever the releases say.
+# The build runs the same checks CI runs; a failing check uploads nothing, so the live site stays on the last
+# good release. Needs the repository secrets CLOUDFLARE_API_TOKEN (Pages: Edit) and CLOUDFLARE_ACCOUNT_ID;
+# without them the job says so and uploads nothing.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: build from Colophon and upload
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PUBLIC_APP_URL: https://colophonapp.404human.dev
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Is the live site behind the project?
+        id: behind
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" != "schedule" ]; then
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+            echo "a $EVENT always deploys"
+          else
+            node scripts/deploy-needed.mjs >> "$GITHUB_OUTPUT"
+          fi
+      - name: The upload credentials are set
+        id: credentials
+        if: steps.behind.outputs.needed == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::warning::CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID is not set: nothing is uploaded"
+            echo "set=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "set=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install exactly what package-lock.json pins
+        if: steps.credentials.outputs.set == 'true'
+        run: npm ci
+      - name: Build from the project's newest release
+        if: steps.credentials.outputs.set == 'true'
+        run: npm run build
+      - name: Dist checks (headers and CSP, leaks, drafts, links, SEO, JSON-LD)
+        if: steps.credentials.outputs.set == 'true'
+        env:
+          LEAK_SCAN_NAMES: ${{ secrets.LEAK_SCAN_NAMES }}
+        run: npm run check
+      # wrangler isn't a dependency of the site (nothing ships it); one pinned version, as CI does for Playwright.
+      - name: Upload to Cloudflare Pages
+        if: steps.credentials.outputs.set == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock wrangler@4.159.0
+          npx wrangler pages deploy dist --project-name colophon-landing --branch main

@@ -152,9 +152,14 @@ from the public delivery API (no credential) and prints plain HTML, as before.
   `src/data/home.ts` are the copy the project was seeded from on 26 November 2026: nothing reads them unless a
   build sets `COLOPHON_PROJECT=` (empty), which builds from them and prints no marker. Edit the site in the
   Studio, not there.
-- A deploy is a build, the checks and an upload, with the app's address so the header links to it:
+- **Deploys** are `.github/workflows/deploy.yml`: on every push to `main`, and every five minutes when the
+  project has a release the live site wasn't built from (`scripts/deploy-needed.mjs` compares the live page's
+  marker with the project's newest release), so publishing in the Studio reaches the site without anyone
+  running a command. It builds with the app's address, runs `npm run check`, and uploads `dist/` to the Pages
+  project; a failing check uploads nothing. It needs the repository secrets `CLOUDFLARE_API_TOKEN` (Pages:
+  Edit) and `CLOUDFLARE_ACCOUNT_ID`. By hand, the same thing is
   `PUBLIC_APP_URL=https://colophonapp.404human.dev npm run build`, `npm run check` with the same variable,
-  then `wrangler pages deploy dist`. Publishing in the Studio doesn't rebuild the site by itself yet.
+  then `wrangler pages deploy dist --project-name colophon-landing --branch main`.
 
 ## Security headers and checks
 
